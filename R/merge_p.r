@@ -1,18 +1,20 @@
 # Merge a list or matrix of p-values
 # INPUT:
-# scores:   Either a vector of p-values, or a numerical matrix where each column is a test   
+# scores:   Either a vector of p-values, or a numerical matrix where each column is a test
 # method:   method to merge p-values. See metap documentation for more infor on methods
 # RETURNS:
 # If scores is a list, returns a number
 # If scores is a matrix, returns a named list of p-values merged by row
 merge_p_values <- function(scores, method=c("Fisher", "Brown", "logtip", "meanp", "sump", "sumz", "sumlog")) {
-    
-    suppressPackageStartupMessages(metap)
+    if (ncol(scores) == 1) return (scores[, 1])
+
     method <- match.arg(method)
+    if(method == "Fisher") method <- "sumlog"
+    func <- get(method)
 
     if (is.list(scores)) {
         if (method == "Brown") stop("Brown's method cannot be used with a single list of p-values")
-        return (match.fun(method)(scores)$p)
+        return (func(scores)$p)
     }
 
     if (method == "Brown") {
@@ -20,7 +22,7 @@ merge_p_values <- function(scores, method=c("Fisher", "Brown", "logtip", "meanp"
         apply(scores, 1, empiricalBrownsMethod, corr.matrix=corr.matrix)
     }
 
-    apply(scores, 1, match.fun(method)(scores)$p)
+    apply(scores, 1, function(x) func(x)$p)
 }
 
 
@@ -52,7 +54,7 @@ brownsMethod <- function(data.matrix, p.values, cov.matrix=NULL) {
         df <- 2 * N
         sf <- 1
     }
-    
+
     x <- 2 * sum(-log(p.values), na.rm=TRUE)
     p.brown <- pchisq(df=df, q=x/sf, lower.tail=FALSE)
     p.brown

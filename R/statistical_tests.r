@@ -1,36 +1,65 @@
-# Hypergeometric / Fisher's exact test
-# INPUT:
-# genelist:       vector of gene names being tested for enrichment
-# background:     vector of all gene names
-# annotations;    vector of gene names annotated to the term being tested
-# RETURN:
-# p.val:  a number in [0,1]
-hypergeometric <- function(genelist, background, annotations) {
+#' Hypergeometric Test
+#'
+#' Perform a Hypergeometric, aka Fisher's exact test, on a list of significant
+#'   genes and annotation genes
+#'
+#' @param complement character vector of gene names. All other genes not being
+#'   tested for enrichment. Ie \code{setdiff(background, genelist)}
+#' 
+# genelist and annotations
+#' @inheritParams orderedHypergeometric
+#'
+#' @return a p-value
+hypergeometric <- function(genelist, complement, annotations) {
     genelist1 <- length(which(genelist %in% annotations))
     genelist0 <- length(genelist) - genelist1
-    background1 <- length(which(background %in% annotations))
-    background0 <- length(background) - background1
-    counts <- matrix(data=c(genelist1, genelist0, background1, background0), nrow=2, ncol=2)
+    complement1 <- length(which(complement %in% annotations))
+    complement0 <- length(complement) - complement1
+    counts <- matrix(data=c(genelist1, genelist0, complement1, complement0), nrow=2, ncol=2)
     fisher.test(counts, alternative='greater')
 }
 
-# Ordered Hypergeometric / Fisher's exact test
-# The hypergeometric test is run with increasingly large numbers of genes
-#   starting from the top of genelist and the lowerst pvalue is returned
-# INPUT:
-# genelist:     vector of gene names being tested for enrichment
-# background:   vector of all gene names
-# annotations:  vector of gene names annotated to the term being tested
-# RETURN:
-# a list with the items:
-#   p.val:    a number in [0,1]
-#   index:    index of gene list such that genelist[1:index] gives the lowest p value
+#' Ordered Hypergeometric Test
+#'
+#' Perform a Hypergeometric, aka Fisher's Exact test, on a list of genes
+#'   ordered by significance against a list of annotation genes
+#'
+#' The hypergeometric test is run with increasingly large numbers of genes
+#'   starting from the top, and the lowest p-value is returned
+#' 
+#' @param genelist character vector of gene names. List of differentially 
+#'   expressed genes being tested for enrichment
+#' @param background character vector of gene names. List of all genes being used
+#'   as a statistical background
+#' @param annotations character vector of gene names. List of genes annotated
+#'   to the term being tested.
+#'
+#' @return a list with the items:
+#'   \describe {
+#'     \item{p.val}{the lowest obtained p-value}
+#'     \item{ind}{the index of \code{genelist} such that 
+#'       \code{genelist[1:index]} gives the lowest p-value}
+#'   }
 orderedHypergeometric <- function(genelist, background, annotations) {
-    f <- function(ind) {
-        if (genelist[ind] %in% pathway_genes) return(1)
-        hypergeometric(genelist, background, annotations)$p.val
+    # remove genes in genelist from background to form a list of all other genes
+    # genes in genelist that are not being tested in each call will be added back
+    complement <- setdiff(background, genelist)
+    
+    # Test only when a gene is in annotation since that's the only case that 
+    # could reduce the p-value
+    which.in <- which(genelist %in% annotations)
+
+    if (length(which.in) == 0) return(list(p.val=1, ind=1))
+
+    # Test first i genes in genelist. The rest of genelist has to be added to
+    # complement
+    f <- function(i) {
+        hypergeometric(genelist[1:i], 
+                       c(genelist[i + 1:length(genelist)], complement), 
+                       annotations)
     }
-    scores <- sapply(1:length(genelist), f)
+    scores <- sapply(which.in, function(i) f(i)$p.val)
+    
     min.score <- min(scores)
-    lsit(p.val=min.score, ind=max(which(scores==min_score)))
+    list(p.val=min.score, ind=which.in[max(which(scores==min.score))])
 }

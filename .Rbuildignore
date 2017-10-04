@@ -1,2 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^self_testing$
+^\.Rhistory$
+^\.gitignore$
+^Notes$

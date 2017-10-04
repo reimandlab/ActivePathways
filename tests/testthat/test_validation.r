@@ -1,0 +1,35 @@
+context("Validation on parameters")
+
+# Prepare testing data
+library(mpea)
+gmt <- read.GMT('test.gmt')
+dat <- read.table('test.dat')
+rownames(dat) <- dat$Gene
+dat <- as.matrix(dat[, -1])
+dat[is.na(dat)] <- 1
+
+file.names <- paste(c('terms', 'groups', 'smallgmt'), '.txt', sep="")
+
+test_that("cytoscape.filenames specified", {
+    expect_error(mpea(dat, gmt, contribution=TRUE, cytoscape.filenames=file.names[1]), 
+                 "Must supply 3 file names to cytoscape.filenames", fixed=TRUE)
+    expect_error(mpea(dat, gmt, contribution=FALSE, cytoscape.filenames=file.names[1]),
+                 "Must supply 2 file names to cytoscape.filenames", fixed=TRUE)
+    expect_error(mpea(dat, gmt, contribution=FALSE, significant=1, cytoscape.filenames=file.names[c(1,3)]), NA)
+    expect_warning(mpea(dat, gmt, contribution=FALSE, significant=1, cytoscape.filenames=file.names),
+                   "Column contributions will not be evaluated so the contribution matrix is not being written. cytoscape.filenames[2] will be ignored", fixed=TRUE)
+})
+
+test_that("significant is valid", {
+    expect_error(mpea(dat, gmt, significant=-0.1), "significant must be a value in [0,1]", fixed=TRUE)
+    expect_error(mpea(dat, gmt, significant = 1.1), "significant must be a value in [0,1]", fixed=TRUE)
+    expect_error(suppressWarnings(mpea(dat, gmt, significant=0, return.all=TRUE)), NA)
+    expect_error(suppressWarnings(mpea(dat, gmt, significant=1, return.all=TRUE)), NA)
+})
+
+test_that("cutoff is valid", {
+    expect_error(mpea(dat, gmt, cutoff=-0.1), "cutoff must be a value in [0,1]", fixed=TRUE)
+    expect_error(mpea(dat, gmt, cutoff = 1.1), "cutoff must be a value in [0,1]", fixed=TRUE)
+    expect_error(mpea(dat, gmt, cutoff=0, return.all=TRUE), "No genes made the cutoff", fixed=TRUE)
+    expect_error(suppressWarnings(mpea(dat, gmt, cutoff=1, return.all=TRUE)), NA)
+})

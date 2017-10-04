@@ -2,7 +2,7 @@
 #'
 #' Returns a gmt object read in from a file
 #'
-#' @param filename a character vector containing the location of the gmt file
+#' @param filename a string containing the location of the gmt file
 #' @return a gmt object, which is a lest of terms where each term is a list with the items:
 #'   \itemize{
 #'     \item{"id"}{The term id}
@@ -11,12 +11,24 @@
 #'   }
 #' @exportClass gmt
 #' @export
-readGMT <- function(filename) {
+read.GMT <- function(filename) {
     gmt <- strsplit(readLines(filename), '\t')
     names(gmt) <- sapply(gmt, `[`, 1)
     gmt <- lapply(gmt, function(x) { list(id=x[1], name=x[2], genes=x[-c(1,2)]) })
     class(gmt) <- 'GMT'
     gmt
+}
+
+#' Write a gmt to file
+#'
+#' @param gmt a gmt object
+#' @param filename Where to write the gmt file to
+#' @export
+write.GMT <- function(gmt, filename) {
+    if (!is.GMT(gmt)) stop("gmt is not a valid GMT object")
+    sink(filename)
+    for (term in gmt) cat(term$id, term$name, paste(term$genes, collapse="\t"), "\n", sep="\t")
+    sink()
 }
 
 #' Make a background list of genes

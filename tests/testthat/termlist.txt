@@ -1,0 +1,51 @@
+term.id	term.name	p.val
+REAC:73930 	 Abasic sugar-phosphate removal via the single-nucleotide replacement pathway 	1
+REAC:73848 	 Pyrimidine metabolism 	1
+REAC:190373 	 FGFR1c ligand binding and activation 	1
+REAC:427975 	 Proton/oligopeptide cotransporters 	1
+REAC:111458 	 Formation of apoptosome 	1
+REAC:164525 	 Plus-strand DNA synthesis 	1
+REAC:5358493 	 Synthesis of diphthamide-EEF2 	1
+REAC:418592 	 ADP signalling through P2Y purinoceptor 1 	1
+REAC:1222449 	 Mtb iron assimilation by chelation 	1
+REAC:141444 	 Amplification  of signal from unattached  kinetochores via a MAD2  inhibitory signal 	1
+REAC:203765 	 eNOS activation and regulation 	1
+REAC:1912420 	 Pre-NOTCH Processing in Golgi 	1
+REAC:72165 	 mRNA Splicing - Minor Pathway 	1
+REAC:83936 	 Transport of nucleosides and free purine and pyrimidine bases across the plasma membrane 	1
+REAC:5602566 	 TICAM1 deficiency - HSE 	1
+REAC:444473 	 Formyl peptide receptors bind formyl peptides and many other ligands 	1
+REAC:168325 	 Viral Messenger RNA Synthesis 	1
+REAC:177162 	 Conjugation of phenylacetate with glutamine 	1
+REAC:8849469 	 PTK6 Regulates RTKs and Their Effectors AKT1 and DOK1 	1
+REAC:622312 	 Inflammasomes 	1
+REAC:879518 	 Transport of organic anions 	1
+REAC:72766 	 Translation 	1
+REAC:5626467 	 RHO GTPases activate IQGAPs 	1
+REAC:112311 	 Neurotransmitter Clearance In The Synaptic Cleft 	1
+REAC:389542 	 NADPH regeneration 	1
+REAC:975956 	 Nonsense Mediated Decay (NMD) independent of the Exon Junction Complex (EJC) 	1
+REAC:418359 	 Reduction of cytosolic Ca++ levels 	1
+REAC:376172 	 DSCAM interactions 	1
+REAC:3560783 	 Defective B4GALT7 causes EDS, progeroid type 	1
+REAC:203615 	 eNOS activation 	1
+REAC:6811438 	 Intra-Golgi traffic 	1
+REAC:163841 	 Gamma carboxylation, hypusine formation and arylsulfatase activation 	1
+REAC:2978092 	 Abnormal conversion of 2-oxoglutarate to 2-hydroxyglutarate 	1
+REAC:76061 	 RNA Polymerase III Transcription Initiation From Type 1 Promoter 	1
+REAC:174048 	 APC/C:Cdc20 mediated degradation of Cyclin B 	1
+REAC:5637810 	 Constitutive Signaling by EGFRvIII 	1
+REAC:69278 	 Cell Cycle, Mitotic 	1
+REAC:1296071 	 Potassium Channels 	1
+REAC:163125 	 Post-translational modification: synthesis of GPI-anchored proteins 	1
+REAC:1483226 	 Synthesis of PI 	1
+REAC:5663205 	 Infectious disease 	1
+REAC:8856688 	 Golgi-to-ER retrograde transport 	1
+REAC:1358803 	 Downregulation of ERBB2:ERBB3 signaling 	1
+REAC:2142845 	 Hyaluronan metabolism 	1
+REAC:73893 	 DNA Damage Bypass 	1
+REAC:446107 	 Type I hemidesmosome assembly 	1
+REAC:3371511 	 HSF1 activation 	1
+REAC:977347 	 Serine biosynthesis 	1
+REAC:389356 	 CD28 co-stimulation 	1
+REAC:5250968 	 Toxicity of botulinum toxin type A (BoNT/A) 	1

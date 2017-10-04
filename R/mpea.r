@@ -22,7 +22,7 @@
 #'   terms
 #' @param contribution Evaluate contribution of individual columns to a term's
 #'   significance. See section Column Contribution
-#' @param cytoscape.filenames: a vector of 3 filenames denoting where information
+#' @param cytoscape.filenames: a vector of 2 or 3 filenames denoting where information
 #'   for Cytoscape will be written to (see section Cytoscape). If NULL,
 #'   do not write any files.
 #'
@@ -55,12 +55,15 @@
 #'     \item{cytoscape.filenames[3]}{A Shortened version of the supplied gmt
 #'       file, containing only the terms in \code{cytoscape.filenames[1]}}
 #'   }
+#'   If \code{contribution == FALSE} the matrix of column contributions will
+#'     not be written. Only 2 file names need to be supplied, and if three are
+#'     given the second will be ignored
 #'
 #' @section Merging p-Values:
 #'
 #' @section Adjusting p-Values:
 #'
-#' @section Column Contribution;
+#' @section Column Contribution:
 #'   If \code{contribution == TRUE}, mpea will
 #'
 #' @export
@@ -69,38 +72,53 @@ mpea <- function(scores, gmt,
                  correction.method=c("fdr"), background=makeBackground(gmt),
                  cutoff=0.1, significant=0.05, return.all=FALSE, contribution=TRUE,
                  cytoscape.filenames=c('termlist.txt', 'subgroups.txt', 'abridged.gmt')) {
-    # Type-checking
+
+    # Validation
     merge.method <- match.arg(merge.method)
-    if (!is.numeric(scores)) stop("scores must be a numeric matrix")
     correction.method <- match.arg(correction.method)
-    if (!is.numeric(cutoff) || cutoff < 0 || cutoff > 1) stop("cutoff must be in [0,1]")
+
+    if (!is.numeric(scores)) stop("scores must be a numeric matrix")
+    if (!is.numeric(cutoff) || cutoff < 0 || cutoff > 1) stop("cutoff must be a value in [0,1]")
     if (!is.numeric(significant) || significant < 0 || significant > 1) {
-        stop("significant must be a value or in [0,1]")
+        stop("significant must be a value in [0,1]")
     }
     if (!is.character(background)) stop("background must be a character vector")
-    if (!is.GMT(gmt)) gmt <- readGMT(gmt)
+    if (!is.GMT(gmt)) gmt <- read.GMT(gmt)
+
+    if (!is.null(cytoscape.filenames)){
+        if (contribution == TRUE && length(cytoscape.filenames) != 3) {
+            stop("Must supply 3 file names to cytoscape.filenames")
+        }
+        if (contribution == FALSE){
+            if (!length(cytoscape.filenames) %in% c(2,3)) {
+                stop("Must supply 2 file names to cytoscape.filenames")
+            }
+            if (length(cytoscape.filenames) == 3) {
+                warning("Column contributions will not be evaluated so the contribution matrix is not being written. cytoscape.filenames[2] will be ignored")
+                cytoscape.filenames <- cytoscape.filenames[-2]
+            }
+        }
+    }
 
     # Remove any genes not found in the GMT
     scores <- scores[rownames(scores) %in% background, , drop=FALSE]
 
-    # merge p-values do get a single score for each gene and sort
-    # Remove any genes that don't make the cutoff
+    # merge p-values to get a single score for each gene and remove any genes
+    # that don't make the cutoff
     merged.scores <- merge_p_values(scores, merge.method)
     merged.scores <- merged.scores[merged.scores <= cutoff]
+    if (length(merged.scores) == 0) stop("No genes made the cutoff")
+
+    # Sort genes by p-value
     ordered.scores <- names(merged.scores)[order(merged.scores)]
 
     res <- gsea(ordered.scores, gmt, background)
-
-    # adjust p-value
     res[, p.val := p.adjust(p.val, method=correction.method)]
 
-    #####
-    # SKIP REST OF FUNCTION FOR NOW
-    #return(res)
-    #####
-
-    contribution <- columnContribution(scores, gmt, background, significant, cutoff, correction.method)
-    res <- cbind(res, contribution[, -c('term.id', 'term.name')])
+    if (contribution){
+        column.contribution <- columnContribution(scores, gmt, background, significant, cutoff, correction.method)
+        res <- cbind(res, column.contribution[, -c('term.id', 'term.name')])
+    }
 
     significant.indeces <- which(res$p.val <= significant)
     if (length(significant.indeces) == 0) {
@@ -111,10 +129,10 @@ mpea <- function(scores, gmt,
         }
     } else {
         if (!is.null(cytoscape.filenames)) {
-            prepareCytoscape(contribution[significant.indeces],
-                             gmt, cytoscape.filenames)
+            prepareCytoscape(res[significant.indeces], gmt, cytoscape.filenames, contribution)
         }
     }
+
     if (return.all) return(res)
     return(res[significant.indeces])
 }
@@ -191,30 +209,38 @@ columnContribution <- function(scores, gmt, background, significant, cutoff, cor
 #'       file, containing only the terms in \code{cytoscape.filenames[1]}}
 #'   }
 #'
-#' @param enrichment.matrix a data.table of terms. The first two columns contain
-#'   the term id and name. The rest of the columns denoting whether the term is
-#'   found to be significant if using only that test in analysis
+#' @param terms a data.table of terms, the output of mpea()
+#'
 #' @inheritParams mpea
 #'
 #' @return None
 
-prepareCytoscape <- function(enrichment.matrix, gmt, filenames) {
-    termlist <- enrichment.matrix[, .(term.id, term.name, p.val)]
+prepareCytoscape <- function(terms, gmt, filenames, contribution) {
+    termlist <- terms[, .(term.id, term.name, p.val)]
 
-    subgroups <- enrichment.matrix[, -'term.name']
-    tests <- colnames(subgroups[, -'term.id'])
-    instruct.str <- paste('pichart:',
-                          ' attributelist="', paste(tests,collapse=","), '"',
-                          ' colorlist="', paste(rainbow(length(tests)), collapse=","), '"',
-                          ' showlabels=FALSE', sep="")
-    subgroups[, instruct := instruct.str]
+    abridged.gmt <- gmt[unlist(terms$term.id)]
 
-    terms <- enrichment.matrix[, 'term.id']
-    abridged.gmt <- gmt[terms]
+    if (contribution) {
+        tests <- colnames(terms)
+        tests <- tests[6:length(tests)]
+        subgroups <- terms[, c('term.id', tests), with=FALSE]
 
-    write.table(termlist, file=filenames[1], row.names=FALSE, sep="\t", quote=FALSE)
-    write.table(subgroups, file=filenames[2], row.names=FALSE, sep="\t", quote=FALSE)
-    write.table(abridged.gmt, file=filenames[3], row.names=FALSE, sep="\t", quote=FALSE)
+        tests <- colnames(subgroups[, -'term.id'])
+        instruct.str <- paste('pichart:',
+                              ' attributelist="', paste(tests,collapse=","), '"',
+                              ' colorlist="', paste(rainbow(length(tests)), collapse=","), '"',
+                              ' showlabels=FALSE', sep="")
+        subgroups[, instruct := instruct.str]
+        write.table(termlist, file=filenames[1], row.names=FALSE, sep="\t", quote=FALSE)
+        write.table(subgroups, file=filenames[2], row.names=FALSE, sep="\t", quote=FALSE)
+        write.GMT(abridged.gmt, filenames[3])
+    } else {
+        write.table(termlist, file=filenames[1], row.names=FALSE, sep="\t", quote=FALSE)
+        write.GMT(abridged.gmt, filenames[2])
+    }
+
+
+
 }
 
 

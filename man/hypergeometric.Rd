@@ -7,19 +7,19 @@
 hypergeometric(genelist, complement, annotations)
 }
 \arguments{
-\item{genelist}{character vector of gene names. List of differentially 
+\item{genelist}{character vector of gene names. List of differentially
 expressed genes being tested for enrichment}
 
 \item{complement}{character vector of gene names. All other genes not being
 tested for enrichment. Ie \code{setdiff(background, genelist)}}
 
-\item{annotations}{character vector of gene names. List of genes annotated
-to the term being tested.}
+\item{annotations}{character vector of gene names. List of genes annotated to
+the term being tested.}
 }
 \value{
 a p-value
 }
 \description{
 Perform a Hypergeometric, aka Fisher's exact test, on a list of significant
-  genes and annotation genes
+genes and annotation genes
 }

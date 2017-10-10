@@ -7,11 +7,11 @@
 makeBackground(gmt)
 }
 \arguments{
-\item{gmt}{a gmt object (see \code{\link{readGMT}})}
+\item{gmt}{a \link{GMT} object}
 }
 \value{
-a character vector containing all genes in gmt
+a character vector containing all genes in GMT
 }
 \description{
-Returns a character vector of all genes in a gmt object
+Returns a character vector of all genes in a GMT object
 }

@@ -29,3 +29,4 @@ a data.table of terms with the following columns:
 \description{
 Perform Gene Set Enrichment Analysis on an ordered list of genes
 }
+\keyword{internal}

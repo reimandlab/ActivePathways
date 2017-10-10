@@ -10,19 +10,24 @@ columnContribution(scores, gmt, background, significant, cutoff,
 \arguments{
 \item{scores}{A numerical matrix of p-values where each row is a gene and
 each column is a test. Rownames should be the genes and colnames the names
-of the tests. All values must be 0<=p<=1 with missing values converted to 1}
+of the tests. All values must be 0<=p<=1 with missing values removed or
+converted to 1}
 
-\item{gmt}{A GMT object to be used for enrichment analysis. If a filename,
-a GMT object will be created from the file}
+\item{gmt}{A GMT object to be used for enrichment analysis. If a filename, a
+GMT object will be read from the file}
 
 \item{background}{A character vector of gene names to be used as a
-statistical background. By default, the background is all genes that
-appear in \code{gmt}}
+statistical background. By default, the background is all genes that appear
+in \code{gmt}}
+
+\item{significant}{A number in [0,1] denoting the maximum p-value for a
+pathway to be considered significantly enriched.}
 
 \item{cutoff}{A maximum p-value for agene to be used for enrichment analysis.
 Any genes with \code{p.val > significant} will be discarded before testing}
 
-\item{correction.method}{Method to correct p-values. See Adjusting p-Values}
+\item{correction.method}{Method to correct p-values. See 
+\code{\link[stats]{p.adjust}} for details}
 }
 \value{
 a data.table of terms. The first two columns contain the term id and

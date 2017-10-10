@@ -1,15 +1,30 @@
-#' Read a gmt file
+#' Read and Write GMT files
 #'
-#' Returns a gmt object read in from a file
+#' Functions to read and Write Gene Matrix Transposed (GMT) files. A GMT file
+#' describes gene sets, such as pathways. GMT files are tab delimeted and each
+#' row contains a term id, a term name, and all genes annotated to the term.
 #'
-#' @param filename a string containing the location of the gmt file
-#' @return a gmt object, which is a lest of terms where each term is a list with the items:
-#'   \itemize{
-#'     \item{"id"}{The term id}
-#'     \item{"name"}{The full name of the term}
-#'     \item{"genes"}{A character vector of genes annotated to this term}
+#' @format
+#' A named list of terms, where each term is a list with the items:
+#' \describe{
+#'     \item{id}{The term id}
+#'     \item{name}{The full name of the term}
+#'     \item{genes}{A character vector of genes annotated to this term}
 #'   }
-#' @exportClass gmt
+#' @exportClass GMT
+#' @rdname GMT
+#' @name GMT
+#' @aliases GMT gmt
+#' 
+#' @param filename Location of the gmt file
+#' @param gmt a GMT object
+#' 
+#' @return \code{read.GMT} returns a GMT object. \cr
+#' \code{write.gmt} returns NULL.
+#' 
+NULL
+
+#' @rdname GMT
 #' @export
 read.GMT <- function(filename) {
     gmt <- strsplit(readLines(filename), '\t')
@@ -19,24 +34,23 @@ read.GMT <- function(filename) {
     gmt
 }
 
-#' Write a gmt to file
-#'
-#' @param gmt a gmt object
-#' @param filename Where to write the gmt file to
+#' @rdname GMT
 #' @export
 write.GMT <- function(gmt, filename) {
     if (!is.GMT(gmt)) stop("gmt is not a valid GMT object")
     sink(filename)
-    for (term in gmt) cat(term$id, term$name, paste(term$genes, collapse="\t"), "\n", sep="\t")
+    for (term in gmt) {
+        cat(term$id, term$name, paste(term$genes, collapse="\t"), "\n", sep="\t")
+    }
     sink()
 }
 
 #' Make a background list of genes
 #'
-#' Returns a character vector of all genes in a gmt object
+#' Returns a character vector of all genes in a GMT object
 #'
-#' @param gmt a gmt object (see \code{\link{readGMT}})
-#' @return a character vector containing all genes in gmt
+#' @param gmt a \link{GMT} object
+#' @return a character vector containing all genes in GMT
 #' @export
 makeBackground <- function(gmt) {
     if (!is.GMT(gmt)) stop('gmt is not a valid GMT object')
@@ -44,29 +58,34 @@ makeBackground <- function(gmt) {
 }
 
 ### Subsetting functions. Treat as a list but return an object of "GMT" class
+#' @export
 `[.GMT` <- function(x, i) {
     x <- unclass(x)
     res <- x[i]
     class(res) <- c('GMT')
     res
 }
+#' @export
 `[[.GMT` <- function(x, i, exact = TRUE) {
     x <- unclass(x)
     x[[i, exact = exact]]
 }
+
+#' @export
 `$.GMT` <- function(x, i) {
     x[[i]]
 }
+
+#' @export
 is.GMT <- function(x) inherits(x, 'GMT')
 
-#' Print a gmt object
-#'
+# Print a GMT object
 #' @export
 print.GMT <- function(x, ...) {
     num.lines <- min(length(x), getOption("max.print", 99999))
     num.trunc <- length(x) - num.lines
-    str <- sapply(x[1:num.lines], function(a) paste(a$id, "-", a$name, "\n", paste(a$genes, collapse=", "), '\n\n'))
-    cat(str)
+    cat(sapply(x[1:num.lines], function(a) paste(a$id, "-", a$name, "\n",
+                                                 paste(a$genes, collapse=", "), '\n\n')))
     if (num.trunc == 1) {
         cat('[ reached getOption("max.print") -- omitted 1 term ]')
     } else if (num.trunc > 1) {

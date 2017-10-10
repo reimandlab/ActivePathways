@@ -9,8 +9,8 @@ prepareCytoscape(terms, gmt, filenames, contribution)
 \arguments{
 \item{terms}{a data.table of terms, the output of mpea()}
 
-\item{gmt}{A GMT object to be used for enrichment analysis. If a filename,
-a GMT object will be created from the file}
+\item{gmt}{A GMT object to be used for enrichment analysis. If a filename, a
+GMT object will be read from the file}
 
 \item{contribution}{Evaluate contribution of individual columns to a term's
 significance. See section Column Contribution}

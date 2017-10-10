@@ -1,47 +1,56 @@
-# Merge a list or matrix of p-values
-# INPUT:
-# scores:   Either a vector of p-values, or a numerical matrix where each column is a test
-# method:   method to merge p-values. See metap documentation for more infor on methods
-# RETURNS:
-# If scores is a list, returns a number
-# If scores is a matrix, returns a named list of p-values merged by row
-merge_p_values <- function(scores, method=c("Fisher", "Brown", "logtip", "meanp", "sump", "sumz", "sumlog")) {
+#' Merge a list or matrix of p-values
+#'
+#' @param scores Either a list of p-values or a matrix where each column is a test
+#' @param method Method to merge p-valeus. See metap documentation for more info
+#'
+#' @return If scores is a list, returns a number. If scores is a matrix, returns
+#'   a named list of p-values merged by row
+merge_p_values <- function(scores, method=c("Fisher", "Brown", "logitp",
+                                            "meanp", "sump", "sumz", "sumlog")) {
     if (ncol(scores) == 1) return (scores[, 1])
 
     method <- match.arg(method)
     if(method == "Fisher") method <- "sumlog"
-    func <- get(method)
-
-    if (is.list(scores)) {
-        if (method == "Brown") stop("Brown's method cannot be used with a single list of p-values")
-        return (func(scores)$p)
-    }
 
     if (method == "Brown") {
-        corr.matrix <- calculateCovariances(t(scores))
-        apply(scores, 1, empiricalBrownsMethod, corr.matrix=corr.matrix)
+        if (is.list(scores)) {
+            stop("Brown's method cannot be used with a single list of p-values")
+        }
+        cov.matrix <- calculateCovariances(t(scores))
+        return(apply(scores, 1, brownsMethod, cov.matrix=cov.matrix))
     }
 
-    apply(scores, 1, function(x) func(x)$p)
+    # Some metap function don't like p-values that are 0 or 1 so make them (0,1) to avoid errors
+    scores <- apply(scores, c(1,2), function(x) if (x == 0) 0.0000001 else if (x==1) 0.9999999 else x)
+
+    func <- function(x) get(method)(x)$p
+    if (is.list(scores)) return(func(scores))
+    return (apply(scores, 1, func))
 }
 
 
-
-### BROWN'S METHOD ###
-### Based on R package EmpiricalBrownsMethod
-### https://github.com/IlyaLab/CombiningDependentPvaluesUsingEBM/blob/master/R/EmpiricalBrownsMethod/R/ebm.R
-### The only significant differences are the removal of extra_info and allowing a pre-calculated correlation matrix
-
-# INPUT
-# data_matrix:      m x n matrix representing m tests and n samples
-# p_values:         vector length m of p values
-# cov.matrix:       pre-calculated covariance matrix of data_matrix. Saves time by
-#                   not having to calculate the corvariance matrix for each call
-brownsMethod <- function(data.matrix, p.values, cov.matrix=NULL) {
-    #TODO: figure out how to handle NAs in p_values
-    data.matrix <- na.exclude(data.matrix)
-
-    if (is.null(cov.matrix)) cov.matrix <- calculateCovariances(data.matrix)
+#' Merge p-values using Brown's method
+#'
+#' Based on the R package EmpiricalBrownsMethod
+#' https://github.com/IlyaLab/CombiningDependentPvaluesUsingEBM/blob/master/R/EmpiricalBrownsMethod/R/ebm.R
+#' Only significant differences are the removal of extra_info and allowing a
+#' pre-calculated covariance matrix
+#'
+#' @param p.values A vector of m p-values
+#' @param data.matrix An m x n matrix representing m tests and n samples
+#' @param cov.matrix A pre-calculated covariance matrix of data.matrix. More
+#'   efficient when making many calls with the same data.matrix.
+#'   Only one of data.matrix and cov.matrix must be given. If both are supplied,
+#'   data.matrix is ignored
+#' @return a p-value
+brownsMethod <- function(p.values, data.matrix=NULL, cov.matrix=NULL) {
+    if (missing(data.matrix) && missing(cov.matrix)) {
+        stop ("Either data.matrix or cov.matrix must be supplied")
+    }
+    if (!(missing(data.matrix) || missing(cov.matrix))) {
+        warning("Both data.matrix and cov.matrix were supplied. Ignoring data.matrix")
+    }
+    if (missing(cov.matrix)) cov.matrix <- calculateCovariances(data.matrix)
 
     N <- ncol(cov.matrix)
     expected <- 2 * N

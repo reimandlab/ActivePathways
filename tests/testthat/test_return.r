@@ -4,9 +4,7 @@ context("Format of the returned object and output files")
 # Prepare testing data
 library(mpea)
 gmt <- read.GMT('test.gmt')
-dat <- read.table('test.dat')
-rownames(dat) <- dat$Gene
-dat <- as.matrix(dat[, -1])
+dat <- as.matrix(read.table('test_data.txt', header=TRUE, row.names='Gene'))
 dat[is.na(dat)] <- 1
 
 file.names <- paste(c('terms', 'groups', 'smallgmt'), '.txt', sep="")

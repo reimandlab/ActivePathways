@@ -7,28 +7,28 @@
 orderedHypergeometric(genelist, background, annotations)
 }
 \arguments{
-\item{genelist}{character vector of gene names. List of differentially 
+\item{genelist}{character vector of gene names. List of differentially
 expressed genes being tested for enrichment}
 
-\item{background}{character vector of gene names. List of all genes being used
-as a statistical background}
+\item{background}{character vector of gene names. List of all genes being
+used as a statistical background}
 
-\item{annotations}{character vector of gene names. List of genes annotated
-to the term being tested.}
+\item{annotations}{character vector of gene names. List of genes annotated to
+the term being tested.}
 }
 \value{
 a list with the items:
-  \describe {
-    \item{p.val}{the lowest obtained p-value}
-    \item{ind}{the index of \code{genelist} such that 
-      \code{genelist[1:index]} gives the lowest p-value}
-  }
+  \describe{
+    \item{p.val}{The lowest obtained p-value}
+    \item{ind}{The index of \code{genelist} such that \code{genelist[1:ind]}
+      gives the lowest p-value}
+ }
 }
 \description{
-Perform a Hypergeometric, aka Fisher's Exact test, on a list of genes
-  ordered by significance against a list of annotation genes
+Perform a Hypergeometric, aka Fisher's Exact test, on a list of genes ordered
+by significance against a list of annotation genes
 }
 \details{
 The hypergeometric test is run with increasingly large numbers of genes
-  starting from the top, and the lowest p-value is returned
+starting from the top, and the lowest p-value is returned
 }

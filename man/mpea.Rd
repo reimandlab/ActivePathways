@@ -30,7 +30,7 @@ terms}
 
 \item{merge.method}{Method to merge p-values.}
 
-\item{correction.method}{Method to correct p-values. See 
+\item{correction.method}{Method to correct p-values. See
 \code{\link[stats]{p.adjust}} for details}
 
 \item{background}{A character vector of gene names to be used as a

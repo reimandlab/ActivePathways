@@ -7,7 +7,7 @@
 #' @param gmt A GMT object to be used for enrichment analysis. If a filename, a
 #'   GMT object will be read from the file
 #' @param merge.method Method to merge p-values.
-#' @param correction.method Method to correct p-values. See 
+#' @param correction.method Method to correct p-values. See
 #'   \code{\link[stats]{p.adjust}} for details
 #' @param background A character vector of gene names to be used as a
 #'   statistical background. By default, the background is all genes that appear
@@ -82,11 +82,11 @@
 #'
 #' @export
 mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
-                 merge.method=c("Fisher", "Brown", "logitp", "meanp", "sump", 
+                 merge.method=c("Fisher", "Brown", "logitp", "meanp", "sump",
                                 "sumz", "sumlog"),
-                 correction.method=c("fdr", "holm", "hochberg", "hommel", 
-                                     "bonferroni", "BH", "BY"), 
-                 background=makeBackground(gmt), contribution=TRUE, 
+                 correction.method=c("fdr", "holm", "hochberg", "hommel",
+                                     "bonferroni", "BH", "BY"),
+                 background=makeBackground(gmt), contribution=TRUE,
                  cytoscape.filenames=NULL) {
 
     ### Validation
@@ -237,6 +237,7 @@ columnContribution <- function(scores, gmt, background, significant,
 #'   }
 #'
 #' @param terms a data.table of terms, the output of mpea()
+#' @param filenames vector of 2 or 3 filesnames denoting where to write fles to
 #'
 #' @inheritParams mpea
 #'

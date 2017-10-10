@@ -12,6 +12,8 @@ prepareCytoscape(terms, gmt, filenames, contribution)
 \item{gmt}{A GMT object to be used for enrichment analysis. If a filename, a
 GMT object will be read from the file}
 
+\item{filenames}{vector of 2 or 3 filesnames denoting where to write fles to}
+
 \item{contribution}{Evaluate contribution of individual columns to a term's
 significance. See section Column Contribution}
 }

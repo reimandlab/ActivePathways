@@ -26,7 +26,7 @@ pathway to be considered significantly enriched.}
 \item{cutoff}{A maximum p-value for agene to be used for enrichment analysis.
 Any genes with \code{p.val > significant} will be discarded before testing}
 
-\item{correction.method}{Method to correct p-values. See 
+\item{correction.method}{Method to correct p-values. See
 \code{\link[stats]{p.adjust}} for details}
 }
 \value{

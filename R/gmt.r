@@ -1,11 +1,14 @@
 #' Read and Write GMT files
 #'
-#' Functions to read and Write Gene Matrix Transposed (GMT) files. A GMT file
-#' describes gene sets, such as pathways. GMT files are tab delimeted and each
-#' row contains a term id, a term name, and all genes annotated to the term.
+#' Functions to read and Write Gene Matrix Transposed (GMT) files and to test if
+#' an object inherits from GMT
+#'
+#' A GMT file describes gene sets, such as pathways. GMT files are tab delimeted
+#' and each row contains a term id, a term name, and all genes annotated to the
+#' term.
 #'
 #' @format
-#' A named list of terms, where each term is a list with the items:
+#' A GMT object is a named list of terms, where each term is a list with the items:
 #' \describe{
 #'     \item{id}{The term id}
 #'     \item{name}{The full name of the term}
@@ -15,13 +18,15 @@
 #' @rdname GMT
 #' @name GMT
 #' @aliases GMT gmt
-#' 
+#'
 #' @param filename Location of the gmt file
 #' @param gmt a GMT object
-#' 
+#' @param x object to test
+#'
 #' @return \code{read.GMT} returns a GMT object. \cr
-#' \code{write.gmt} returns NULL.
-#' 
+#' \code{write.GMT} returns NULL. \cr
+#' \code{is.GMT} returns TRUE if \code{x} is a GMT object, else FALSE
+#'
 NULL
 
 #' @rdname GMT
@@ -77,6 +82,7 @@ makeBackground <- function(gmt) {
 }
 
 #' @export
+#' @rdname GMT
 is.GMT <- function(x) inherits(x, 'GMT')
 
 # Print a GMT object

@@ -13,9 +13,16 @@ merge_p_values(scores, method = c("Fisher", "Brown", "logitp", "meanp",
 \item{method}{Method to merge p-valeus. See metap documentation for more info}
 }
 \value{
-If scores is a list, returns a number. If scores is a matrix, returns
-  a named list of p-values merged by row
+If scores is a vector or list list, returns a number. If scores is a
+  matrix, returns a named list of p-values merged by row
 }
 \description{
 Merge a list or matrix of p-values
+}
+\examples{
+\dontrun{
+  merge_p_values(c(0.05, 0.09, 0.01))
+  merge_p_values(list(a=0.01, b=1, c=0.0015), method='meanp')
+  merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow=2), method='Brown')
+}
 }

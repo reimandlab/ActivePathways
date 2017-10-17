@@ -23,6 +23,11 @@ a list with the items:
     \item{ind}{The index of \code{genelist} such that \code{genelist[1:ind]}
       gives the lowest p-value}
  }
+ @examples
+ \dontrun{
+   orderedHypergeometric(c('HERC2', 'SP100'), c('PHC2', 'BLM', 'NDC1', 'XPC', 'SMC3', 'HERC2', 'SP100'),
+                         c('HERC2', 'PHC2', 'BLM'))
+ }
 }
 \description{
 Perform a Hypergeometric, aka Fisher's Exact test, on a list of genes ordered

@@ -15,3 +15,8 @@ a character vector containing all genes in GMT
 \description{
 Returns a character vector of all genes in a GMT object
 }
+\examples{
+\dontrun{
+  makeBackground(gmt)
+}
+}

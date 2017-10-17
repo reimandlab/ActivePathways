@@ -41,3 +41,16 @@ A GMT file describes gene sets, such as pathways. GMT files are tab delimeted
 and each row contains a term id, a term name, and all genes annotated to the
 term.
 }
+\examples{
+\dontrun{
+  gmt <- read.GMT('path/to/gmt.gmt')
+  gmt[13:22]
+  gmt[1]
+  gmt[[1]]
+  gmt[1]$id
+  gmt[1]$genes
+  gmt[1]$name
+  gmt$`REAC:3108214`
+  write.GMT(gmt, 'filename.gmt')
+}
+}

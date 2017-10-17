@@ -29,4 +29,9 @@ a data.table of terms with the following columns:
 \description{
 Perform Gene Set Enrichment Analysis on an ordered list of genes
 }
+\examples{
+\dontrun{
+    gsea(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt, makeBackground(gmt))
+}
+}
 \keyword{internal}

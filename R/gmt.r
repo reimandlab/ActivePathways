@@ -27,6 +27,19 @@
 #' \code{write.GMT} returns NULL. \cr
 #' \code{is.GMT} returns TRUE if \code{x} is a GMT object, else FALSE
 #'
+#'
+#' @examples
+#' \dontrun{
+#'   gmt <- read.GMT('path/to/gmt.gmt')
+#'   gmt[13:22]
+#'   gmt[1]
+#'   gmt[[1]]
+#'   gmt[1]$id
+#'   gmt[1]$genes
+#'   gmt[1]$name
+#'   gmt$`REAC:3108214`
+#'   write.GMT(gmt, 'filename.gmt')
+#' }
 NULL
 
 #' @rdname GMT
@@ -57,6 +70,11 @@ write.GMT <- function(gmt, filename) {
 #' @param gmt a \link{GMT} object
 #' @return a character vector containing all genes in GMT
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#'   makeBackground(gmt)
+#' }
 makeBackground <- function(gmt) {
     if (!is.GMT(gmt)) stop('gmt is not a valid GMT object')
     unlist(Reduce(function(x, y) union(x, y$genes), gmt, gmt[[1]]$genes))

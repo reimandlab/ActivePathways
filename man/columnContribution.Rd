@@ -37,3 +37,11 @@ a data.table of terms. The first two columns contain the term id and
 \description{
 Get contribution of each column to each term
 }
+\examples{
+\dontrun{
+  dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
+  dat[is.na(dat)] <- 1
+  gmt <- read.GMT('path/to/gmt.gmt')
+  columnContribution(dat, gmt, makeBackground(gmt), 0.05, 0.1, 'fdr')
+}
+}

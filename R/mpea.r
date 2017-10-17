@@ -76,8 +76,8 @@
 #'     dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
 #'     dat[is.na(dat)] <- 1
 #'     gmt <- read.GMT('path/to/gmt.gmt')
-#'     res <- mpea(dat, gmt, return.all=TRUE,
-#'                 cytoscape.filenames=c('terms.txt', 'groups.txt', 'abridged.gmt'))
+#'     mpea(dat, gmt, return.all=TRUE,
+#'          cytoscape.filenames=c('terms.txt', 'groups.txt', 'abridged.gmt'))
 #' }
 #'
 #' @export
@@ -179,13 +179,19 @@ mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
 #'        term and the query}
 #'   }
 #' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#'     gsea(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt, makeBackground(gmt))
+#' }
 gsea <- function(genelist, gmt, background) {
     dt <- data.table(term.id=names(gmt))
 
     for (i in 1:length(gmt)) {
         term <- gmt[[i]]
         tmp <- orderedHypergeometric(genelist, background, term$genes)
-        overlap <- genelist[1:tmp$ind][genelist[1:tmp$ind] %in% term$genes]
+        overlap <- genelist[1:tmp$ind]
+        overlap <- overlap[overlap %in% term$genes]
         if (length(overlap) == 0) overlap <- NA
         set(dt, i, 'term.name', term$name)
         set(dt, i, 'p.val', tmp$p.val)
@@ -202,6 +208,14 @@ gsea <- function(genelist, gmt, background) {
 #' @return a data.table of terms. The first two columns contain the term id and
 #'   name. The rest of the columns denoting whether the term is found to be
 #'   significant if using only that test in analysis
+#'
+#' @examples
+#' \dontrun{
+#'   dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
+#'   dat[is.na(dat)] <- 1
+#'   gmt <- read.GMT('path/to/gmt.gmt')
+#'   columnContribution(dat, gmt, makeBackground(gmt), 0.05, 0.1, 'fdr')
+#' }
 columnContribution <- function(scores, gmt, background, significant,
                                cutoff, correction.method) {
     dt <- data.table(term.id=names(gmt), term.name=sapply(gmt, function(x) x$name))

@@ -107,8 +107,8 @@ mpea
     dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
     dat[is.na(dat)] <- 1
     gmt <- read.GMT('path/to/gmt.gmt')
-    res <- mpea(dat, gmt, return.all=TRUE,
-                cytoscape.filenames=c('terms.txt', 'groups.txt', 'abridged.gmt'))
+    mpea(dat, gmt, return.all=TRUE,
+         cytoscape.filenames=c('terms.txt', 'groups.txt', 'abridged.gmt'))
 }
 
 }

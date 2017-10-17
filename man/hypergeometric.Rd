@@ -23,3 +23,8 @@ a p-value
 Perform a Hypergeometric, aka Fisher's exact test, on a list of significant
 genes and annotation genes
 }
+\examples{
+\dontrun{
+  hypergeometric(c('HERC2', 'SP100'), c('PHC2', 'BLM', 'NDC1', 'XPC', 'SMC3'), c('HERC2', 'PHC2', 'BLM'))
+}
+}

@@ -1,3 +1,6 @@
 .Rproj.user
 .Rhistory
 .RData
+self_testing/cytoscape
+self_testing/profiling
+self_testing/output

@@ -116,14 +116,24 @@ mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
                 stop("Must supply 2 file names to cytoscape.filenames")
             }
             if (length(cytoscape.filenames) == 3) {
-                warning("Column contributions will not be evaluated so the contribution matrix is not being written. cytoscape.filenames[2] will be ignored")
+                warning(paste("Column contributions will not be evaluated so the",
+                              "contribution matrix is not being written.",
+                              "cytoscape.filenames[2] will be ignored"))
                 cytoscape.filenames <- cytoscape.filenames[-2]
             }
         }
     }
 
     # Remove any genes not found in the GMT
+    orig.length <- nrow(scores)
     scores <- scores[rownames(scores) %in% background, , drop=FALSE]
+    if (nrow(scores) == 0) {
+        stop("scores does not contain any genes annotated in gmt")
+    }
+    if (nrow(scores) > orig.length) {
+        warning(paste(orig.length - nrow(scores), "rows were removed from scores",
+                      "because they are not found in the background"))
+    }
 
     # merge p-values to get a single score for each gene and remove any genes
     # that don't make the cutoff
@@ -145,16 +155,10 @@ mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
 
     significant.indeces <- which(res$p.val <= significant)
     if (length(significant.indeces) == 0) {
-        if (return.all) {
-            warning("No significant terms were found")
-        } else {
-            stop("No significant terms were found")
-        }
-    } else {
-        if (!is.null(cytoscape.filenames)) {
+        warning("No significant terms were found")
+    } else if (!is.null(cytoscape.filenames)) {
             prepareCytoscape(res[significant.indeces], gmt,
                              cytoscape.filenames, contribution)
-        }
     }
 
     if (return.all) return(res)

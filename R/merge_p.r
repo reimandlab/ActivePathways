@@ -3,8 +3,15 @@
 #' @param scores Either a list of p-values or a matrix where each column is a test
 #' @param method Method to merge p-valeus. See metap documentation for more info
 #'
-#' @return If scores is a list, returns a number. If scores is a matrix, returns
-#'   a named list of p-values merged by row
+#' @return If scores is a vector or list list, returns a number. If scores is a
+#'   matrix, returns a named list of p-values merged by row
+#'
+#' @examples
+#' \dontrun{
+#'   merge_p_values(c(0.05, 0.09, 0.01))
+#'   merge_p_values(list(a=0.01, b=1, c=0.0015), method='meanp')
+#'   merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow=2), method='Brown')
+#' }
 merge_p_values <- function(scores, method=c("Fisher", "Brown", "logitp",
                                             "meanp", "sump", "sumz", "sumlog")) {
     if (ncol(scores) == 1) return (scores[, 1])
@@ -13,7 +20,7 @@ merge_p_values <- function(scores, method=c("Fisher", "Brown", "logitp",
     if(method == "Fisher") method <- "sumlog"
 
     if (method == "Brown") {
-        if (is.list(scores)) {
+        if (is.list(scores) || is.vector(scores)) {
             stop("Brown's method cannot be used with a single list of p-values")
         }
         cov.matrix <- calculateCovariances(t(scores))
@@ -24,7 +31,7 @@ merge_p_values <- function(scores, method=c("Fisher", "Brown", "logitp",
     scores <- apply(scores, c(1,2), function(x) if (x == 0) 0.0000001 else if (x==1) 0.9999999 else x)
 
     func <- function(x) get(method)(x)$p
-    if (is.list(scores)) return(func(scores))
+    if (is.list(scores) || is.vector(scores)) return(func(scores))
     return (apply(scores, 1, func))
 }
 
@@ -70,6 +77,11 @@ brownsMethod <- function(p.values, data.matrix=NULL, cov.matrix=NULL) {
 }
 
 transformData <- function(dat) {
+    # If all values in dat are the same (equal to y), return dat. The covariance
+    # matrix will be the zero matrix, and brown's method gives the p-value as y
+    # Otherwise (dat - dmv) / dvsd is NaN and ecdf throws and error
+    if (isTRUE(all.equal(min(dat), max(dat)))) return(dat)
+
     dvm <- mean(dat, na.rm=TRUE)
     dvsd <- pop.sd(dat)
     s <- (dat - dvm) / dvsd

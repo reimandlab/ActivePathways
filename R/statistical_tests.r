@@ -64,7 +64,7 @@ orderedHypergeometric <- function(genelist, background, annotations) {
     # complement
     f <- function(i) {
         hypergeometric(genelist[1:i],
-                       c(genelist[i+1:length(genelist)], complement),
+                       c(genelist[(i+1):length(genelist)], complement),
                        annotations)
     }
     scores <- sapply(which.in, function(i) f(i)$p.val)

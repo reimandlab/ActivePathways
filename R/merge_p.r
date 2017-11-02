@@ -55,7 +55,7 @@ brownsMethod <- function(p.values, data.matrix=NULL, cov.matrix=NULL) {
         stop ("Either data.matrix or cov.matrix must be supplied")
     }
     if (!(missing(data.matrix) || missing(cov.matrix))) {
-        warning("Both data.matrix and cov.matrix were supplied. Ignoring data.matrix")
+        message("Both data.matrix and cov.matrix were supplied. Ignoring data.matrix")
     }
     if (missing(cov.matrix)) cov.matrix <- calculateCovariances(data.matrix)
 

@@ -1,21 +1,21 @@
 term.id	term.name	p.val
-REAC:196783	Coenzyme A biosynthesis	0.0363027826704814
-REAC:445355	Smooth Muscle Contraction	0.364917066848563
-REAC:111997	CaM pathway	0.364917066848563
-REAC:442982	Ras activation uopn Ca2+ infux through NMDA receptor	0.434176805292675
-REAC:202131	Metabolism of nitric oxide	0.364917066848563
-REAC:438064	Post NMDA receptor activation events	0.470205375308335
-REAC:5210891	Uptake and function of anthrax toxins	0.364917066848563
-REAC:167021	PLC-gamma1 signalling	0.191565462255269
-REAC:212718	EGFR interacts with phospholipase C-gamma	0.191565462255269
-REAC:1474151	Tetrahydrobiopterin (BH4) synthesis, recycling, salvage and regulation	0.54859951649288
-REAC:203615	eNOS activation	0.364917066848563
-REAC:442729	CREB phosphorylation through the activation of CaMKII	0.364917066848563
-REAC:111996	Ca-dependent events	0.364917066848563
-REAC:203765	eNOS activation and regulation	0.364917066848563
-REAC:199220	Vitamin B5 (pantothenate) metabolism	0.0118191299250148
-REAC:1489509	DAG and IP3 signaling	0.215421763318558
-REAC:5626467	RHO GTPases activate IQGAPs	0.0359704893147228
-REAC:442742	CREB phosphorylation through the activation of Ras	0.432421997479447
-REAC:75067	Processing of Capped Intronless Pre-mRNA	0.0285214524958651
-REAC:5218920	VEGFR2 mediated vascular permeability	0.0359704893147228
+REAC:196783	Coenzyme A biosynthesis	0.270986280642023
+REAC:445355	Smooth Muscle Contraction	0.67398013602791
+REAC:111997	CaM pathway	0.67398013602791
+REAC:442982	Ras activation uopn Ca2+ infux through NMDA receptor	0.67398013602791
+REAC:202131	Metabolism of nitric oxide	0.67398013602791
+REAC:438064	Post NMDA receptor activation events	0.69514776713022
+REAC:5210891	Uptake and function of anthrax toxins	0.650241292384413
+REAC:167021	PLC-gamma1 signalling	0.67398013602791
+REAC:212718	EGFR interacts with phospholipase C-gamma	0.619061104486533
+REAC:1474151	Tetrahydrobiopterin (BH4) synthesis, recycling, salvage and regulation	0.880383668635666
+REAC:203615	eNOS activation	0.67398013602791
+REAC:442729	CREB phosphorylation through the activation of CaMKII	0.67398013602791
+REAC:111996	Ca-dependent events	0.67398013602791
+REAC:203765	eNOS activation and regulation	0.67398013602791
+REAC:199220	Vitamin B5 (pantothenate) metabolism	0.270986280642023
+REAC:1489509	DAG and IP3 signaling	0.67398013602791
+REAC:5626467	RHO GTPases activate IQGAPs	0.270986280642023
+REAC:442742	CREB phosphorylation through the activation of Ras	0.67398013602791
+REAC:75067	Processing of Capped Intronless Pre-mRNA	0.270986280642023
+REAC:5218920	VEGFR2 mediated vascular permeability	0.270986280642023

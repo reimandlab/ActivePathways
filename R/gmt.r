@@ -31,8 +31,7 @@
 #' @examples
 #' \dontrun{
 #'   gmt <- read.GMT('path/to/gmt.gmt')
-#'   gmt[13:22]
-#'   gmt[1]
+#'   gmt[1:10]
 #'   gmt[[1]]
 #'   gmt[1]$id
 #'   gmt[1]$genes
@@ -80,7 +79,8 @@ makeBackground <- function(gmt) {
     unlist(Reduce(function(x, y) union(x, y$genes), gmt, gmt[[1]]$genes))
 }
 
-### Subsetting functions. Treat as a list but return an object of "GMT" class
+#####  Subsetting functions #####
+# Treat as a list but return an object of "GMT" class
 #' @export
 `[.GMT` <- function(x, i) {
     x <- unclass(x)

@@ -66,6 +66,23 @@
 #'
 #'
 #' @section Merging p-Values:
+#' In order to obtain a single score for each gene, the p-values in \code{scores}
+#' are merged row-wise. There are multiple methods available that can be used
+#' to obtain this merged score. They are:
+#' \describe{
+#'  \item{Fisher or sumlog}{Fisher's method assumes p-values are uniformly
+#'  distributed and performs a chi-squared test on the statistic sum(-2 log(p).
+#'  This method is most appropriate when the columns in \code{scores} are
+#'  independent.}
+#'  \item{Brown}{Brown's method extends Fisher's method by accounting for the
+#'  covariance in the columns of \code{scores}. It is more appropriate when the
+#'  tests of significance used to create the columns in \code{scores} are not
+#'  necessarily independent.}
+#' }
+#' \item{logitp}{}
+#' \item{meanp}{}
+#' \item{sump}{}
+#' \item{sumz}{}
 #'
 #' @section Adjusting p-Values:
 #'
@@ -81,6 +98,10 @@
 #' }
 #'
 #' @export
+#
+# TODO: enter citations for articles on merging p-values
+# http://www.jstor.org/stable/2529826?seq=1#page_scan_tab_contents
+# TODO: finis h
 mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
                  merge.method=c("Fisher", "Brown", "logitp", "meanp", "sump",
                                 "sumz", "sumlog"),
@@ -89,9 +110,11 @@ mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
                  background=makeBackground(gmt), contribution=TRUE,
                  cytoscape.filenames=NULL) {
 
-    ### Validation
+
     merge.method <- match.arg(merge.method)
     correction.method <- match.arg(correction.method)
+
+    ##### Validation #####
 
     if (!(is.matrix(scores) && is.numeric(scores))) stop("scores must be a numeric matrix")
     if (!is.numeric(cutoff) || cutoff < 0 || cutoff > 1) {
@@ -105,7 +128,7 @@ mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
 
     if (ncol(scores) == 1 && contribution) {
         contribution <- FALSE
-        warning("scores contains only one column. Column contributions will not be calculated")
+        message("scores contains only one column. Column contributions will not be calculated")
     }
     if (!is.null(cytoscape.filenames)){
         if (contribution == TRUE && length(cytoscape.filenames) != 3) {
@@ -116,7 +139,7 @@ mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
                 stop("Must supply 2 file names to cytoscape.filenames")
             }
             if (length(cytoscape.filenames) == 3) {
-                warning(paste("Column contributions will not be evaluated so the",
+                message(paste("Column contributions will not be evaluated so the",
                               "contribution matrix is not being written.",
                               "cytoscape.filenames[2] will be ignored"))
                 cytoscape.filenames <- cytoscape.filenames[-2]
@@ -124,14 +147,16 @@ mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
         }
     }
 
+    ##### filtering and sorting #####
+
     # Remove any genes not found in the GMT
     orig.length <- nrow(scores)
     scores <- scores[rownames(scores) %in% background, , drop=FALSE]
     if (nrow(scores) == 0) {
-        stop("scores does not contain any genes annotated in gmt")
+        stop("scores does not contain any genes in the background")
     }
-    if (nrow(scores) > orig.length) {
-        warning(paste(orig.length - nrow(scores), "rows were removed from scores",
+    if (nrow(scores) < orig.length) {
+        message(paste(orig.length - nrow(scores), "rows were removed from scores",
                       "because they are not found in the background"))
     }
 
@@ -143,6 +168,8 @@ mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
 
     # Sort genes by p-value
     ordered.scores <- names(merged.scores)[order(merged.scores)]
+
+    ##### gsea and column contribution #####
 
     res <- gsea(ordered.scores, gmt, background)
     res[, p.val := p.adjust(p.val, method=correction.method)]

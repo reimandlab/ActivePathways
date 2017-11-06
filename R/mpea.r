@@ -105,7 +105,7 @@
 mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
                  merge.method=c("Fisher", "Brown", "logitp", "meanp", "sump",
                                 "sumz", "sumlog"),
-                 correction.method=c("fdr", "holm", "hochberg", "hommel",
+                 correction.method=c("holm", "fdr", "hochberg", "hommel",
                                      "bonferroni", "BH", "BY"),
                  background=makeBackground(gmt), contribution=TRUE,
                  cytoscape.filenames=NULL) {
@@ -174,18 +174,23 @@ mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
     res <- gsea(ordered.scores, gmt, background)
     res[, p.val := p.adjust(p.val, method=correction.method)]
 
-    if (contribution){
-        col.contribution <- columnContribution(scores, gmt, background,
-                                               significant, cutoff, correction.method)
-        res <- cbind(res, col.contribution[, -c('term.id', 'term.name')])
-    }
-
     significant.indeces <- which(res$p.val <= significant)
     if (length(significant.indeces) == 0) {
         warning("No significant terms were found")
-    } else if (!is.null(cytoscape.filenames)) {
-            prepareCytoscape(res[significant.indeces], gmt,
-                             cytoscape.filenames, contribution)
+        if (!is.null(cytoscape.filenames)) warning("Cytoscape files were not written")
+    }
+
+    # if return.all==FALSE, only find column contribution for terms that
+    # will be included in the results
+    if (contribution) {
+        agmt <- if (!return.all) gmt[significant.indeces] else gmt
+        col.contribution <- columnContribution(scores, agmt, background,
+                                               significant, cutoff, correction.method)
+        res <- merge(res, col.contribution[, -'term.name'], by='term.id', all=TRUE, sort=FALSE)
+    }
+
+    if (!is.null(cytoscape.filenames) && length(significant.indeces) > 0) {
+        prepareCytoscape(res[significant.indeces], gmt, cytoscape.filenames, contribution)
     }
 
     if (return.all) return(res)

@@ -6,7 +6,7 @@
 \usage{
 mpea(scores, gmt, cutoff = 0.1, significant = 0.05, return.all = FALSE,
   merge.method = c("Fisher", "Brown", "logitp", "meanp", "sump", "sumz",
-  "sumlog"), correction.method = c("fdr", "holm", "hochberg", "hommel",
+  "sumlog"), correction.method = c("holm", "fdr", "hochberg", "hommel",
   "bonferroni", "BH", "BY"), background = makeBackground(gmt),
   contribution = TRUE, cytoscape.filenames = NULL)
 }
@@ -92,6 +92,23 @@ mpea
 
 \section{Merging p-Values}{
 
+In order to obtain a single score for each gene, the p-values in \code{scores}
+are merged row-wise. There are multiple methods available that can be used
+to obtain this merged score. They are:
+\describe{
+ \item{Fisher or sumlog}{Fisher's method assumes p-values are uniformly
+ distributed and performs a chi-squared test on the statistic sum(-2 log(p).
+ This method is most appropriate when the columns in \code{scores} are
+ independent.}
+ \item{Brown}{Brown's method extends Fisher's method by accounting for the
+ covariance in the columns of \code{scores}. It is more appropriate when the
+ tests of significance used to create the columns in \code{scores} are not
+ necessarily independent.}
+}
+\item{logitp}{}
+\item{meanp}{}
+\item{sump}{}
+\item{sumz}{}
 }
 
 \section{Adjusting p-Values}{

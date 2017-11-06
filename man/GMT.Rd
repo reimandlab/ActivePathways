@@ -44,8 +44,7 @@ term.
 \examples{
 \dontrun{
   gmt <- read.GMT('path/to/gmt.gmt')
-  gmt[13:22]
-  gmt[1]
+  gmt[1:10]
   gmt[[1]]
   gmt[1]$id
   gmt[1]$genes

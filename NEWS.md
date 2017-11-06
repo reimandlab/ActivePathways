@@ -4,6 +4,9 @@
 * No longer raises an error if no significant terms are found and `return.all` 
 is false. Instead returns an empty `data.table` and issues a warning.
 * Issue a warning if genes are filtered out for not being found in the background
+* Change default p-value adjustment method to "holm"
+* If return.all==FALSE, calculates columnContribution only for terms that will
+returned. Speeds up runtime by roughly a factor of 2
 
 
 ## Bug fixes

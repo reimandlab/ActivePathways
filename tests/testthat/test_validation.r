@@ -21,7 +21,7 @@ test_that("cytoscape.filenames specified", {
 test_that("significant is valid", {
     expect_error(mpea(dat, gmt, significant=-0.1), "significant must be a value in [0,1]", fixed=TRUE)
     expect_error(mpea(dat, gmt, significant = 1.1), "significant must be a value in [0,1]", fixed=TRUE)
-    expect_warning(mpea(dat, gmt, significant=0, return.all=TRUE), "No significant terms were gound")
+    expect_warning(mpea(dat, gmt, significant=0, return.all=TRUE), "No significant terms were found")
     expect_error(mpea(dat, gmt, significant=1, return.all=TRUE), NA)
 })
 
@@ -33,6 +33,6 @@ test_that("cutoff is valid", {
 })
 
 test_that("genes not found in background are removed", {
-    expect_message(mpea(dat, gmt, background=rownames(dat)[1]), "99 rows were removed from scores because they are not found in the background")
+    expect_message(mpea(dat, gmt, background=rownames(dat)[1], significant=1, cutoff=1), "99 rows were removed from scores because they are not found in the background")
     expect_error(mpea(dat, gmt, background='qwerty'), "scores does not contain any genes in the background")
 })

@@ -78,12 +78,11 @@
 #'  covariance in the columns of \code{scores}. It is more appropriate when the
 #'  tests of significance used to create the columns in \code{scores} are not
 #'  necessarily independent.}
+#'  \item{logitp}{}
+#'  \item{meanp}{}
+#'  \item{sump}{}
+#'  \item{sumz}{}
 #' }
-#' \item{logitp}{}
-#' \item{meanp}{}
-#' \item{sump}{}
-#' \item{sumz}{}
-#'
 #' @section Adjusting p-Values:
 #'
 #' @section Column Contribution:
@@ -106,7 +105,7 @@ mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
                  merge.method=c("Fisher", "Brown", "logitp", "meanp", "sump",
                                 "sumz", "sumlog"),
                  correction.method=c("holm", "fdr", "hochberg", "hommel",
-                                     "bonferroni", "BH", "BY"),
+                                     "bonferroni", "BH", "BY", "none"),
                  background=makeBackground(gmt), contribution=TRUE,
                  cytoscape.filenames=NULL) {
 

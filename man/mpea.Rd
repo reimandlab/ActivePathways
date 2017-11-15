@@ -104,11 +104,11 @@ to obtain this merged score. They are:
  covariance in the columns of \code{scores}. It is more appropriate when the
  tests of significance used to create the columns in \code{scores} are not
  necessarily independent.}
+ \item{logitp}{}
+ \item{meanp}{}
+ \item{sump}{}
+ \item{sumz}{}
 }
-\item{logitp}{}
-\item{meanp}{}
-\item{sump}{}
-\item{sumz}{}
 }
 
 \section{Adjusting p-Values}{

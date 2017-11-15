@@ -13,7 +13,7 @@ test_that("Column names of data.table is correct", {
     expect_equal(colnames(mpea(dat, gmt, cytoscape.filenames=NULL, contribution=FALSE, significant=1)),
                  c('term.id', 'term.name', 'p.val', 'term.size', 'overlap'))
     expect_equal(colnames(mpea(dat, gmt, cytoscape.filenames=NULL, contribution=TRUE, significant=1)),
-                 c('term.id', 'term.name', 'p.val', 'term.size', 'overlap', 'CDS', 'promCore', 'X5UTR', 'X3UTR', 'enhancer'))
+                 c('term.id', 'term.name', 'p.val', 'term.size', 'overlap', 'cds', 'promoter', 'enhancer'))
 })
 
 test_that("All results or only significant ones are returned", {

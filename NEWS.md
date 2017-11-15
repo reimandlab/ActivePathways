@@ -7,6 +7,7 @@ is false. Instead returns an empty `data.table` and issues a warning.
 * Change default p-value adjustment method to "holm"
 * If return.all==FALSE, calculates columnContribution only for terms that will
 returned. Speeds up runtime by roughly a factor of 2
+* Add "none" option to p-value adjustment methods
 
 
 ## Bug fixes

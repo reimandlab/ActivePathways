@@ -44,11 +44,12 @@ hypergeometric <- function(genelist, complement, annotations) {
 #'     \item{ind}{The index of \code{genelist} such that \code{genelist[1:ind]}
 #'       gives the lowest p-value}
 #'  }
-#'  @examples
-#'  \dontrun{
+#'
+#' @examples
+#' \dontrun{
 #'    orderedHypergeometric(c('HERC2', 'SP100'), c('PHC2', 'BLM', 'NDC1', 'XPC', 'SMC3', 'HERC2', 'SP100'),
 #'                          c('HERC2', 'PHC2', 'BLM'))
-#'  }
+#' }
 orderedHypergeometric <- function(genelist, background, annotations) {
     # remove genes in genelist from background to form a list of all other genes
     # genes that are not being tested in each call will be added back

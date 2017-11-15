@@ -168,9 +168,9 @@ mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
     # Sort genes by p-value
     ordered.scores <- names(merged.scores)[order(merged.scores)]
 
-    ##### gsea and column contribution #####
+    ##### enrichmentAnalysis and column contribution #####
 
-    res <- gsea(ordered.scores, gmt, background)
+    res <- enrichmentAnalysis(ordered.scores, gmt, background)
     res[, p.val := p.adjust(p.val, method=correction.method)]
 
     significant.indeces <- which(res$p.val <= significant)
@@ -179,21 +179,32 @@ mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
         if (!is.null(cytoscape.filenames)) warning("Cytoscape files were not written")
     }
 
-    # if return.all==FALSE, only find column contribution for terms that
-    # will be included in the results
+    # If return.all==FALSE replace res and gmt with only the terms that will be
+    # returned with the results
+    if (!return.all) {
+        res <- res[significant.indeces]
+        gmt <- gmt[significant.indeces]
+        significant.indeces <- 1:length(significant.indeces)
+    }
+
     if (contribution) {
-        agmt <- if (!return.all) gmt[significant.indeces] else gmt
-        col.contribution <- columnContribution(scores, agmt, background,
-                                               significant, cutoff, correction.method)
-        res <- merge(res, col.contribution[, -'term.name'], by='term.id', all=TRUE, sort=FALSE)
+        col.contribution <- columnContribution(scores, gmt, background, cutoff,
+                                               correction.method, merge.method, res$p.val)
+        res <- merge(res, col.contribution, by='term.id', all=TRUE, sort=FALSE)
     }
 
     if (!is.null(cytoscape.filenames) && length(significant.indeces) > 0) {
-        prepareCytoscape(res[significant.indeces], gmt, cytoscape.filenames, contribution)
+        if (contribution) {
+            sig.cols <- columnSignificance(scores, gmt[significant.indeces],
+                                           background, cutoff, significant, correction.method)
+        } else {
+            sig.cols <- NULL
+        }
+        prepareCytoscape(res[significant.indeces, .(term.id, term.name, p.val)],
+                         gmt[significant.indeces], cytoscape.filenames, sig.cols)
     }
 
-    if (return.all) return(res)
-    return(res[significant.indeces])
+    res
 }
 
 #' Perform Gene Set Enrichment Analysis on an ordered list of genes
@@ -217,9 +228,9 @@ mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
 #'
 #' @examples
 #' \dontrun{
-#'     gsea(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt, makeBackground(gmt))
+#'     enrichmentAnalysis(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt, makeBackground(gmt))
 #' }
-gsea <- function(genelist, gmt, background) {
+enrichmentAnalysis <- function(genelist, gmt, background) {
     dt <- data.table(term.id=names(gmt))
 
     for (i in 1:length(gmt)) {
@@ -238,34 +249,62 @@ gsea <- function(genelist, gmt, background) {
 
 #' Get contribution of each column to each term
 #'
+#' @param mpea.pvals p-values determined by mpea
+#'
 #' @inheritParams mpea
 #'
-#' @return a data.table of terms. The first two columns contain the term id and
-#'   name. The rest of the columns denoting whether the term is found to be
-#'   significant if using only that test in analysis
+#' @return a data.table of terms. The first column contains the term id. The
+#'  rest of the columns give the log-fold-change when the column is excluded
 #'
 #' @examples
 #' \dontrun{
 #'   dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
 #'   dat[is.na(dat)] <- 1
 #'   gmt <- read.GMT('path/to/gmt.gmt')
-#'   columnContribution(dat, gmt, makeBackground(gmt), 0.05, 0.1, 'fdr')
+#'   res <- mpea(dat, gmt, contribution=FALSE)
+#'   columnContribution(dat, gmt, makeBackground(gmt), 0.1, 'fdr', 'Fisher', res$p.val)
 #' }
-columnContribution <- function(scores, gmt, background, significant,
-                               cutoff, correction.method) {
-    dt <- data.table(term.id=names(gmt), term.name=sapply(gmt, function(x) x$name))
+columnContribution <- function(scores, gmt, background, cutoff,
+                               correction.method, merge.method, mpea.pvals) {
+    dt <- data.table(term.id=names(gmt))
 
     for (col in colnames(scores)) {
-        col.scores <- scores[, col, drop=TRUE]
-        col.scores <- col.scores[col.scores <= cutoff]
-        col.scores <- names(col.scores[order(col.scores)])
+        # Remove column and merge scores
+        scores2 <- scores[, -which(col == colnames(scores)), drop=FALSE]
+        merged.scores <- merge_p_values(scores2, merge.method)
+        merged.scores <- merged.scores[merged.scores <= cutoff]
+        merged.scores <- names(merged.scores)[order(merged.scores)]
 
+        # Get p-valeus and report log-fold-change
         p.vals <- sapply(gmt, function(x)
-            orderedHypergeometric(col.scores, background, x$genes)$p.val)
+            orderedHypergeometric(merged.scores, background, x$genes)$p.val)
         p.vals <- p.adjust(p.vals, method=correction.method)
-        p.vals <- as.numeric(p.vals <= significant)
-        dt[, (col) := p.vals]
+        dt[, (col) := -log10(mpea.pvals / p.vals)]
      }
     dt
 }
 
+#' Determine which pathways are found to be significant using each column
+#' individually
+#'
+#' @inheritParams mpea
+#'
+#' @return a data.table with columns 'term.id' and a column for each column
+#' in \code{scores}, indicating whether each pathway was found to be
+#' significant(TRUE) or not(FALSE) when considering only that column
+
+columnSignificance <- function(scores, gmt, background, cutoff, significant, correction.method) {
+    dt <- data.table(term.id=names(gmt))
+
+    for (col in colnames(scores)) {
+        col.scores <- scores[, col, drop=TRUE]
+        col.scores <- col.scores[col.scores <= cutoff]
+        col.scores <- names(col.scores)[order(col.scores)]
+
+        p.vals <- sapply(gmt, function(x)
+            orderedHypergeometric(col.scores, background, x$genes)$p.val)
+        p.vals <- p.adjust(p.vals, correction.method)
+        dt[, (col) := as.numeric(p.vals <= significant)]
+    }
+    dt
+}

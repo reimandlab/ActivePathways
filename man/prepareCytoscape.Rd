@@ -4,18 +4,20 @@
 \alias{prepareCytoscape}
 \title{Prepare files for building an Enrichment Map in Cytoscape}
 \usage{
-prepareCytoscape(terms, gmt, filenames, contribution)
+prepareCytoscape(terms, gmt, filenames, col.significance)
 }
 \arguments{
-\item{terms}{a data.table of terms, the output of mpea()}
+\item{terms}{a data.table with columns 'term.id', 'term.name', 'p.val'}
 
-\item{gmt}{A GMT object to be used for enrichment analysis. If a filename, a
-GMT object will be read from the file}
+\item{gmt}{an abridged gmt object containing only the pathways that were
+found to be significant}
 
 \item{filenames}{vector of 2 or 3 filesnames denoting where to write fles to}
 
-\item{contribution}{Evaluate contribution of individual columns to a term's
-significance. See section Column Contribution}
+\item{col.significance}{a data.table with a column 'term.id' and a column
+for each test indicating whether a pathways is signficiant (TRUE) or not
+(FALSE) when considering only that column. If contribution==TRUE, use
+col.significance=NULL and this will be skipped}
 }
 \value{
 None
@@ -30,14 +32,9 @@ Cytoscape and the EnrichmentMap app.
       written to this file}
     \item{cytoscape.filenames[2]}{A matrix of column contributions to each
       term. A \code{1} indicates that that term is significant using only
-      that column to test for enrichment analysis}
+      that column to test for enrichment analysis}. Left out if
+      contribution==FALSE and therefore col.significance==NULL
     \item{cytoscape.filenames[3]}{A Shortened version of the supplied gmt
       file, containing only the terms in \code{cytoscape.filenames[1]}}
   }
-}
-\examples{
-\dontrun{
-    res <- mpea(dat, gmt)
-    prepareCytoscape(res, gmt, paste('cytoscape', c('terms.txt', 'groups.txt', 'abridged.gmt'), sep='/'), TRUE)
-}
 }

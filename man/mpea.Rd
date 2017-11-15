@@ -7,7 +7,7 @@
 mpea(scores, gmt, cutoff = 0.1, significant = 0.05, return.all = FALSE,
   merge.method = c("Fisher", "Brown", "logitp", "meanp", "sump", "sumz",
   "sumlog"), correction.method = c("holm", "fdr", "hochberg", "hommel",
-  "bonferroni", "BH", "BY"), background = makeBackground(gmt),
+  "bonferroni", "BH", "BY", "none"), background = makeBackground(gmt),
   contribution = TRUE, cytoscape.filenames = NULL)
 }
 \arguments{

@@ -1,5 +1,9 @@
 # mpea 0.0.0.90001
 
+## Major Changes
+* Change column contribution method. Column contribution is now reported as the
+log-fold-change when the column is excluded. ie, -log10(p_val_with_column / p_val_without_column)
+
 ## Minor Changes
 * No longer raises an error if no significant terms are found and `return.all` 
 is false. Instead returns an empty `data.table` and issues a warning.

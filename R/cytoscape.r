@@ -9,60 +9,54 @@
 #'       written to this file}
 #'     \item{cytoscape.filenames[2]}{A matrix of column contributions to each
 #'       term. A \code{1} indicates that that term is significant using only
-#'       that column to test for enrichment analysis}
+#'       that column to test for enrichment analysis}. Left out if
+#'       contribution==FALSE and therefore col.significance==NULL
 #'     \item{cytoscape.filenames[3]}{A Shortened version of the supplied gmt
 #'       file, containing only the terms in \code{cytoscape.filenames[1]}}
 #'   }
 #'
-#' @param terms a data.table of terms, the output of mpea()
+#' @param terms a data.table with columns 'term.id', 'term.name', 'p.val'
+#' @param gmt an abridged gmt object containing only the pathways that were
+#' found to be significant
 #' @param filenames vector of 2 or 3 filesnames denoting where to write fles to
-#'
-#' @inheritParams mpea
+#' @param col.significance a data.table with a column 'term.id' and a column
+#' for each test indicating whether a pathways is signficiant (TRUE) or not
+#' (FALSE) when considering only that column. If contribution==TRUE, use
+#' col.significance=NULL and this will be skipped
 #'
 #' @return None
-#'
-#' @examples
-#' \dontrun{
-#'     res <- mpea(dat, gmt)
-#'     prepareCytoscape(res, gmt, paste('cytoscape', c('terms.txt', 'groups.txt', 'abridged.gmt'), sep='/'), TRUE)
-#' }
 
-prepareCytoscape <- function(terms, gmt, filenames, contribution) {
-    termlist <- terms[, .(term.id, term.name, p.val)]
-
-    abridged.gmt <- gmt[unlist(terms$term.id)]
-
-    if (contribution) {
-        tests <- colnames(terms)[-1:-5]
+prepareCytoscape <- function(terms, gmt, filenames, col.significance) {
+    if (!is.null(col.significance)) {
+        tests <- colnames(col.significance)[-1]
+        rows <- 1:nrow(col.significance)
 
         ## Create groups file for enhancedgraphics. Keep both methods for now
         if (FALSE) {
             # Use outer ring
-            subgroups <- terms[, .(term.id)]
-            contributes <- apply(terms, 1, function(x) paste(x[tests], collapse='|'))
+            col.significance[, contributes := paste(.SDcol, collapse='|'), by=rows, .SDcols=-1]
             colors <- paste(rainbow(length(tests), start=0.2), collapse=',')
             instruct.str <- paste('circoschart: firstarc=.7 arcwidth=.3 attributelist="contributes"',
                                   ' colorlist="', colors, '"',
                                   ' showlabels=FALSE', sep="")
-            subgroups[, c('contributes', 'instruct') := list(contributes, instruct.str)]
+            col.significance[, instruct := instruct.str]
         } else {
             # Use pichart
-            subgroups <- terms[, c('term.id', tests), with=FALSE]
-            subgroups[, none := as.numeric(all(!.SD)), by=1:nrow(subgroups), .SDcols=tests]
+            col.significance[, none := as.numeric(all(!.SD)), by=rows, .SDcols=-1]
             colors <- paste(rainbow(length(tests)), collapse=',')
             instruct.str <- paste('piechart:',
                                   ' attributelist="', paste(tests, collapse=','), ',none"',
                                   ' colorlist="', colors, ',#CCCCCC"',
                                   ' showlabels=FALSE', sep='')
-            subgroups[, 'instruct' := instruct.str]
+            col.significance[, instruct := instruct.str]
         }
 
-        write.table(termlist, file=filenames[1], row.names=FALSE, sep="\t", quote=FALSE)
-        write.table(subgroups, file=filenames[2], row.names=FALSE, sep="\t", quote=FALSE)
-        write.GMT(abridged.gmt, filenames[3])
+        write.table(terms, file=filenames[1], row.names=FALSE, sep="\t", quote=FALSE)
+        write.table(col.significance, file=filenames[2], row.names=FALSE, sep="\t", quote=FALSE)
+        write.GMT(gmt, filenames[3])
     } else {
-        write.table(termlist, file=filenames[1], row.names=FALSE, sep="\t", quote=FALSE)
-        write.GMT(abridged.gmt, filenames[2])
+        write.table(terms, file=filenames[1], row.names=FALSE, sep="\t", quote=FALSE)
+        write.GMT(gmt, filenames[2])
     }
 }
 

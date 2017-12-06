@@ -2,29 +2,23 @@
 % Please edit documentation in R/statistical_tests.r
 \name{hypergeometric}
 \alias{hypergeometric}
-\title{Hypergeometric Test}
+\title{Hypergemoetric Test}
 \usage{
-hypergeometric(genelist, complement, annotations)
+hypergeometric(counts)
 }
 \arguments{
-\item{genelist}{character vector of gene names. List of differentially
-expressed genes being tested for enrichment}
-
-\item{complement}{character vector of gene names. All other genes not being
-tested for enrichment. Ie \code{setdiff(background, genelist)}}
-
-\item{annotations}{character vector of gene names. List of genes annotated to
-the term being tested.}
+\item{counts}{a 2x2 numerical matrix representing a contingency table}
 }
 \value{
 a p-value
 }
 \description{
-Perform a Hypergeometric, aka Fisher's exact test, on a list of significant
-genes and annotation genes
+Perform a Hypergeometric test, aka Fisher's exact test, on a 2x2 contingency
+table with a 'greater' alternative hypothesis. That is, find the
+probability that counts[1, 1] or more genes would be found in annotations,
+assuming the null hypothesis.
 }
 \examples{
-\dontrun{
-  hypergeometric(c('HERC2', 'SP100'), c('PHC2', 'BLM', 'NDC1', 'XPC', 'SMC3'), c('HERC2', 'PHC2', 'BLM'))
-}
+hypergeometric(matrix(data=c(1, 8, 14, 836), nrow=2))
+
 }

@@ -20,13 +20,13 @@ GMT object will be read from the file}
 statistical background. By default, the background is all genes that appear
 in \code{gmt}}
 
-\item{cutoff}{A maximum p-value for agene to be used for enrichment analysis.
+\item{cutoff}{A maximum p-value for a gene to be used for enrichment analysis.
 Any genes with \code{p.val > significant} will be discarded before testing}
 
 \item{correction.method}{Method to correct p-values. See
 \code{\link[stats]{p.adjust}} for details}
 
-\item{merge.method}{Method to merge p-values.}
+\item{merge.method}{Method to merge p-values. See section Merging p Values}
 
 \item{mpea.pvals}{p-values determined by mpea}
 }

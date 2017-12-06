@@ -12,18 +12,17 @@ is false. Instead returns an empty `data.table` and issues a warning.
 * If return.all==FALSE, calculates columnContribution only for terms that will
 returned. Speeds up runtime by roughly a factor of 2
 * Add "none" option to p-value adjustment methods
-
+* New implementation of orderedHypergeometric function which is several times faster.
 
 ## Bug fixes
 * Fix Brown's method when all p-values in a column are the same
 * Fix in orderedHypergeometric which added an extra NA to the `complement`, leading
 to small errors in the calculated p-value
+* Fixed another bug in orderedHypergeometric which added an extra NA to the 
+`complement` in some cases, leading to small errors in the calculated p-value
 
 # mpea 0.0.0.9000
 
 * Initial Build
 
 * Added a `NEWS.md` file to track changes to the package.
-
-
-

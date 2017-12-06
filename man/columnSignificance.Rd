@@ -21,7 +21,7 @@ GMT object will be read from the file}
 statistical background. By default, the background is all genes that appear
 in \code{gmt}}
 
-\item{cutoff}{A maximum p-value for agene to be used for enrichment analysis.
+\item{cutoff}{A maximum p-value for a gene to be used for enrichment analysis.
 Any genes with \code{p.val > significant} will be discarded before testing}
 
 \item{significant}{A number in [0,1] denoting the maximum p-value for a

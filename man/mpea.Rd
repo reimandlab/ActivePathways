@@ -6,9 +6,10 @@
 \usage{
 mpea(scores, gmt, cutoff = 0.1, significant = 0.05, return.all = FALSE,
   merge.method = c("Fisher", "Brown", "logitp", "meanp", "sump", "sumz",
-  "sumlog"), correction.method = c("holm", "fdr", "hochberg", "hommel",
-  "bonferroni", "BH", "BY", "none"), background = makeBackground(gmt),
-  contribution = TRUE, cytoscape.filenames = NULL)
+  "sumlog", "votep", "wilkinsonp"), correction.method = c("holm", "fdr",
+  "hochberg", "hommel", "bonferroni", "BH", "BY", "none"),
+  background = makeBackground(gmt), contribution = TRUE,
+  cytoscape.filenames = NULL)
 }
 \arguments{
 \item{scores}{A numerical matrix of p-values where each row is a gene and
@@ -19,7 +20,7 @@ converted to 1}
 \item{gmt}{A GMT object to be used for enrichment analysis. If a filename, a
 GMT object will be read from the file}
 
-\item{cutoff}{A maximum p-value for agene to be used for enrichment analysis.
+\item{cutoff}{A maximum p-value for a gene to be used for enrichment analysis.
 Any genes with \code{p.val > significant} will be discarded before testing}
 
 \item{significant}{A number in [0,1] denoting the maximum p-value for a
@@ -28,7 +29,7 @@ pathway to be considered significantly enriched.}
 \item{return.all}{Whether to return results for all terms or only significant
 terms}
 
-\item{merge.method}{Method to merge p-values.}
+\item{merge.method}{Method to merge p-values. See section Merging p Values}
 
 \item{correction.method}{Method to correct p-values. See
 \code{\link[stats]{p.adjust}} for details}
@@ -53,70 +54,73 @@ A data.table of terms containing the following columns:
     \item{term.size}{The number of genes annotated to the term}
     \item{overlap}{A character vector of the genes that overlap between the
     term and the query}
-    \item{...}{If \code{contribution == TRUE}, A column for each test in
-      \code{scores} denoting whether the term is found to be significant if
-      using only that test in analysis}
+    \item{...}{If \code{contribution == TRUE}, a column for each test in
+      \code{scores} denoting the contribution of that column to each
+      pathway's p-value. See secion Column Contribution.}
   }
   If \code{return.all == FALSE} then only terms with
-    \code{p.val <= significant} will be returned.
+    \code{p.val <= significant} will be returned, otherwise all terms will be
+    returned.
 }
 \description{
 mpea
 }
-\section{Cytoscape}{
-
-  If \code{cytoscape.filenames} is supplied, \code{mpea} will write three
-  files that can be used to build an network using Cytoscape and the
-  EnrichmentMap app. The three fies written are:
-  \describe{
-    \item{cytoscape.filenames[1]}{A list of significant terms and the
-    associated p-value. Only terms with \code{p.val <= significant} are
-    written to this file}
-    \item{cytoscape.filenames[2]}{A matrix of column contributions to each
-    term. A 1 indicates that that term is significant using only that
-    column to test for enrichment analysis}
-    \item{cytoscape.filenames[3]}{A Shortened version of the supplied gmt
-    file, containing only the terms in \code{cytoscape.filenames[1]}}
-  }
-  If \code{contribution == FALSE} the matrix of column contributions will not
-  be written. Only 2 file names need to be supplied, and if three are given
-  the second will be ignored
-
-  Use: Create an enrichment map in Cytoscape with the file of terms
-  (cytoscape.filenames[1]) and the shortened gmt file
-  (cytoscape.filenames[3]). Upload (File > import > table > file) the
-  subgroups file (cytoscape.filenames[2]) and **ensure the `contributes`
-  column is a list data type. Under style set image/Chart1 to use the column
-  `instruct` and the passthrough mapping type.
-}
-
-\section{Merging p-Values}{
+\section{Merging p Values}{
 
 In order to obtain a single score for each gene, the p-values in \code{scores}
 are merged row-wise. There are multiple methods available that can be used
-to obtain this merged score. They are:
+to obtain this merged score. The main methods are:
 \describe{
  \item{Fisher or sumlog}{Fisher's method assumes p-values are uniformly
- distributed and performs a chi-squared test on the statistic sum(-2 log(p).
+ distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
  This method is most appropriate when the columns in \code{scores} are
  independent.}
  \item{Brown}{Brown's method extends Fisher's method by accounting for the
  covariance in the columns of \code{scores}. It is more appropriate when the
  tests of significance used to create the columns in \code{scores} are not
  necessarily independent.}
- \item{logitp}{}
- \item{meanp}{}
- \item{sump}{}
- \item{sumz}{}
 }
-}
-
-\section{Adjusting p-Values}{
-
+Other methods are also available. See \code{\link[metap]{metap-package}}
+for more details
 }
 
 \section{Column Contribution}{
+ If \code{contribution == TRUE}, mpea will find
+  the contribution of each column in \code{scores} to the p-value for each
+  pathway. The contribution is reported as the log-fold-change in p-values
+  when mpea is run with the column excluded from the data
+  (\code{-log10(p_with_column / p_without_column)}). A contribution of 0
+  means the p-value is the same with or without that column, while a large
+  positive number means the p-value is significantly smaller when that column
+  is included in the data.
+}
 
+\section{Cytoscape}{
+
+  If \code{cytoscape.filenames} is supplied, \code{mpea} will write three
+  files that can be used to build a network using Cytoscape and the
+  EnrichmentMap and enhancedGraphics apps. The three fies written are:
+  \describe{
+    \item{cytoscape.filenames[1]}{A list of significant terms and the
+    associated p-value. Only terms with \code{p.val <= significant} are
+    written to this file}
+    \item{cytoscape.filenames[2]}{A matrix indicating whether the significant
+    pathways are found to be significant when considering only one column from
+    \code{scores}. A 1 indicates that that term is significant using only that
+    column to test for enrichment analysis}
+    \item{cytoscape.filenames[3]}{A Shortened version of the supplied gmt
+    file, containing only the terms in \code{cytoscape.filenames[1]}}
+  }
+  If \code{contribution == FALSE} the matrix of column significance will not
+  be written. Only 2 file names need to be supplied, and if three are given
+  the second will be ignored
+
+  How to use: Create an enrichment map in Cytoscape with the file of terms
+  (cytoscape.filenames[1]) and the shortened gmt file
+  (cytoscape.filenames[3]). Upload (File > import > table > file) the
+  subgroups file (cytoscape.filenames[2]) as a table. Under the 'style'
+  panel, set image/Chart1 to use the column `instruct` and the passthrough
+  mapping type.
 }
 
 \examples{

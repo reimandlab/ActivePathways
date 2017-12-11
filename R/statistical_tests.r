@@ -63,7 +63,7 @@ orderedHypergeometric <- function(genelist, background, annotations) {
     counts <- matrix(data=c(1, genelist0, complement1, complement0), nrow=2)
     scores <- hypergeometric(counts)
 
-    if (length(which.in) == 1) return(list(p.val=scores, ind=1))
+    if (length(which.in) == 1) return(list(p.val=scores, ind=which.in[1]))
 
     # Update counts and recalculate score for the rest of the indeces in which.in
     # The genes in genelist[which.in[i]:which.in[i-1]] are added to the genes

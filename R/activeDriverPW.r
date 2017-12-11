@@ -124,13 +124,15 @@ activeDriverPW <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all
     ##### Validation #####
 
     if (!(is.matrix(scores) && is.numeric(scores))) stop("scores must be a numeric matrix")
+    if (any(is.na(scores))) stop("scores may not contain missing values")
+    if (any(scores < 0) || any(scores > 1)) stop("All values in scores must be in [0,1]")
     if (!is.numeric(cutoff) || cutoff < 0 || cutoff > 1) {
         stop("cutoff must be a value in [0,1]")
     }
     if (!is.numeric(significant) || significant < 0 || significant > 1) {
         stop("significant must be a value in [0,1]")
     }
-    if (!is.character(background)) stop("background must be a character vector")
+    if (!(is.character(background) && is.vector(background))) stop("background must be a character vector")
     if (!is.GMT(gmt)) gmt <- read.GMT(gmt)
 
     if (ncol(scores) == 1 && contribution) {

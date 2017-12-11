@@ -1,4 +1,4 @@
-#' mpea
+#' activeDriverPW
 #'
 #' @param scores A numerical matrix of p-values where each row is a gene and
 #'   each column is a test. Rownames should be the genes and colnames the names
@@ -57,17 +57,17 @@
 #' Other methods are also available. See \code{\link[metap]{metap-package}}
 #' for more details
 #'
-#' @section Column Contribution: If \code{contribution == TRUE}, mpea will find
+#' @section Column Contribution: If \code{contribution == TRUE}, activeDriverPW will find
 #'   the contribution of each column in \code{scores} to the p-value for each
 #'   pathway. The contribution is reported as the log-fold-change in p-values
-#'   when mpea is run with the column excluded from the data
+#'   when activeDriverPW is run with the column excluded from the data
 #'   (\code{-log10(p_with_column / p_without_column)}). A contribution of 0
 #'   means the p-value is the same with or without that column, while a large
 #'   positive number means the p-value is significantly smaller when that column
 #'   is included in the data.
 #'
 #' @section Cytoscape:
-#'   If \code{cytoscape.filenames} is supplied, \code{mpea} will write three
+#'   If \code{cytoscape.filenames} is supplied, activeDriverPW will write three
 #'   files that can be used to build a network using Cytoscape and the
 #'   EnrichmentMap and enhancedGraphics apps. The three fies written are:
 #'   \describe{
@@ -97,16 +97,19 @@
 #'     dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
 #'     dat[is.na(dat)] <- 1
 #'     gmt <- read.GMT('path/to/gmt.gmt')
-#'     mpea(dat, gmt, return.all=TRUE,
+#'     activeDriverPW(dat, gmt, return.all=TRUE,
 #'          cytoscape.filenames=c('terms.txt', 'groups.txt', 'abridged.gmt'))
 #' }
+#'
+#' @import metap
+#' @import data.table
 #'
 #' @export
 #
 # TODO: enter citations for article on merging p-values
 # http://www.jstor.org/stable/2529826
 # TODO: enter citations for Cytoscape, enrichmentMap, and enhancedGraphics
-mpea <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
+activeDriverPW <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
                  merge.method=c("Fisher", "Brown", "logitp", "meanp", "sump",
                                 "sumz", "sumlog", "votep", "wilkinsonp"),
                  correction.method=c("holm", "fdr", "hochberg", "hommel",
@@ -254,9 +257,9 @@ enrichmentAnalysis <- function(genelist, gmt, background) {
 
 #' Get contribution of each column to each term
 #'
-#' @param mpea.pvals p-values determined by mpea
+#' @param ad.pvals p-values determined by activeDriverPW
 #'
-#' @inheritParams mpea
+#' @inheritParams activeDriverPW
 #'
 #' @return a data.table of terms. The first column contains the term id. The
 #'  rest of the columns give the log-fold-change when the column is excluded
@@ -266,11 +269,11 @@ enrichmentAnalysis <- function(genelist, gmt, background) {
 #'   dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
 #'   dat[is.na(dat)] <- 1
 #'   gmt <- read.GMT('path/to/gmt.gmt')
-#'   res <- mpea(dat, gmt, contribution=FALSE)
+#'   res <- activeDriverPW(dat, gmt, contribution=FALSE)
 #'   columnContribution(dat, gmt, makeBackground(gmt), 0.1, 'fdr', 'Fisher', res$p.val)
 #' }
 columnContribution <- function(scores, gmt, background, cutoff,
-                               correction.method, merge.method, mpea.pvals) {
+                               correction.method, merge.method, ad.pvals) {
     dt <- data.table(term.id=names(gmt))
 
     for (col in colnames(scores)) {
@@ -284,7 +287,7 @@ columnContribution <- function(scores, gmt, background, cutoff,
         p.vals <- sapply(gmt, function(x)
             orderedHypergeometric(merged.scores, background, x$genes)$p.val)
         p.vals <- p.adjust(p.vals, method=correction.method)
-        dt[, (col) := -log10(mpea.pvals / p.vals)]
+        dt[, (col) := -log10(ad.pvals / p.vals)]
      }
     dt
 }
@@ -292,7 +295,7 @@ columnContribution <- function(scores, gmt, background, cutoff,
 #' Determine which pathways are found to be significant using each column
 #' individually
 #'
-#' @inheritParams mpea
+#' @inheritParams activeDriverPW
 #'
 #' @return a data.table with columns 'term.id' and a column for each column
 #' in \code{scores}, indicating whether each pathway was found to be

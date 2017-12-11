@@ -1,4 +1,4 @@
 library(testthat)
-library(mpea)
+library(activeDriverPW)
 
-test_check("mpea")
+test_check("activeDriverPW")

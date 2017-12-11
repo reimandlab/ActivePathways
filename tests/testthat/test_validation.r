@@ -1,38 +1,60 @@
 context("Validation on parameters")
 
-# Prepare testing data
-library(mpea)
-gmt <- read.GMT('test.gmt')
-dat <- as.matrix(read.table('test_data.txt', header=TRUE, row.names='Gene'))
-dat[is.na(dat)] <- 1
 
-file.names <- paste(c('terms', 'groups', 'smallgmt'), '.txt', sep="")
+test_that("scores is a numeric matrix with valid p-values", {
+  dat2 <- dat
+  dat2[1, 1] <- 'a'
+  expect_error(run_adPW_short(dat2), 'scores must be a numeric matrix')
 
-test_that("cytoscape.filenames specified", {
-    expect_error(mpea(dat, gmt, contribution=TRUE, cytoscape.filenames=file.names[1]),
-                 "Must supply 3 file names to cytoscape.filenames", fixed=TRUE)
-    expect_error(mpea(dat, gmt, contribution=FALSE, cytoscape.filenames=file.names[1]),
-                 "Must supply 2 file names to cytoscape.filenames", fixed=TRUE)
-    expect_error(mpea(dat, gmt, contribution=FALSE, significant=1, cytoscape.filenames=file.names[c(1,3)]), NA)
-    expect_message(mpea(dat, gmt, contribution=FALSE, significant=1, cytoscape.filenames=file.names),
-                   "Column contributions will not be evaluated so the contribution matrix is not being written. cytoscape.filenames[2] will be ignored", fixed=TRUE)
+  dat2 <- dat
+  dat2[1, 1] <- NA
+  expect_error(run_adPW_short(dat2), 'scores may not contain missing values')
+
+  dat2[1, 1] <- -0.1
+  expect_error(run_adPW_short(dat2), "All values in scores must be in [0,1]", fixed=TRUE)
+
+  dat2[1, 1] <- 1.1
+  expect_error(run_adPW_short(dat2), "All values in scores must be in [0,1]", fixed=TRUE)
+
+  dat2[1, 1] <- 1
+  expect_error(run_adPW_short(dat2), NA)
+
+  dat2[1, 1] <- 0
+  expect_error(run_adPW_short(dat2), NA)
 })
 
 test_that("significant is valid", {
-    expect_error(mpea(dat, gmt, significant=-0.1), "significant must be a value in [0,1]", fixed=TRUE)
-    expect_error(mpea(dat, gmt, significant = 1.1), "significant must be a value in [0,1]", fixed=TRUE)
-    expect_warning(mpea(dat, gmt, significant=0, return.all=TRUE), "No significant terms were found")
-    expect_error(mpea(dat, gmt, significant=1, return.all=TRUE), NA)
+    expect_error(activeDriverPW(dat, gmt, significant=-0.1),
+                 "significant must be a value in [0,1]", fixed=TRUE)
+    expect_error(activeDriverPW(dat, gmt, significant = 1.1),
+                 "significant must be a value in [0,1]", fixed=TRUE)
+    expect_warning(activeDriverPW(dat, gmt, significant=0, return.all=TRUE),
+                   "No significant terms were found")
+    expect_error(activeDriverPW(dat, gmt, significant=1, return.all=TRUE), NA)
 })
+
 
 test_that("cutoff is valid", {
-    expect_error(mpea(dat, gmt, cutoff=-0.1), "cutoff must be a value in [0,1]", fixed=TRUE)
-    expect_error(mpea(dat, gmt, cutoff = 1.1), "cutoff must be a value in [0,1]", fixed=TRUE)
-    expect_error(mpea(dat, gmt, cutoff=0, return.all=TRUE), "No genes made the cutoff", fixed=TRUE)
-    expect_error(mpea(dat, gmt, cutoff=1, return.all=TRUE), NA)
+    expect_error(activeDriverPW(dat, gmt, cutoff=-0.1),
+                 "cutoff must be a value in [0,1]", fixed=TRUE)
+    expect_error(activeDriverPW(dat, gmt, cutoff = 1.1),
+                 "cutoff must be a value in [0,1]", fixed=TRUE)
+    expect_error(activeDriverPW(dat, gmt, cutoff=0, return.all=TRUE),
+                 "No genes made the cutoff", fixed=TRUE)
+    expect_error(activeDriverPW(dat, gmt, cutoff=1, return.all=TRUE), NA)
 })
 
+
+test_that("background is a character vector", {
+    error_msg <- "background must be a character vector"
+    expect_error(activeDriverPW(dat, gmt, background=c(1,5,2)), error_msg)
+    expect_error(activeDriverPW(dat, gmt, background=matrix(c('a', 'b', 'c', 'd'), 2)), error_msg)
+})
+
+
 test_that("genes not found in background are removed", {
-    expect_message(mpea(dat, gmt, background=rownames(dat)[1], significant=1, cutoff=1), "99 rows were removed from scores because they are not found in the background")
-    expect_error(mpea(dat, gmt, background='qwerty'), "scores does not contain any genes in the background")
+    expect_message(activeDriverPW(dat, gmt, background=rownames(dat)[-(1:10)], significant=1, cutoff=1),
+                   "10 rows were removed from scores because they are not found in the background")
+    expect_error(activeDriverPW(dat, gmt, background='qwerty'),
+                 "scores does not contain any genes in the background")
 })

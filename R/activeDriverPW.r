@@ -188,25 +188,18 @@ activeDriverPW <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all
         warning("No significant terms were found")
         if (!is.null(cytoscape.filenames)) warning("Cytoscape files were not written")
     }
-
-    # If return.all==FALSE replace res and gmt with only the terms that will be
-    # returned with the results
-    if (!return.all) {
-        res <- res[significant.indeces]
-        gmt <- gmt[significant.indeces]
-        significant.indeces <- 1:length(significant.indeces)
-    }
-
+    
     if (contribution) {
         col.contribution <- columnContribution(scores, gmt, background, cutoff,
                                                correction.method, merge.method, res$p.val)
-        res <- merge(res, col.contribution, by='term.id', all=TRUE, sort=FALSE)
+        res <- cbind(res, col.contribution[, -'term.id'])
     }
 
     if (!is.null(cytoscape.filenames) && length(significant.indeces) > 0) {
         if (contribution) {
-            sig.cols <- columnSignificance(scores, gmt[significant.indeces],
-                                           background, cutoff, significant, correction.method)
+            sig.cols <- columnSignificance(scores, gmt, background, cutoff,
+                                           significant, correction.method)
+            sig.cols <- sig.cols[significant.indeces]
         } else {
             sig.cols <- NULL
         }
@@ -214,7 +207,8 @@ activeDriverPW <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all
                          gmt[significant.indeces], cytoscape.filenames, sig.cols)
     }
 
-    res
+    if(return.all) return(res)
+    res[significant.indeces]
 }
 
 #' Perform Gene Set Enrichment Analysis on an ordered list of genes

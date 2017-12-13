@@ -28,6 +28,12 @@ test_that("significant is valid", {
                  "significant must be a value in [0,1]", fixed=TRUE)
     expect_error(activeDriverPW(dat, gmt, significant = 1.1),
                  "significant must be a value in [0,1]", fixed=TRUE)
+    expect_error(activeDriverPW(dat, gmt, significant=NULL),
+                 "length(significant) == 1 is not TRUE", fixed=TRUE)
+    expect_error(activeDriverPW(dat, gmt, significant=c(1,2)),
+                 "length(significant) == 1 is not TRUE", fixed=TRUE)
+    expect_error(activeDriverPW(dat, gmt, significant='qwe'),
+                 "is.numeric(significant) is not TRUE", fixed=TRUE)
     expect_warning(activeDriverPW(dat, gmt, significant=0, return.all=TRUE),
                    "No significant terms were found")
     expect_error(activeDriverPW(dat, gmt, significant=1, return.all=TRUE), NA)
@@ -39,6 +45,12 @@ test_that("cutoff is valid", {
                  "cutoff must be a value in [0,1]", fixed=TRUE)
     expect_error(activeDriverPW(dat, gmt, cutoff = 1.1),
                  "cutoff must be a value in [0,1]", fixed=TRUE)
+    expect_error(activeDriverPW(dat, gmt, cutoff=NULL),
+                 "length(cutoff) == 1 is not TRUE", fixed=TRUE)
+    expect_error(activeDriverPW(dat, gmt, cutoff=c(1,2)),
+                 "length(cutoff) == 1 is not TRUE", fixed=TRUE)
+    expect_error(activeDriverPW(dat, gmt, cutoff='qwe'),
+                 "is.numeric(cutoff) is not TRUE", fixed=TRUE)
     expect_error(activeDriverPW(dat, gmt, cutoff=0, return.all=TRUE),
                  "No genes made the cutoff", fixed=TRUE)
     expect_error(activeDriverPW(dat, gmt, cutoff=1, return.all=TRUE), NA)
@@ -58,3 +70,20 @@ test_that("genes not found in background are removed", {
     expect_error(activeDriverPW(dat, gmt, background='qwerty'),
                  "scores does not contain any genes in the background")
 })
+
+test_that("geneset.filter is a numeric vector of length 2", {
+    expect_error(activeDriverPW(dat, gmt, geneset.filter=1), 
+                 "geneset.filter must be length 2")
+    expect_error(activeDriverPW(dat, gmt, geneset.filter=list(1,2)),
+                 "geneset.filter must be an atomic vector")
+    expect_error(activeDriverPW(dat, gmt, geneset.filter=c('q', 2)),
+                 "geneset.filter must be numeric")
+    expect_error(activeDriverPW(dat, gmt, geneset.filter=c(1, -2)),
+                 "geneset.filter limits must be positive")
+    expect_error(activeDriverPW(dat, gmt, geneset.filter=c(0, 0)), 
+                 "No pathways in gmt made the geneset.filter", fixed=TRUE)
+    expect_message(activeDriverPW(dat, gmt, geneset.filter=c(NA, 10)),
+                   "[0-9]+ terms were removed from gmt because they did not make the geneset.filter")
+    expect_error(activeDriverPW(dat, gmt, geneset.filter=c(0, NA)), NA)
+    expect_error(activeDriverPW(dat, gmt, geneset.filter=NULL), NA)
+}) 

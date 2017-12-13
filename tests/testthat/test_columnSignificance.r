@@ -5,7 +5,7 @@ test_that('columnSignificance agrees with testing individual columns', {
     col <- colnames(dat)[1]
 
     res1 <- columnSignificance(dat, gmt, background, 0.1, 0.05, 'holm')
-    res2 <- activeDriverPW(dat[, col, drop=FALSE], gmt, correction.method='holm', contribution=FALSE)
+    res2 <- activeDriverPW(dat[, col, drop=FALSE], gmt, correction.method='holm', contribution=FALSE, geneset.filter=NULL)
 
     # Pathways that are significant according to columnSignificance
     comp1 <- res1$term.id[which(res1[[col]] == 1)]

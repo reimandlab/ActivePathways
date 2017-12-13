@@ -4,11 +4,11 @@
 \alias{activeDriverPW}
 \title{activeDriverPW}
 \usage{
-activeDriverPW(scores, gmt, cutoff = 0.1, significant = 0.05,
-  return.all = FALSE, merge.method = c("Fisher", "Brown", "logitp", "meanp",
-  "sump", "sumz", "sumlog", "votep", "wilkinsonp"),
-  correction.method = c("holm", "fdr", "hochberg", "hommel", "bonferroni",
-  "BH", "BY", "none"), background = makeBackground(gmt),
+activeDriverPW(scores, gmt, background = makeBackground(gmt),
+  geneset.filter = c(5, 1000), cutoff = 0.1, significant = 0.05,
+  merge.method = c("Fisher", "Brown", "logitp", "meanp", "sump", "sumz",
+  "sumlog"), correction.method = c("holm", "fdr", "hochberg", "hommel",
+  "bonferroni", "BH", "BY", "none"), return.all = FALSE,
   contribution = TRUE, cytoscape.filenames = NULL)
 }
 \arguments{
@@ -20,23 +20,30 @@ converted to 1}
 \item{gmt}{A GMT object to be used for enrichment analysis. If a filename, a
 GMT object will be read from the file}
 
+\item{background}{A character vector of gene names to be used as a
+statistical background. By default, the background is all genes that appear
+in \code{gmt}}
+
+\item{geneset.filter}{A numeric vector of length two giving the lower and 
+upper limits for the size of the annotated geneset to pathways in gmt.
+Pathways with a geneset shorter than \code{geneset.filter[1]} or longer
+than \code{geneset.filter[2]} will be removed. Set either value to NA to
+to not enforce a minimum or maximum value, or set \code{geneset.filter} to 
+\code{NULL} to skip filtering}
+
 \item{cutoff}{A maximum p-value for a gene to be used for enrichment analysis.
 Any genes with \code{p.val > significant} will be discarded before testing}
 
 \item{significant}{A number in [0,1] denoting the maximum p-value for a
 pathway to be considered significantly enriched.}
 
-\item{return.all}{Whether to return results for all terms or only significant
-terms}
-
 \item{merge.method}{Method to merge p-values. See section Merging p Values}
 
 \item{correction.method}{Method to correct p-values. See
 \code{\link[stats]{p.adjust}} for details}
 
-\item{background}{A character vector of gene names to be used as a
-statistical background. By default, the background is all genes that appear
-in \code{gmt}}
+\item{return.all}{Whether to return results for all terms or only significant
+terms}
 
 \item{contribution}{Evaluate contribution of individual columns to a term's
 significance. See section Column Contribution}

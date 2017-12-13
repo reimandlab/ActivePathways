@@ -13,6 +13,7 @@
 #' hypergeometric(matrix(data=c(1, 8, 14, 836), nrow=2))
 #'
 hypergeometric <- function(counts) {
+    if (any(counts < 0)) stop('counts contains negative values. Something went very wrong.')
     m <- counts[1, 1] + counts[2, 1]
     n <- counts[1, 2] + counts[2, 2]
     k <- counts[1, 1] + counts[1, 2]

@@ -6,16 +6,22 @@
 #'   converted to 1
 #' @param gmt A GMT object to be used for enrichment analysis. If a filename, a
 #'   GMT object will be read from the file
-#' @param merge.method Method to merge p-values. See section Merging p Values
-#' @param correction.method Method to correct p-values. See
-#'   \code{\link[stats]{p.adjust}} for details
 #' @param background A character vector of gene names to be used as a
 #'   statistical background. By default, the background is all genes that appear
 #'   in \code{gmt}
+#' @param geneset.filter A numeric vector of length two giving the lower and 
+#'   upper limits for the size of the annotated geneset to pathways in gmt.
+#'   Pathways with a geneset shorter than \code{geneset.filter[1]} or longer
+#'   than \code{geneset.filter[2]} will be removed. Set either value to NA to
+#'   to not enforce a minimum or maximum value, or set \code{geneset.filter} to 
+#'   \code{NULL} to skip filtering
 #' @param cutoff A maximum p-value for a gene to be used for enrichment analysis.
 #'   Any genes with \code{p.val > significant} will be discarded before testing
 #' @param significant A number in [0,1] denoting the maximum p-value for a
 #'   pathway to be considered significantly enriched.
+#' @param merge.method Method to merge p-values. See section Merging p Values
+#' @param correction.method Method to correct p-values. See
+#'   \code{\link[stats]{p.adjust}} for details
 #' @param return.all Whether to return results for all terms or only significant
 #'   terms
 #' @param contribution Evaluate contribution of individual columns to a term's
@@ -109,36 +115,54 @@
 # TODO: enter citations for article on merging p-values
 # http://www.jstor.org/stable/2529826
 # TODO: enter citations for Cytoscape, enrichmentMap, and enhancedGraphics
-activeDriverPW <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all=FALSE,
-                 merge.method=c("Fisher", "Brown", "logitp", "meanp", "sump",
-                                "sumz", "sumlog", "votep", "wilkinsonp"),
-                 correction.method=c("holm", "fdr", "hochberg", "hommel",
-                                     "bonferroni", "BH", "BY", "none"),
-                 background=makeBackground(gmt), contribution=TRUE,
-                 cytoscape.filenames=NULL) {
-
-
+activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
+                            geneset.filter = c(5, 1000), cutoff = 0.1, significant = 0.05,
+                            merge.method = c("Fisher", "Brown", "logitp", "meanp", 
+                                             "sump", "sumz", "sumlog"),
+                            correction.method = c("holm", "fdr", "hochberg", "hommel",
+                                                  "bonferroni", "BH", "BY", "none"),
+                            return.all=FALSE, contribution = TRUE, 
+                            cytoscape.filenames = NULL) {
+        
     merge.method <- match.arg(merge.method)
     correction.method <- match.arg(correction.method)
 
     ##### Validation #####
-
+    # scores
     if (!(is.matrix(scores) && is.numeric(scores))) stop("scores must be a numeric matrix")
     if (any(is.na(scores))) stop("scores may not contain missing values")
     if (any(scores < 0) || any(scores > 1)) stop("All values in scores must be in [0,1]")
-    if (!is.numeric(cutoff) || cutoff < 0 || cutoff > 1) {
-        stop("cutoff must be a value in [0,1]")
-    }
-    if (!is.numeric(significant) || significant < 0 || significant > 1) {
-        stop("significant must be a value in [0,1]")
-    }
-    if (!(is.character(background) && is.vector(background))) stop("background must be a character vector")
+    
+    # cutoff and significant
+    stopifnot(length(cutoff) == 1)
+    stopifnot(is.numeric(cutoff))
+    if (cutoff < 0 || cutoff > 1) stop("cutoff must be a value in [0,1]")
+    stopifnot(length(significant) == 1)
+    stopifnot(is.numeric(significant))
+    if (significant < 0 || significant > 1) stop("significant must be a value in [0,1]")
+    
+    # gmt
     if (!is.GMT(gmt)) gmt <- read.GMT(gmt)
+    if (!(is.character(background) && is.vector(background))) {
+        stop("background must be a character vector")
+    } 
 
+    # geneset.filter
+    if (!is.null(geneset.filter)) {
+        if (!(is.atomic(geneset.filter))) stop("geneset.filter must be an atomic vector")
+        if (length(geneset.filter) != 2) stop("geneset.filter must be length 2")
+        if (!is.numeric(geneset.filter)) stop("geneset.filter must be numeric")
+        if (any(geneset.filter < 0, na.rm=TRUE)) stop("geneset.filter limits must be positive")
+    }
+   
+    
+    # contribution
     if (ncol(scores) == 1 && contribution) {
         contribution <- FALSE
         message("scores contains only one column. Column contributions will not be calculated")
     }
+    
+    # cytoscape.filenames
     if (!is.null(cytoscape.filenames)){
         if (contribution == TRUE && length(cytoscape.filenames) != 3) {
             stop("Must supply 3 file names to cytoscape.filenames")
@@ -157,8 +181,24 @@ activeDriverPW <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all
     }
 
     ##### filtering and sorting #####
+    
+    # Filter the GMT
+    if(!is.null(geneset.filter)) {
+        orig.length <- length(gmt)
+        if (!is.na(geneset.filter[1])) {
+            gmt <- Filter(function(x) length(x$genes) >= geneset.filter[1], gmt)
+        }
+        if (!is.na(geneset.filter[2])) {
+            gmt <- Filter(function(x) length(x$genes) <= geneset.filter[2], gmt)
+        }
+        if (length(gmt) == 0) stop("No pathways in gmt made the geneset.filter")
+        if (length(gmt) < orig.length) {
+            message(paste(orig.length - length(gmt), "terms were removed from gmt", 
+                          "because they did not make the geneset.filter"))
+        }
+    }
 
-    # Remove any genes not found in the GMT
+    # Remove any genes not found in the background
     orig.length <- nrow(scores)
     scores <- scores[rownames(scores) %in% background, , drop=FALSE]
     if (nrow(scores) == 0) {
@@ -210,6 +250,7 @@ activeDriverPW <- function(scores, gmt, cutoff=0.1, significant=0.05, return.all
     if(return.all) return(res)
     res[significant.indeces]
 }
+
 
 #' Perform Gene Set Enrichment Analysis on an ordered list of genes
 #'

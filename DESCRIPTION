@@ -1,9 +1,9 @@
 Package: activeDriverPW
-Title: 
-Version: 0.0.0.9002
+Title: Multivariate Pathway Enrichment Analysis
+Version: 1.0.0
 Authors@R: c(person("Juri", "Reimand", email = "juri.reimand@utoronto.ca", role = c("aut", "cre")),
            person("Jonathan", "Barenboim", email = "jon.barenboim@gmail.com", role = "aut"))
-Description: 
+Description: Enrichment analysis of annotated gene sets using a set of genes of interest with multiple variables.
 Depends: R (>= 3.2.3)
 Imports:
     metap,
@@ -14,4 +14,7 @@ BugReports:
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
-Suggests: testthat
+Suggests: testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

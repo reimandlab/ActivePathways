@@ -20,8 +20,5 @@ data.matrix is ignored}
 a p-value
 }
 \description{
-Based on the R package EmpiricalBrownsMethod
-https://github.com/IlyaLab/CombiningDependentPvaluesUsingEBM/blob/master/R/EmpiricalBrownsMethod/R/ebm.R
-Only significant differences are the removal of extra_info and allowing a
-pre-calculated covariance matrix
+Merge p-values using Brown's method
 }

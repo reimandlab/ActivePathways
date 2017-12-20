@@ -1,4 +1,4 @@
-context("Validation on parameters")
+context("Validation on input to activeDriverPW")
 
 
 test_that("scores is a numeric matrix with valid p-values", {
@@ -75,9 +75,9 @@ test_that("geneset.filter is a numeric vector of length 2", {
     expect_error(activeDriverPW(dat, gmt, geneset.filter=1), 
                  "geneset.filter must be length 2")
     expect_error(activeDriverPW(dat, gmt, geneset.filter=list(1,2)),
-                 "geneset.filter must be an atomic vector")
+                 "geneset.filter must be a numeric vector")
     expect_error(activeDriverPW(dat, gmt, geneset.filter=c('q', 2)),
-                 "geneset.filter must be numeric")
+                 "geneset.filter must be a numeric vector")
     expect_error(activeDriverPW(dat, gmt, geneset.filter=c(1, -2)),
                  "geneset.filter limits must be positive")
     expect_error(activeDriverPW(dat, gmt, geneset.filter=c(0, 0)), 

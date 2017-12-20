@@ -134,8 +134,7 @@ for more details
 \dontrun{
     dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
     dat[is.na(dat)] <- 1
-    gmt <- read.GMT('path/to/gmt.gmt')
-    activeDriverPW(dat, gmt, return.all=TRUE,
+    activeDriverPW(dat, 'path/to/gmt.gmt', return.all=TRUE,
          cytoscape.filenames=c('terms.txt', 'groups.txt', 'abridged.gmt'))
 }
 

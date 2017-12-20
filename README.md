@@ -1,10 +1,8 @@
 # activeDriverPW
 
--- description
-
-## Installation
 activeDriverPW is a tool for multivariate pathway enrichment analysis. activeDriverPW identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. Unlike other enrichment analysis tools, activeDriverPW implements an algorithm to compare a data set that contains multiple variables for each gene. For example, the data may contain the confidence that the gene is a driver as reported by several tools, or it may contain differential expression values across different genetic regions such as coding regions and promoter regions.
 
+## Installation
 
 #### devtools:
 Using the R package `devtools`, run

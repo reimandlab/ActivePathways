@@ -10,19 +10,38 @@ merge_p_values(scores, method = c("Fisher", "Brown", "logitp", "meanp",
 \arguments{
 \item{scores}{Either a list of p-values or a matrix where each column is a test}
 
-\item{method}{Method to merge p-valeus. See metap documentation for more info}
+\item{method}{Method to merge p-values. See 'methods' section below.}
 }
 \value{
-If scores is a vector or list list, returns a number. If scores is a
+If scores is a vector or list, returns a number. If scores is a
   matrix, returns a named list of p-values merged by row
 }
 \description{
 Merge a list or matrix of p-values
 }
-\examples{
-\dontrun{
-  merge_p_values(c(0.05, 0.09, 0.01))
-  merge_p_values(list(a=0.01, b=1, c=0.0015), method='meanp')
-  merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow=2), method='Brown')
+\section{Methods}{
+
+There are multiple methods available that can be used to merge a list of
+  p-values. The main methods encouraged by this package are:
+\describe{
+ \item{Fisher or sumlog}{Fisher's method assumes p-values are uniformly
+ distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
+ This method is most appropriate when the columns in \code{scores} are
+ independent.}
+ \item{Brown}{Brown's method extends Fisher's method by accounting for the
+ covariance in the columns of \code{scores}. It is more appropriate when the
+ tests of significance used to create the columns in \code{scores} are not
+ necessarily independent. Note that the "Brown" method cannot be used with a 
+ single list of p-values. However, in this case Brown's method is identical 
+ to Fisher's method.}
 }
+Other methods are also available. See \code{\link[metap]{metap-package}}
+for more details
+}
+
+\examples{
+  merge_p_values(c(0.05, 0.09, 0.01))
+  merge_p_values(list(a=0.01, b=1, c=0.0015, d=0.025), method='meanp')
+  merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow=2), method='Brown')
+
 }

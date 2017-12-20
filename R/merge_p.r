@@ -1,47 +1,71 @@
 #' Merge a list or matrix of p-values
 #'
 #' @param scores Either a list of p-values or a matrix where each column is a test
-#' @param method Method to merge p-valeus. See metap documentation for more info
+#' @param method Method to merge p-values. See 'methods' section below.
 #'
-#' @return If scores is a vector or list list, returns a number. If scores is a
+#' @return If scores is a vector or list, returns a number. If scores is a
 #'   matrix, returns a named list of p-values merged by row
 #'
-#' @examples
-#' \dontrun{
-#'   merge_p_values(c(0.05, 0.09, 0.01))
-#'   merge_p_values(list(a=0.01, b=1, c=0.0015), method='meanp')
-#'   merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow=2), method='Brown')
+#' @section Methods:
+#' There are multiple methods available that can be used to merge a list of
+#'   p-values. The main methods encouraged by this package are:
+#' \describe{
+#'  \item{Fisher or sumlog}{Fisher's method assumes p-values are uniformly
+#'  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
+#'  This method is most appropriate when the columns in \code{scores} are
+#'  independent.}
+#'  \item{Brown}{Brown's method extends Fisher's method by accounting for the
+#'  covariance in the columns of \code{scores}. It is more appropriate when the
+#'  tests of significance used to create the columns in \code{scores} are not
+#'  necessarily independent. Note that the "Brown" method cannot be used with a 
+#'  single list of p-values. However, in this case Brown's method is identical 
+#'  to Fisher's method.}
 #' }
+#' Other methods are also available. See \code{\link[metap]{metap-package}}
+#' for more details
+#'
+#' @examples
+#'   merge_p_values(c(0.05, 0.09, 0.01))
+#'   merge_p_values(list(a=0.01, b=1, c=0.0015, d=0.025), method='meanp')
+#'   merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow=2), method='Brown')
+#' 
+#' @export
 merge_p_values <- function(scores, method=c("Fisher", "Brown", "logitp",
                                             "meanp", "sump", "sumz", "sumlog")) {
-    if (ncol(scores) == 1) return (scores[, 1])
-
+    # Validation on scores
+    if (is.list(scores)) scores <- unlist(scores, recursive=FALSE)
+    if (!(is.vector(scores) || is.matrix(scores))) stop("scores must be a matrix or list")
+    if (any(is.na(scores))) stop("scores may not contain missing values")
+    if (!is.numeric(scores)) stop("scores must be numeric")
+    if (any(scores < 0 | scores > 1)) stop("All values in scores must be in [0,1]")
+        
     method <- match.arg(method)
     if(method == "Fisher") method <- "sumlog"
 
+    if (is.vector(scores)) {
+        if (method == "Brown") stop("Brown's method cannot be used with a single list of p-values")
+        
+        # Some metap functions don't like p-values that are 0 or 1 so make them (0, 1) to avoid errors
+        scores <- sapply(scores, function(x) if (x == 0) 0.0000001 else if (x==1) 0.9999999 else x)
+        func <- function(x) getFromNamespace(method, 'metap')(x)$p
+        return(func(scores))
+    }
+    
+    # scores is a matrix
+    if (ncol(scores) == 1) return (scores[, 1, drop=TRUE])
+    
     if (method == "Brown") {
-        if (is.list(scores) || is.vector(scores)) {
-            stop("Brown's method cannot be used with a single list of p-values")
-        }
         cov.matrix <- calculateCovariances(t(scores))
         return(apply(scores, 1, brownsMethod, cov.matrix=cov.matrix))
     }
-
-    # Some metap function don't like p-values that are 0 or 1 so make them (0,1) to avoid errors
+    
     scores <- apply(scores, c(1,2), function(x) if (x == 0) 0.0000001 else if (x==1) 0.9999999 else x)
-
-    func <- function(x) get(method)(x)$p
-    if (is.list(scores) || is.vector(scores)) return(func(scores))
+    func <- function(x) getFromNamespace(method, 'metap')(x)$p
     return (apply(scores, 1, func))
 }
 
 
 #' Merge p-values using Brown's method
-#'
-#' Based on the R package EmpiricalBrownsMethod
-#' https://github.com/IlyaLab/CombiningDependentPvaluesUsingEBM/blob/master/R/EmpiricalBrownsMethod/R/ebm.R
-#' Only significant differences are the removal of extra_info and allowing a
-#' pre-calculated covariance matrix
 #'
 #' @param p.values A vector of m p-values
 #' @param data.matrix An m x n matrix representing m tests and n samples
@@ -50,6 +74,14 @@ merge_p_values <- function(scores, method=c("Fisher", "Brown", "logitp",
 #'   Only one of data.matrix and cov.matrix must be given. If both are supplied,
 #'   data.matrix is ignored
 #' @return a p-value
+
+# Based on the R package EmpiricalBrownsMethod
+# https://github.com/IlyaLab/CombiningDependentPvaluesUsingEBM/blob/master/R/EmpiricalBrownsMethod/R/ebm.R
+# Only significant differences are the removal of extra_info and allowing a
+# pre-calculated covariance matrix
+# 
+# TODO: submit pull request to IlyaLab/CombiningDependentPvaluesUsingEBM
+# and change this method to use their package if/when it is accepted
 brownsMethod <- function(p.values, data.matrix=NULL, cov.matrix=NULL) {
     if (missing(data.matrix) && missing(cov.matrix)) {
         stop ("Either data.matrix or cov.matrix must be supplied")

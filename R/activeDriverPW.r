@@ -102,16 +102,15 @@
 #' \dontrun{
 #'     dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
 #'     dat[is.na(dat)] <- 1
-#'     gmt <- read.GMT('path/to/gmt.gmt')
-#'     activeDriverPW(dat, gmt, return.all=TRUE,
+#'     activeDriverPW(dat, 'path/to/gmt.gmt', return.all=TRUE,
 #'          cytoscape.filenames=c('terms.txt', 'groups.txt', 'abridged.gmt'))
 #' }
 #'
-#' @import metap
 #' @import data.table
+#' @import metap
 #'
 #' @export
-#
+
 # TODO: enter citations for article on merging p-values
 # http://www.jstor.org/stable/2529826
 # TODO: enter citations for Cytoscape, enrichmentMap, and enhancedGraphics
@@ -143,13 +142,16 @@ activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
     
     # gmt
     if (!is.GMT(gmt)) gmt <- read.GMT(gmt)
+    if (length(gmt) == 0) stop("No pathways in gmt made the geneset.filter")
     if (!(is.character(background) && is.vector(background))) {
         stop("background must be a character vector")
     } 
 
     # geneset.filter
     if (!is.null(geneset.filter)) {
-        if (!(is.atomic(geneset.filter))) stop("geneset.filter must be an atomic vector")
+        if (!(is.numeric(geneset.filter) && is.vector(geneset.filter))) {
+            stop("geneset.filter must be a numeric vector")
+        }
         if (length(geneset.filter) != 2) stop("geneset.filter must be length 2")
         if (!is.numeric(geneset.filter)) stop("geneset.filter must be numeric")
         if (any(geneset.filter < 0, na.rm=TRUE)) stop("geneset.filter limits must be positive")

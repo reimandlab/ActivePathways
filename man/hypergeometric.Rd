@@ -19,6 +19,7 @@ probability that counts[1, 1] or more genes would be found in annotations,
 assuming the null hypothesis.
 }
 \examples{
-hypergeometric(matrix(data=c(1, 8, 14, 836), nrow=2))
-
+\dontrun{
+  hypergeometric(matrix(data=c(1, 8, 14, 836), nrow=2))
+}
 }

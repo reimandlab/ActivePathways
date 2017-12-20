@@ -105,16 +105,16 @@ Note that only genes found in the background are used for testing enrichment. An
 
 
 ## Merging p-values
-Our input file consisted of multiple scores for each gene, but in order to perform pathway enrichment analysis each gene needs to have a single score. `activeDriverPW` accomplishes this by merging the p-values for each gene into a single combined score. The two main methods to merge p-values are Fisher's method (the default) and Brown's method, but other methods are also available. You can preview the merged p-values using the hidden merge_p_values method
+Our input file consisted of multiple scores for each gene, but in order to perform pathway enrichment analysis each gene needs to have a single score. `activeDriverPW` accomplishes this by merging the p-values for each gene into a single combined score. The two main methods to merge p-values are Fisher's method (the default) and Brown's method, but other methods are also available. You can preview the merged p-values using the `merge_p_values` function
 ```{r}
 scores
-activeDriverPW:::merge_p_values(scores, 'Fisher')
-activeDriverPW:::merge_p_values(scores, 'Brown')
+merge_p_values(scores, 'Fisher')
+merge_p_values(scores, 'Brown')
 ```
 
 You can also use this function to combine some of the data before hand. For example, we can merge the `X3UTR`, `X5UTR`, and `promCore` columns into a single `non_coding` column. This will consider the three non-coding regions as a single column, rather than giving them all equal weight to the `CDS` column
 ```{r}
-scores2 <- cbind(scores[, 'CDS'], activeDriverPW:::merge_p_values(scores[, c('X3UTR', 'X5UTR', 'promCore')], 'Fisher'))
+scores2 <- cbind(scores[, 'CDS'], merge_p_values(scores[, c('X3UTR', 'X5UTR', 'promCore')], 'Fisher'))
 colnames(scores2) <- c('CDS', 'non_coding')
 scores
 scores2

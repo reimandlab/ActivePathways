@@ -14,15 +14,15 @@ vignette: >
 knitr::opts_chunk$set(warning=FALSE, 
                       message=FALSE, 
                       width=500)
-options(max.print=40)
+options(max.print=35)
 ```
 
 # Introduction
-activeDriverPW is a tool for multivariate pathway enrichment analysis. activeDriverPW identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. Unlike other enrichment analysis tools, activeDriverPW implements an algorithm to compare a data set that contains multiple variables for each gene. For example, the data may contain the confidence that the gene is a driver as reported by several tools, or it may contain differential expression values across different genetic regions such as coding regions and promoter regions.
+activeDriverPW is a tool for multivariate pathway enrichment analysis. Pathway enrichment analysis identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. activeDriverPW implements an algorithm to perform pathway enrichment analysis on a data set that contains multiple variables for each gene. For example, the data may contain the confidence that the gene is a driver as reported by several tools, or it may contain differential expression values across different genetic regions such as coding regions and promoter regions.
 
 ## Pathway Enrichment and The Ordered Hypergeometric algorithm
 
-From a matrix of p-values, `activeDriverPW` creates a gene list query by merging the values to determine a single score for each gene, then filtering and sorting this list of p-values. This creates a list of genes - which we'll creatively call the `genelist` - ordered most significant first. `activeDriverPW` tests if a pathway is 'enriched', or over-represented in our `genelist`, by performing a hypergeometric test (aka a Fisher's exact test) on the `genelist` and the genes annotated to the pathway. But rather than testing the entire `genelist`, `activeDriverPW` performs incremental enrichment analysis with an increasingly larger subset of `genelist` starting at the top of the list, and takes the subset of `genelist` that yields the smallest p-value. This approach is useful when scores are of varying biological importance as it identifies the genes most relevant to the enrichment of the pathway.
+From a matrix of p-values, `activeDriverPW` creates a gene list query by merging the values to determine a single score for each gene, then filtering and sorting this list of p-values. This creates a list of genes - which we'll creatively call the `genelist` - ordered most significant first. `activeDriverPW` tests if a pathway is 'enriched', or over-represented in our gene list, by performing a hypergeometric test (aka a Fisher's exact test) on the `genelist` and the genes annotated to the pathway. But rather than testing the entire `genelist`, `activeDriverPW` performs incremental enrichment analysis with an increasingly larger subset of `genelist` starting at the top of the list, and takes the subset of `genelist` that yields the smallest p-value. This approach is useful when the genes in our `genelist` are of varying biological importance as it identifies the genes most relevant to the enrichment of the pathway.
 
 
 # Using the package
@@ -81,7 +81,7 @@ A common filter to apply to the GMT is to remove gene sets that are too large or
 gmt <- Filter(function(term) length(term$genes) >= 10, gmt)
 gmt <- Filter(function(term) length(term$genes) <= 500, gmt)
 ```
-This filtering can also be done automatically using the `geneset.filter` option to the `activeDriverPW` function. By default this filter removes any gene sets with less than 5 or more than 1000 annotated genes. Our stricter filter can be applied inside `activeDriverPW` using the option `geneset.filter=c(10, 500)`
+This filtering can also be done automatically using the `geneset.filter` option to the `activeDriverPW` function. By default `activeDriverPW` removes any gene sets with less than 5 or more than 1000 annotated genes. Our stricter filter can be applied inside `activeDriverPW` using the option `geneset.filter=c(10, 500)`
 
 The new GMT object can now be used for analysis with `activeDriverPW`
 ```{r}
@@ -125,7 +125,7 @@ activeDriverPW(scores2, gmt.file)
 
 
 ## Cutoff
-In addition to removing any genes not found in the background, `activeDriverPW` also removes any genes that have a very high p-value after merging the scores. This threshold represents the maximum p-value for a gene to be considered of interest in our analysis. The threshold is `0.1` by default, but can be changed using the `cutoff` option.
+In addition to removing any genes not found in the background, `activeDriverPW` also removes any genes that have a high p-value after merging the scores. This threshold represents the maximum p-value for a gene to be considered of interest in our analysis. The threshold is `0.1` by default, but can be changed using the `cutoff` option.
 
 
 ## p-value adjustment
@@ -141,9 +141,8 @@ activeDriverPW(scores[, 'CDS', drop=FALSE], gmt.file, contribution=FALSE)
 ```
 
 
-# Looking at the results
+# The Results Table
 
-## The results table
 Lets take a look again at the results from the basic case
 ```{r}
 res <- activeDriverPW(scores, gmt.file)
@@ -188,4 +187,4 @@ cat(paste(readLines(files[1])[1:5], collapse='\n'))
 cat(paste(readLines(files[2])[1:5], collapse='\n'))
 ```
 
-To see how to use these files to create an enrichment map, take a look at the enrichmentMap-vignette included with this package.
+To see how to use these files to create an enrichment map, take a look at the `enrichmentMap-vignette` included with this package.

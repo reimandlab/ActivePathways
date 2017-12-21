@@ -3,6 +3,7 @@
 ## Major Changes
 * Add a geneset.filter option to activeDriverPW to filter the GMT by geneset size
 * Add vignettes
+* Export merge_p_values method
 
 
 # activeDriverPW 0.0.0.9002

@@ -1,6 +1,6 @@
 # activeDriverPW
 
-activeDriverPW is a tool for multivariate pathway enrichment analysis. activeDriverPW identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. Unlike other enrichment analysis tools, activeDriverPW implements an algorithm to compare a data set that contains multiple variables for each gene. For example, the data may contain the confidence that the gene is a driver as reported by several tools, or it may contain differential expression values across different genetic regions such as coding regions and promoter regions.
+activeDriverPW is a tool for multivariate pathway enrichment analysis. Pathway enrichment analysis identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. activeDriverPW implements an algorithm to perform pathway enrichment analysis on a data set that contains multiple variables for each gene. For example, the data may contain the confidence that the gene is a driver as reported by several tools, or it may contain differential expression values across different genetic regions such as coding regions and promoter regions.
 
 ## Installation
 
@@ -15,7 +15,7 @@ Open R in the directory you cloned the package in and run `install.packages('act
 ## Using activeDriverPW
 
 ### Examples
-The simplest use of activeDriver requires only a data file and a list of gene sets in the form of a GMT [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file. The data must be in the form of numerical matrix and cannot contain any missing values
+The simplest use of activeDriver requires only a data table and a list of gene sets in the form of a GMT [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file. The data must be in the form of numerical matrix and cannot contain any missing values
 ```
 scores <- read.table('example_data.txt', header=TRUE, row.names='Gene')
 scores <- as.matrix(scores)
@@ -28,7 +28,7 @@ scores
 ## ABCC1         0.9383431571 9.198887e-01 2.599319e-01 2.980455e-01
 ##  [ reached getOption("max.print") -- omitted 2410 rows ]
 
-res <- activeDriverPW(scores, 'example_geneset.gmt')
+res <- activeDriverPW(scores, 'example_genesets.gmt')
 ```
 
-More thorough documentation of the activeDriverPW function can be found in R with `?activeDriverPW`, and complete tutorials can be found with `browseVignettes(package='activeDriverPW')
+More thorough documentation of the activeDriverPW function can be found in R with `?activeDriverPW`, and complete tutorials can be found with `browseVignettes(package='activeDriverPW')`

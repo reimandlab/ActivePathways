@@ -83,5 +83,9 @@ orderedHypergeometric <- function(genelist, background, annotations) {
 
     # Return the lowest p-value and the associated index
     min.score <- min(scores)
+    
+    # Correct minimal p-value by number of tries
+    min.score = min.score * length(which.in)
+    
     list(p.val=min.score, ind=which.in[max(which(scores==min.score))])
 }

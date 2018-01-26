@@ -20,7 +20,7 @@
 #' found to be significant
 #' @param filenames vector of 2 or 3 filesnames denoting where to write fles to
 #' @param col.significance a data.table with a column 'term.id' and a column
-#' for each test indicating whether a pathways is signficiant (TRUE) or not
+#' for each test indicating whether a pathway is signficiant (TRUE) or not
 #' (FALSE) when considering only that column. If contribution==TRUE, use
 #' col.significance=NULL and this will be skipped
 #'
@@ -42,10 +42,10 @@ prepareCytoscape <- function(terms, gmt, filenames, col.significance) {
             col.significance[, instruct := instruct.str]
         } else {
             # Use pichart
-            col.significance[, none := as.numeric(all(!.SD)), by=rows, .SDcols=-1]
+            col.significance[, combined_only := as.numeric(all(!.SD)), by=rows, .SDcols=-1]
             colors <- paste(rainbow(length(tests)), collapse=',')
             instruct.str <- paste('piechart:',
-                                  ' attributelist="', paste(tests, collapse=','), ',none"',
+                                  ' attributelist="', paste(tests, collapse=','), ',combined_only"',
                                   ' colorlist="', colors, ',#CCCCCC"',
                                   ' showlabels=FALSE', sep='')
             col.significance[, instruct := instruct.str]

@@ -322,7 +322,7 @@ columnContribution <- function(scores, gmt, background, cutoff,
         merged.scores <- merged.scores[merged.scores <= cutoff]
         merged.scores <- names(merged.scores)[order(merged.scores)]
 
-        # Get p-valeus and report log-fold-change
+        # Get p-values and report log-fold-change
         p.vals <- sapply(gmt, function(x)
             orderedHypergeometric(merged.scores, background, x$genes)$p.val)
         p.vals <- p.adjust(p.vals, method=correction.method)

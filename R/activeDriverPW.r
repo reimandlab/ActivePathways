@@ -24,8 +24,6 @@
 #'   \code{\link[stats]{p.adjust}} for details
 #' @param return.all Whether to return results for all terms or only significant
 #'   terms
-#' @param contribution Evaluate contribution of individual columns to a term's
-#'   significance. See section Column Contribution
 #' @param cytoscape.filenames a vector of 2 or 3 filenames denoting where
 #'   information for Cytoscape will be written to (see section Cytoscape). If
 #'   NULL, do not write any files.
@@ -38,9 +36,9 @@
 #'     \item{term.size}{The number of genes annotated to the term}
 #'     \item{overlap}{A character vector of the genes that overlap between the
 #'     term and the query}
-#'     \item{...}{If \code{contribution == TRUE}, a column for each test in
-#'       \code{scores} denoting the contribution of that column to each
-#'       pathway's p-value. See secion Column Contribution.}
+#'     \item{evidence}{Columns of \code{scores} that contributed individually to 
+#'          enrichment of the pathway. Each column is evaluated separately for 
+#'          enrichments and added to the evidence field if the pathway is found.}
 #'   }
 #'   If \code{return.all == FALSE} then only terms with
 #'     \code{p.val <= significant} will be returned, otherwise all terms will be
@@ -63,15 +61,6 @@
 #' Other methods are also available. See \code{\link[metap]{metap-package}}
 #' for more details
 #'
-#' @section Column Contribution: If \code{contribution == TRUE}, activeDriverPW will find
-#'   the contribution of each column in \code{scores} to the p-value for each
-#'   pathway. The contribution is reported as the log-fold-change in p-values
-#'   when activeDriverPW is run with the column excluded from the data
-#'   (\code{-log10(p_with_column / p_without_column)}). A contribution of 0
-#'   means the p-value is the same with or without that column, while a large
-#'   positive number means the p-value is significantly smaller when that column
-#'   is included in the data.
-#'
 #' @section Cytoscape:
 #'   If \code{cytoscape.filenames} is supplied, activeDriverPW will write three
 #'   files that can be used to build a network using Cytoscape and the
@@ -87,9 +76,6 @@
 #'     \item{cytoscape.filenames[3]}{A Shortened version of the supplied gmt
 #'     file, containing only the terms in \code{cytoscape.filenames[1]}}
 #'   }
-#'   If \code{contribution == FALSE} the matrix of column significance will not
-#'   be written. Only 2 file names need to be supplied, and if three are given
-#'   the second will be ignored
 #'
 #'   How to use: Create an enrichment map in Cytoscape with the file of terms
 #'   (cytoscape.filenames[1]) and the shortened gmt file
@@ -120,8 +106,7 @@ activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
                                              "sump", "sumz", "sumlog"),
                             correction.method = c("holm", "fdr", "hochberg", "hommel",
                                                   "bonferroni", "BH", "BY", "none"),
-                            return.all=FALSE, contribution = TRUE, 
-                            cytoscape.filenames = NULL) {
+                            return.all=FALSE, cytoscape.filenames = NULL) {
         
     merge.method <- match.arg(merge.method)
     correction.method <- match.arg(correction.method)
@@ -157,9 +142,9 @@ activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
         if (any(geneset.filter < 0, na.rm=TRUE)) stop("geneset.filter limits must be positive")
     }
    
-    
+    contribution <- TRUE
     # contribution
-    if (ncol(scores) == 1 && contribution) {
+    if (ncol(scores) == 1) {
         contribution <- FALSE
         message("scores contains only one column. Column contributions will not be calculated")
     }
@@ -232,21 +217,17 @@ activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
     }
     
     if (contribution) {
-        col.contribution <- columnContribution(scores, gmt, background, cutoff,
-                                               correction.method, merge.method, res$p.val)
-        res <- cbind(res, col.contribution[, -'term.id'])
+        sig.cols <- columnSignificance(scores, gmt, background, cutoff,
+                                       significant, correction.method)
+        res <- cbind(res, sig.cols)
+    } else {
+        sig.cols <- NULL
     }
 
     if (!is.null(cytoscape.filenames) && length(significant.indeces) > 0) {
-        if (contribution) {
-            sig.cols <- columnSignificance(scores, gmt, background, cutoff,
-                                           significant, correction.method)
-            sig.cols <- sig.cols[significant.indeces]
-        } else {
-            sig.cols <- NULL
-        }
         prepareCytoscape(res[significant.indeces, .(term.id, term.name, p.val)],
-                         gmt[significant.indeces], cytoscape.filenames, sig.cols)
+                         gmt[significant.indeces], cytoscape.filenames, 
+                         sig.cols[significant.indeces,])
     }
 
     if(return.all) return(res)
@@ -294,43 +275,6 @@ enrichmentAnalysis <- function(genelist, gmt, background) {
     dt
 }
 
-#' Get contribution of each column to each term
-#'
-#' @param ad.pvals p-values determined by activeDriverPW
-#'
-#' @inheritParams activeDriverPW
-#'
-#' @return a data.table of terms. The first column contains the term id. The
-#'  rest of the columns give the log-fold-change when the column is excluded
-#'
-#' @examples
-#' \dontrun{
-#'   dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
-#'   dat[is.na(dat)] <- 1
-#'   gmt <- read.GMT('path/to/gmt.gmt')
-#'   res <- activeDriverPW(dat, gmt, contribution=FALSE)
-#'   columnContribution(dat, gmt, makeBackground(gmt), 0.1, 'fdr', 'Fisher', res$p.val)
-#' }
-columnContribution <- function(scores, gmt, background, cutoff,
-                               correction.method, merge.method, ad.pvals) {
-    dt <- data.table(term.id=names(gmt))
-
-    for (col in colnames(scores)) {
-        # Remove column and merge scores
-        scores2 <- scores[, -which(col == colnames(scores)), drop=FALSE]
-        merged.scores <- merge_p_values(scores2, merge.method)
-        merged.scores <- merged.scores[merged.scores <= cutoff]
-        merged.scores <- names(merged.scores)[order(merged.scores)]
-
-        # Get p-values and report log-fold-change
-        p.vals <- sapply(gmt, function(x)
-            orderedHypergeometric(merged.scores, background, x$genes)$p.val)
-        p.vals <- p.adjust(p.vals, method=correction.method)
-        dt[, (col) := -log10(ad.pvals / p.vals)]
-     }
-    dt
-}
-
 #' Determine which pathways are found to be significant using each column
 #' individually
 #'
@@ -341,17 +285,23 @@ columnContribution <- function(scores, gmt, background, cutoff,
 #' significant(TRUE) or not(FALSE) when considering only that column
 
 columnSignificance <- function(scores, gmt, background, cutoff, significant, correction.method) {
-    dt <- data.table(term.id=names(gmt))
-
+    dt <- data.table(term.id=names(gmt), evidence=NA)
     for (col in colnames(scores)) {
         col.scores <- scores[, col, drop=TRUE]
         col.scores <- col.scores[col.scores <= cutoff]
         col.scores <- names(col.scores)[order(col.scores)]
-
-        p.vals <- sapply(gmt, function(x)
-            orderedHypergeometric(col.scores, background, x$genes)$p.val)
-        p.vals <- p.adjust(p.vals, correction.method)
-        dt[, (col) := as.numeric(p.vals <= significant)]
+        
+        res <- enrichmentAnalysis(col.scores, gmt, background)
+		set(res, i=NULL, "p.val", p.adjust(res$p.val, correction.method))
+		set(res, i=which(res$p.val>significant), "overlap", list(list(NA)))
+		set(dt, i=NULL, col, res$overlap)
     }
+    evidence = apply(dt[,-1:-2], 1, function(x) names(which(!is.na(x))))
+    evidence[sapply(evidence, length)==0] = "combined"
+    
+    set(dt, i=NULL, "evidence", evidence)
+    colnames(dt)[-1:-2] = paste0("Genes_", colnames(dt)[-1:-2])
+
     dt
 }
+

@@ -28,28 +28,24 @@
 
 prepareCytoscape <- function(terms, gmt, filenames, col.significance) {
     if (!is.null(col.significance)) {
-        tests <- colnames(col.significance)[-1]
+		tests <- unique(unlist(col.significance$evidence))
         rows <- 1:nrow(col.significance)
+        
+        evidence.columns = do.call(rbind, lapply(col.significance$evidence, 
+        	function(x) 0+(tests %in% x)))
+        colnames(evidence.columns) = tests
+        
+        col.significance = cbind(col.significance[,"term.id"], evidence.columns)
 
-        ## Create groups file for enhancedgraphics. Keep both methods for now
-        if (FALSE) {
-            # Use outer ring
-            col.significance[, contributes := paste(.SDcol, collapse='|'), by=rows, .SDcols=-1]
-            colors <- paste(rainbow(length(tests), start=0.2), collapse=',')
-            instruct.str <- paste('circoschart: firstarc=.7 arcwidth=.3 attributelist="contributes"',
-                                  ' colorlist="', colors, '"',
-                                  ' showlabels=FALSE', sep="")
-            col.significance[, instruct := instruct.str]
-        } else {
-            # Use pichart
-            col.significance[, combined_only := as.numeric(all(!.SD)), by=rows, .SDcols=-1]
-            colors <- paste(rainbow(length(tests)), collapse=',')
-            instruct.str <- paste('piechart:',
-                                  ' attributelist="', paste(tests, collapse=','), ',combined_only"',
-                                  ' colorlist="', colors, ',#CCCCCC"',
-                                  ' showlabels=FALSE', sep='')
-            col.significance[, instruct := instruct.str]
-        }
+        # Use pichart
+        col.colors <- paste(rainbow(length(tests)), collapse=',')
+        instruct.str <- paste('piechart:',
+                              ' attributelist="', 
+                              paste(tests, collapse=','),
+                              '" colorlist="', 
+                              paste(col.colors, collapse=','), 
+                              '" showlabels=FALSE', sep='')
+        col.significance[, instruct := instruct.str]
 
         write.table(terms, file=filenames[1], row.names=FALSE, sep="\t", quote=FALSE)
         write.table(col.significance, file=filenames[2], row.names=FALSE, sep="\t", quote=FALSE)

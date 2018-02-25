@@ -291,12 +291,13 @@ columnSignificance <- function(scores, gmt, background, cutoff, significant, cor
         col.scores <- col.scores[col.scores <= cutoff]
         col.scores <- names(col.scores)[order(col.scores)]
         
-        res <- activeDriverPW:::enrichmentAnalysis(col.scores, gmt, background, correct)
+        res <- enrichmentAnalysis(col.scores, gmt, background, correct)
 		set(res, i=NULL, "p.val", p.adjust(res$p.val, correction.method))
 		set(res, i=which(res$p.val>significant), "overlap", list(list(NA)))
 		set(dt, i=NULL, col, res$overlap)
     }
-    evidence = lapply(1:nrow(dt), function(x) names(which(!is.na(dt[x, -1:-2]))))
+    ev_names = colnames(dt[,-1:-2])
+    evidence = lapply(1:nrow(dt), function(x) ev_names[which(!is.na(dt[x, -1:-2]))])
     evidence[sapply(evidence, length)==0] = "combined"
     
     set(dt, i=NULL, "evidence", evidence)

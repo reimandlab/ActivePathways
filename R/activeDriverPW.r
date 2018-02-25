@@ -106,7 +106,7 @@ activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
                                              "sump", "sumz", "sumlog"),
                             correction.method = c("holm", "fdr", "hochberg", "hommel",
                                                   "bonferroni", "BH", "BY", "none"),
-                            return.all=FALSE, cytoscape.filenames = NULL) {
+                            return.all=FALSE, cytoscape.filenames = NULL, correct) {
         
     merge.method <- match.arg(merge.method)
     correction.method <- match.arg(correction.method)
@@ -207,7 +207,7 @@ activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
 
     ##### enrichmentAnalysis and column contribution #####
 
-    res <- enrichmentAnalysis(ordered.scores, gmt, background)
+    res <- enrichmentAnalysis(ordered.scores, gmt, background, correct)
     res[, p.val := p.adjust(p.val, method=correction.method)]
 
     significant.indeces <- which(res$p.val <= significant)
@@ -218,7 +218,7 @@ activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
     
     if (contribution) {
         sig.cols <- columnSignificance(scores, gmt, background, cutoff,
-                                       significant, correction.method)
+                                       significant, correction.method, correct)
         res <- cbind(res, sig.cols)
     } else {
         sig.cols <- NULL
@@ -258,12 +258,12 @@ activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
 #' \dontrun{
 #'     enrichmentAnalysis(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt, makeBackground(gmt))
 #' }
-enrichmentAnalysis <- function(genelist, gmt, background) {
+enrichmentAnalysis <- function(genelist, gmt, background, correct) {
     dt <- data.table(term.id=names(gmt))
 
     for (i in 1:length(gmt)) {
         term <- gmt[[i]]
-        tmp <- orderedHypergeometric(genelist, background, term$genes)
+        tmp <- orderedHypergeometric(genelist, background, term$genes, correct)
         overlap <- genelist[1:tmp$ind]
         overlap <- overlap[overlap %in% term$genes]
         if (length(overlap) == 0) overlap <- NA
@@ -284,19 +284,19 @@ enrichmentAnalysis <- function(genelist, gmt, background) {
 #' in \code{scores}, indicating whether each pathway was found to be
 #' significant(TRUE) or not(FALSE) when considering only that column
 
-columnSignificance <- function(scores, gmt, background, cutoff, significant, correction.method) {
+columnSignificance <- function(scores, gmt, background, cutoff, significant, correction.method, correct) {
     dt <- data.table(term.id=names(gmt), evidence=NA)
     for (col in colnames(scores)) {
         col.scores <- scores[, col, drop=TRUE]
         col.scores <- col.scores[col.scores <= cutoff]
         col.scores <- names(col.scores)[order(col.scores)]
         
-        res <- enrichmentAnalysis(col.scores, gmt, background)
+        res <- activeDriverPW:::enrichmentAnalysis(col.scores, gmt, background, correct)
 		set(res, i=NULL, "p.val", p.adjust(res$p.val, correction.method))
 		set(res, i=which(res$p.val>significant), "overlap", list(list(NA)))
 		set(dt, i=NULL, col, res$overlap)
     }
-    evidence = apply(dt[,-1:-2], 1, function(x) names(which(!is.na(x))))
+    evidence = lapply(1:nrow(dt), function(x) names(which(!is.na(dt[x, -1:-2]))))
     evidence[sapply(evidence, length)==0] = "combined"
     
     set(dt, i=NULL, "evidence", evidence)

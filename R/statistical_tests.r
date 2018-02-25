@@ -50,7 +50,7 @@ hypergeometric <- function(counts) {
 #'    orderedHypergeometric(c('HERC2', 'SP100'), c('PHC2', 'BLM', 'XPC', 'SMC3', 'HERC2', 'SP100'),
 #'                          c('HERC2', 'PHC2', 'BLM'))
 #' }
-orderedHypergeometric <- function(genelist, background, annotations) {
+orderedHypergeometric <- function(genelist, background, annotations, correct) {
     # Only test subsets of genelist that end with a gene in annotations since
     # these are the only tests for which the p-value can decrease
     which.in <- which(genelist %in% annotations)
@@ -83,5 +83,14 @@ orderedHypergeometric <- function(genelist, background, annotations) {
 
     # Return the lowest p-value and the associated index
     min.score <- min(scores)
-    list(p.val=min.score, ind=which.in[max(which(scores==min.score))])
+    
+    ind = which.in[max(which(scores==min.score))]
+    p.val = min.score
+    
+    if (correct) {
+    	# local multi-test correction is multiplication by number of tests performed
+    	p.val = min(1, p.val * length(which.in))
+    }
+	
+	list(p.val=p.val, ind=ind)
 }

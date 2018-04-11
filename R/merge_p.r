@@ -46,7 +46,7 @@ merge_p_values <- function(scores, method=c("Fisher", "Brown", "logitp",
         if (method == "Brown") stop("Brown's method cannot be used with a single list of p-values")
         
         # Some metap functions don't like p-values that are 0 or 1 so make them (0, 1) to avoid errors
-        scores <- sapply(scores, function(x) if (x == 0) 0.0000001 else if (x==1) 0.9999999 else x)
+        scores <- sapply(scores, function(x) if (x == 0) 1e-16 else if (x==1) 1-1e-16 else x)
         func <- function(x) getFromNamespace(method, 'metap')(x)$p
         return(func(scores))
     }
@@ -59,7 +59,7 @@ merge_p_values <- function(scores, method=c("Fisher", "Brown", "logitp",
         return(apply(scores, 1, brownsMethod, cov.matrix=cov.matrix))
     }
     
-    scores <- apply(scores, c(1,2), function(x) if (x == 0) 0.0000001 else if (x==1) 0.9999999 else x)
+    scores <- apply(scores, c(1,2), function(x) if (x == 0) 1e-16 else if (x==1) 1-1e-16 else x)
     func <- function(x) getFromNamespace(method, 'metap')(x)$p
     return (apply(scores, 1, func))
 }

@@ -102,7 +102,7 @@
 # TODO: enter citations for Cytoscape, enrichmentMap, and enhancedGraphics
 activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
                             geneset.filter = c(5, 1000), cutoff = 0.1, significant = 0.05,
-                            merge.method = c("Fisher", "Brown", "logitp", "meanp", 
+                            merge.method = c("Brown", "Fisher", "logitp", "meanp", 
                                              "sump", "sumz", "sumlog"),
                             correction.method = c("holm", "fdr", "hochberg", "hommel",
                                                   "bonferroni", "BH", "BY", "none"),
@@ -200,6 +200,7 @@ activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
     # that don't make the cutoff
     merged.scores <- merge_p_values(scores, merge.method)
     merged.scores <- merged.scores[merged.scores <= cutoff]
+    
     if (length(merged.scores) == 0) stop("No genes made the cutoff")
 
     # Sort genes by p-value

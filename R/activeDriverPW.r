@@ -16,7 +16,7 @@
 #'   to not enforce a minimum or maximum value, or set \code{geneset.filter} to 
 #'   \code{NULL} to skip filtering
 #' @param cutoff A maximum p-value for a gene to be used for enrichment analysis.
-#'   Any genes with \code{p.val > significant} will be discarded before testing
+#'   Any genes with \code{adjusted.p.val > significant} will be discarded before testing
 #' @param significant A number in [0,1] denoting the maximum p-value for a
 #'   pathway to be considered significantly enriched.
 #' @param merge.method Method to merge p-values. See section Merging p Values
@@ -32,7 +32,7 @@
 #'   \describe{
 #'     \item{term.id}{The id of the term}
 #'     \item{term.name}{The full name of the term}
-#'     \item{p.val}{The associated p-value}
+#'     \item{adjusted.p.val}{The associated p-value, adjusted for multiple testing}
 #'     \item{term.size}{The number of genes annotated to the term}
 #'     \item{overlap}{A character vector of the genes that overlap between the
 #'     term and the query}
@@ -41,7 +41,7 @@
 #'          enrichments and added to the evidence field if the pathway is found.}
 #'   }
 #'   If \code{return.all == FALSE} then only terms with
-#'     \code{p.val <= significant} will be returned, otherwise all terms will be
+#'     \code{adjusted.p.val <= significant} will be returned, otherwise all terms will be
 #'     returned.
 #'
 #' @section Merging p Values:
@@ -67,7 +67,7 @@
 #'   EnrichmentMap and enhancedGraphics apps. The three fies written are:
 #'   \describe{
 #'     \item{cytoscape.filenames[1]}{A list of significant terms and the
-#'     associated p-value. Only terms with \code{p.val <= significant} are
+#'     associated p-value. Only terms with \code{adjusted.p.val <= significant} are
 #'     written to this file}
 #'     \item{cytoscape.filenames[2]}{A matrix indicating whether the significant
 #'     pathways are found to be significant when considering only one column from
@@ -209,9 +209,9 @@ activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
     ##### enrichmentAnalysis and column contribution #####
 
     res <- enrichmentAnalysis(ordered.scores, gmt, background, correct)
-    res[, p.val := p.adjust(p.val, method=correction.method)]
+    res[, adjusted.p.val := p.adjust(adjusted.p.val, method=correction.method)]
 
-    significant.indeces <- which(res$p.val <= significant)
+    significant.indeces <- which(res$adjusted.p.val <= significant)
     if (length(significant.indeces) == 0) {
         warning("No significant terms were found")
         if (!is.null(cytoscape.filenames)) warning("Cytoscape files were not written")
@@ -226,7 +226,7 @@ activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
     }
 
     if (!is.null(cytoscape.filenames) && length(significant.indeces) > 0) {
-        prepareCytoscape(res[significant.indeces, .(term.id, term.name, p.val)],
+        prepareCytoscape(res[significant.indeces, .(term.id, term.name, adjusted.p.val)],
                          gmt[significant.indeces], cytoscape.filenames, 
                          sig.cols[significant.indeces,])
     }
@@ -248,7 +248,7 @@ activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
 #'   \describe{
 #'     \item{term.id}{The id of the term}
 #'     \item{term.name}{The full name of the term}
-#'     \item{p.val}{The associated p-value}
+#'     \item{adjusted.p.val}{The associated p-value adjusted for multiple testing}
 #'     \item{term.size}{The number of genes annotated to the term}
 #'     \item{overlap}{A character vector of the genes that overlap between the
 #'        term and the query}
@@ -269,7 +269,7 @@ enrichmentAnalysis <- function(genelist, gmt, background, correct) {
         overlap <- overlap[overlap %in% term$genes]
         if (length(overlap) == 0) overlap <- NA
         set(dt, i, 'term.name', term$name)
-        set(dt, i, 'p.val', tmp$p.val)
+        set(dt, i, 'adjusted.p.val', tmp$p.val)
         set(dt, i, 'term.size', length(term$genes))
         set(dt, i, 'overlap', list(list(overlap)))
     }
@@ -293,8 +293,8 @@ columnSignificance <- function(scores, gmt, background, cutoff, significant, cor
         col.scores <- names(col.scores)[order(col.scores)]
         
         res <- enrichmentAnalysis(col.scores, gmt, background, correct)
-		set(res, i=NULL, "p.val", p.adjust(res$p.val, correction.method))
-		set(res, i=which(res$p.val>significant), "overlap", list(list(NA)))
+		set(res, i=NULL, "adjusted.p.val", p.adjust(res$adjusted.p.val, correction.method))
+		set(res, i=which(res$adjusted.p.val>significant), "overlap", list(list(NA)))
 		set(dt, i=NULL, col, res$overlap)
     }
     ev_names = colnames(dt[,-1:-2])

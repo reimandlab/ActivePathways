@@ -5,7 +5,7 @@
 #'   The three fies written are:
 #'   \describe{
 #'     \item{cytoscape.filenames[1]}{A list of significant terms and the
-#'       associated p-value. Only terms with \code{p.val <= significant} are
+#'       associated adjusted p-value. Only terms with \code{adjusted.p.val <= significant} are
 #'       written to this file}
 #'     \item{cytoscape.filenames[2]}{A matrix of column contributions to each
 #'       term. A \code{1} indicates that that term is significant using only
@@ -15,7 +15,7 @@
 #'       file, containing only the terms in \code{cytoscape.filenames[1]}}
 #'   }
 #'
-#' @param terms a data.table with columns 'term.id', 'term.name', 'p.val'
+#' @param terms a data.table with columns 'term.id', 'term.name', 'adjusted.p.val'
 #' @param gmt an abridged gmt object containing only the pathways that were
 #' found to be significant
 #' @param filenames vector of 2 or 3 filesnames denoting where to write fles to

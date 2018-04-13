@@ -116,6 +116,7 @@ activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
     if (!(is.matrix(scores) && is.numeric(scores))) stop("scores must be a numeric matrix")
     if (any(is.na(scores))) stop("scores may not contain missing values")
     if (any(scores < 0) || any(scores > 1)) stop("All values in scores must be in [0,1]")
+    if (any(duplicated(rownames(scores)))) stop("scores contains duplicated genes. rownames must be unique")
     
     # cutoff and significant
     stopifnot(length(cutoff) == 1)

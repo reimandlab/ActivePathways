@@ -7,9 +7,9 @@ background <- makeBackground(gmt)
 # filenames for cytoscape
 file.names <- paste(c('terms', 'groups', 'smallgmt'), '.txt', sep="")
 
-# Run activeDriverPW quickly
-run_adPW_short <- function(dat) activeDriverPW(dat, gmt[1:3], cutoff=1, significant=1, contribution=FALSE)
-run_adPW_short_contribution <- function(dat) activeDriverPW(dat, gmt[1:3], cutoff=1, significant=1, contribution=TRUE)
+# Run activePathways quickly
+run_ap_short <- function(dat) activePathways(dat, gmt[1:3], cutoff=1, significant=1, contribution=FALSE)
+run_ap_short_contribution <- function(dat) activePathways(dat, gmt[1:3], cutoff=1, significant=1, contribution=TRUE)
 
 # Data for testing enrichmentAnalysis
 ea.gmt <- gmt[1:4]

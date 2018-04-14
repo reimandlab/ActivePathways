@@ -1,3 +1,9 @@
+# activePathways 1.0.1
+
+## Major Changes
+
+* Rename to activePathways
+
 # activeDriverPW 1.0.0
 
 ## Major Changes

@@ -1,4 +1,4 @@
-#' activeDriverPW
+#' activePathways
 #'
 #' @param scores A numerical matrix of p-values where each row is a gene and
 #'   each column is a test. Rownames should be the genes and colnames the names
@@ -62,7 +62,7 @@
 #' for more details
 #'
 #' @section Cytoscape:
-#'   If \code{cytoscape.filenames} is supplied, activeDriverPW will write three
+#'   If \code{cytoscape.filenames} is supplied, activePathways will write three
 #'   files that can be used to build a network using Cytoscape and the
 #'   EnrichmentMap and enhancedGraphics apps. The three fies written are:
 #'   \describe{
@@ -88,7 +88,7 @@
 #' \dontrun{
 #'     dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
 #'     dat[is.na(dat)] <- 1
-#'     activeDriverPW(dat, 'path/to/gmt.gmt', return.all=TRUE,
+#'     activePathways(dat, 'path/to/gmt.gmt', return.all=TRUE,
 #'          cytoscape.filenames=c('terms.txt', 'groups.txt', 'abridged.gmt'))
 #' }
 #'
@@ -100,7 +100,7 @@
 # TODO: enter citations for article on merging p-values
 # http://www.jstor.org/stable/2529826
 # TODO: enter citations for Cytoscape, enrichmentMap, and enhancedGraphics
-activeDriverPW <-  function(scores, gmt, background = makeBackground(gmt),
+activePathways <-  function(scores, gmt, background = makeBackground(gmt),
                             geneset.filter = c(5, 1000), cutoff = 0.1, significant = 0.05,
                             merge.method = c("Brown", "Fisher", "logitp", "meanp", 
                                              "sump", "sumz", "sumlog"),
@@ -280,7 +280,7 @@ enrichmentAnalysis <- function(genelist, gmt, background) {
 #' Determine which pathways are found to be significant using each column
 #' individually
 #'
-#' @inheritParams activeDriverPW
+#' @inheritParams activePathways
 #'
 #' @return a data.table with columns 'term.id' and a column for each column
 #' in \code{scores}, indicating whether each pathway was found to be

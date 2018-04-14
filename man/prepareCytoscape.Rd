@@ -7,7 +7,7 @@
 prepareCytoscape(terms, gmt, filenames, col.significance)
 }
 \arguments{
-\item{terms}{a data.table with columns 'term.id', 'term.name', 'p.val'}
+\item{terms}{a data.table with columns 'term.id', 'term.name', 'adjusted.p.val'}
 
 \item{gmt}{an abridged gmt object containing only the pathways that were
 found to be significant}
@@ -15,7 +15,7 @@ found to be significant}
 \item{filenames}{vector of 2 or 3 filesnames denoting where to write fles to}
 
 \item{col.significance}{a data.table with a column 'term.id' and a column
-for each test indicating whether a pathways is signficiant (TRUE) or not
+for each test indicating whether a pathway is signficiant (TRUE) or not
 (FALSE) when considering only that column. If contribution==TRUE, use
 col.significance=NULL and this will be skipped}
 }
@@ -28,7 +28,7 @@ Cytoscape and the EnrichmentMap app.
   The three fies written are:
   \describe{
     \item{cytoscape.filenames[1]}{A list of significant terms and the
-      associated p-value. Only terms with \code{p.val <= significant} are
+      associated adjusted p-value. Only terms with \code{adjusted.p.val <= significant} are
       written to this file}
     \item{cytoscape.filenames[2]}{A matrix of column contributions to each
       term. A \code{1} indicates that that term is significant using only

@@ -1,5 +1,5 @@
 ---
-title: "Creating Enrichment Maps with Results from ActiveDriverPW"
+title: "Creating Enrichment Maps with Results from activePathways"
 author: "Jonathan Barenboim"
 date: "`r Sys.Date()`"
 output: 
@@ -18,25 +18,25 @@ knitr::opts_chunk$set(warning=FALSE,
 
 # Introduction 
 
-This vignette will show how to create a pathway enrichment map using the results from `activeDriverPW`. In this example we will be using the results from the main activeDriverPW vignette. To follow along with this vignette, use any Cytoscape files written by `activeDriverPW` or follow the main activeDriverPW vignette, making sure to save the Cytoscape files in an accessible location.
+This vignette will show how to create a pathway enrichment map using the results from `activePathways`. In this example we will be using the results from the main activePathways vignette. To follow along with this vignette, use any Cytoscape files written by `activePathways` or follow the main activePathways vignette, making sure to save the Cytoscape files in an accessible location.
 
 # Required Files
 
-Recall that `activeDriverPW` writes three files to be used in Cytoscape.
+Recall that `activePathways` writes three files to be used in Cytoscape.
 ```{r}
-files <- c(system.file('extdata', 'cytoscape_terms.txt', package='activeDriverPW'),
-           system.file('extdata', 'cytoscape_groups.txt', package='activeDriverPW'),
-           system.file('extdata', 'cytoscape_abridged.gmt', package='activeDriverPW'))
+files <- c(system.file('extdata', 'cytoscape_terms.txt', package='activePathways'),
+           system.file('extdata', 'cytoscape_groups.txt', package='activePathways'),
+           system.file('extdata', 'cytoscape_abridged.gmt', package='activePathways'))
 ```
 ```{r, eval=FALSE}
 # Not run. 
-res <- activeDriverPW(dat, gmt, cytoscape.filenames=files)
+res <- activePathways(dat, gmt, cytoscape.filenames=files)
 ```
 The files written are:
 
 * `cytoscape.filenames[1]`: a list of significant terms and the associated p-values. Note that only terms with `p.val <= significant` are written, even if you use the option `return.all=TRUE`.
 
-* `cytoscape.filenames[2]`: a matrix indicating which columns the pathways are significant in. A 1 indicates that that pathway is significant if `activeDriverPW` is run on the data in just that one column. Note that this isn't the same as the column contribution. This file is skipped if you use the option `contribution=FALSE`.
+* `cytoscape.filenames[2]`: a matrix indicating which columns the pathways are significant in. A 1 indicates that that pathway is significant if `activePathways` is run on the data in just that one column. Note that this isn't the same as the column contribution. This file is skipped if you use the option `contribution=FALSE`.
 
 * `cytoscape.filenames[3]`: a shortened version of the supplied GMT file which contains only the significant pathways. You don't need to use this file, but it helps speed up the process of creating the network inside Cytoscape.
 ```{r}

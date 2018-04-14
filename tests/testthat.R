@@ -1,4 +1,4 @@
 library(testthat)
-library(activeDriverPW)
+library(activePathways)
 
-test_check("activeDriverPW")
+test_check("activePathways")

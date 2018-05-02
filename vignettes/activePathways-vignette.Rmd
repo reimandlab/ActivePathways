@@ -105,7 +105,7 @@ Note that only genes found in the background are used for testing enrichment. An
 
 
 ## Merging p-values
-Our input file consisted of multiple scores for each gene, but in order to perform pathway enrichment analysis each gene needs to have a single score. `activePathways` accomplishes this by merging the p-values for each gene into a single combined score. The two main methods to merge p-values are Fisher's method (the default) and Brown's method, but other methods are also available. You can preview the merged p-values using the `merge_p_values` function
+Our input file consisted of multiple scores for each gene, but in order to perform pathway enrichment analysis each gene needs to have a single score. `activePathways` accomplishes this by merging the p-values for each gene into a single combined score. The two main methods to merge p-values are Brown's method (the default) and Fisher's method, but other methods are also available. You can preview the merged p-values using the `merge_p_values` function
 ```{r}
 scores
 merge_p_values(scores, 'Fisher')
@@ -114,7 +114,7 @@ merge_p_values(scores, 'Brown')
 
 You can also use this function to combine some of the data before hand. For example, we can merge the `X3UTR`, `X5UTR`, and `promCore` columns into a single `non_coding` column. This will consider the three non-coding regions as a single column, rather than giving them all equal weight to the `CDS` column
 ```{r}
-scores2 <- cbind(scores[, 'CDS'], merge_p_values(scores[, c('X3UTR', 'X5UTR', 'promCore')], 'Fisher'))
+scores2 <- cbind(scores[, 'CDS'], merge_p_values(scores[, c('X3UTR', 'X5UTR', 'promCore')], 'Brown'))
 colnames(scores2) <- c('CDS', 'non_coding')
 scores
 scores2
@@ -147,7 +147,9 @@ res$overlap[1:3]
 ```
 The overlaps are in the same order as the `genelist`, meaning that the most significant genes from `scores` are placed first. This column is very useful in further analysis on the data, going back from pathway space to gene space and identifying significant genes in each pathway.
 
-The rest of the columns share their names with the columns in `scores`, and represent the column contributions as described above
+The `evidence` column gives the individual gene lists in `scores` in which the pathway is found to be enriched. For example, the majority of the pathways have only 'CDS' as their evidence, meaning that the pathway is enriched either in this column or in the combined data. Pathway `REAC:3214842` has as evidence `list('X3UTR', 'promCore')`, which means that the pathway is found to be enriched when considering either the `X3UTR` column, the `promCore` column, or the combined data. If a pathway is found to be enriched only with the combined data and not in any individual column, 'combined' will be listed as the evidence. If a pathway is not found to be enriched in any individual column or in the combined data (only possible if `return.all==TRUE`) then the evidence will be 'none'.  
+
+The rest of the columns are named as `Genes_{column}`, and represent the overlaps of each individual column if a pathway is found to be enriched according only to that gene list. Otherwise the column is `NA`
 
 ### Writing results to file
 The results are returned as a `data.table`, but since the overlap column is a list it adds some challenges to writing the table to a file, should you need to. The usual `write.table` and `write.csv` functions will struggle with this column unless you manually transform the list into a string. Fortunately, `data.table`'s `fwrite` function is smart enough to handle the complex structure

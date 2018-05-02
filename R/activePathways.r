@@ -220,8 +220,8 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
     
     if (contribution) {
         sig.cols <- columnSignificance(scores, gmt, background, cutoff,
-                                       significant, correction.method)
-        res <- cbind(res, sig.cols)
+                                       significant, correction.method, res$adjusted.p.val)
+        res <- cbind(res, sig.cols[, -1])
     } else {
         sig.cols <- NULL
     }
@@ -281,12 +281,13 @@ enrichmentAnalysis <- function(genelist, gmt, background) {
 #' individually
 #'
 #' @inheritParams activePathways
+#' @param pvals p-value for the pathways calculated by activePathways
 #'
 #' @return a data.table with columns 'term.id' and a column for each column
 #' in \code{scores}, indicating whether each pathway was found to be
 #' significant(TRUE) or not(FALSE) when considering only that column
 
-columnSignificance <- function(scores, gmt, background, cutoff, significant, correction.method) {
+columnSignificance <- function(scores, gmt, background, cutoff, significant, correction.method, pvals) {
     dt <- data.table(term.id=names(gmt), evidence=NA)
     for (col in colnames(scores)) {
         col.scores <- scores[, col, drop=TRUE]
@@ -298,9 +299,20 @@ columnSignificance <- function(scores, gmt, background, cutoff, significant, cor
 		set(res, i=which(res$adjusted.p.val>significant), "overlap", list(list(NA)))
 		set(dt, i=NULL, col, res$overlap)
     }
+   
     ev_names = colnames(dt[,-1:-2])
-    evidence = lapply(1:nrow(dt), function(x) ev_names[which(!is.na(dt[x, -1:-2]))])
-    evidence[sapply(evidence, length)==0] = "combined"
+    set_evidence <- function(x) {
+        ev <- ev_names[!is.na(dt[x, -1:-2])]
+        if(length(ev) == 0) {
+            if (pvals[x] <= significant) {
+                ev <- 'combined'
+            } else {
+                ev <- 'none'
+            }
+        }
+        ev
+    }
+    evidence <- lapply(1:nrow(dt), set_evidence)
     
     set(dt, i=NULL, "evidence", evidence)
     colnames(dt)[-1:-2] = paste0("Genes_", colnames(dt)[-1:-2])

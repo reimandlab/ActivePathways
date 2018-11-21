@@ -40,7 +40,7 @@ prepareCytoscape <- function(terms, gmt, filenames, col.significance) {
     col.significance = cbind(col.significance[,"term.id"], evidence.columns)
     
     # Use pichart
-    col.colors <- paste(rainbow(length(tests)), collapse=',')
+    col.colors <- rainbow(length(tests))
     instruct.str <- paste('piechart:',
                           ' attributelist="', 
                           paste(tests, collapse=','),

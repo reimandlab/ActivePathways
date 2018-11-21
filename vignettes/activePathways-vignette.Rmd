@@ -164,16 +164,18 @@ However, `data.table::fread` isn't quite smart enough to get the table back from
 # Visualizing the results in Cytoscape
 The Cytoscape program, combined with the enrichmentMap app, provide a powerful tool to visualize pathway enrichment analysis as a network. `activePathways` can help speed up this process by automatically writing the files that will be uploaded to Cytoscape to create a map. To create these files, a list of file names must be supplied to `activePathways`
 ```{r}
-files <- paste(system.file('extdata', package='activePathways'), c('cytoscape_terms.txt', 'cytoscape_groups.txt', 'cytoscape_abridged.txt'), sep='/')
+files <- paste(system.file('extdata', package='activePathways'), c('cytoscape_terms.txt', 'cytoscape_groups.txt', 'cytoscape_abridged.txt', 'legend.pdf'), sep='/')
 res <- activePathways(scores, gmt.file, cytoscape.filenames=files)
 ```
-Three files are written:
+Four files are written:
 
 * `cytoscape.filenames[1]` contains the list of significant terms and the associated p-values. Note that only terms with `p.val <= significant` are written, even if you use the option `return.all=TRUE`.
 
 * `cytoscape.filenames[2]` contains a matrix indicating which columns the pathways are significant in. A 1 indicates that that pathway is significant if `activePathways` is run on the data in just that one column. Note that this isn't the same as the column contribution. However, this file will be skipped if you use the option `contribution=FALSE`, since the assumption is that the individual columns aren't of interest.
 
 * `cytoscape.filenames[3]` contains a shortened version of the supplied GMT file which consists of only the significant pathways. You don't have to use this file, but it helps speed up the process of creating the network inside Cytoscape.
+
+* `cytoscape.filenames[4]` a pdf file of a legend which can be used as reference to the generated cytoscape plot.
 
 ```{r}
 cat(paste(readLines(files[1])[1:5], collapse='\n'))

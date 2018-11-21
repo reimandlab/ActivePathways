@@ -7,7 +7,7 @@ Description: Enrichment analysis of annotated gene sets using a set of genes of 
 Depends: R (>= 3.2.3)
 Imports:
     metap,
-    data.table
+    data.table,
     ggplot2
 License: GPL-3
 URL: 

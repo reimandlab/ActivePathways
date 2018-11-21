@@ -58,10 +58,13 @@ prepareCytoscape <- function(terms, gmt, filenames, col.significance) {
     # Making a Legend
     if (requireNamespace("ggplot2", quietly = TRUE)) {
       require(ggplot2)
-      dummy_plot = ggplot(data.frame(tests, 1), aes(tests, fill = tests)) +
+      dummy_plot = ggplot(data.frame("tests" = factor(tests, levels = tests),
+                                     "value" = 1), aes(tests, fill = tests)) +
         geom_bar() +
         scale_fill_manual(name = "Contribution", values=col.colors)
+      pdf(file = NULL) # Suppressing Blank Display Device from ggplot_build
       dummy_table = ggplot_gtable(ggplot_build(dummy_plot))
+      dev.off()
       legend = dummy_table$grobs[[which(sapply(dummy_table$grobs, function(x) x$name) == "guide-box")]]
       
       # Estimating height & width
@@ -71,7 +74,8 @@ prepareCytoscape <- function(terms, gmt, filenames, col.significance) {
       legend_width = ifelse(length(tests) > 20, 
                             ceiling(length(tests)/20)*(max(nchar(tests))*0.05+1), 
                             max(nchar(tests))*0.05+1)
-      ggsave(legend, 
+      ggsave(legend,
+             device = "pdf",
              filename = filenames[4], 
              height = legend_height, 
              width = legend_width, 

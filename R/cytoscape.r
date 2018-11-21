@@ -60,7 +60,7 @@ prepareCytoscape <- function(terms, gmt, filenames, col.significance) {
       geom_bar() +
       scale_fill_manual(name = "Contribution", values=col.colors)
     dummy_table = ggplot_gtable(ggplot_build(dummy_plot))
-    legend = dummy_table$grobs[[which(sapply(tmp$grobs, function(x) x$name) == "guide-box")]]
+    legend = dummy_table$grobs[[which(sapply(dummy_table$grobs, function(x) x$name) == "guide-box")]]
     legend_height = ifelse(length(tests) > 19, 5, length(tests)*0.2 +1)
     legend_width = ifelse(length(tests) > 20, ceiling(length(tests)/20)*(max(nchar(tests))*0.05+1), max(nchar(tests))*0.05+1)
     ggsave(legend, filename = filenames[4], height = legend_height, width = legend_width, scale = 1)

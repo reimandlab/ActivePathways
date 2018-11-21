@@ -24,7 +24,7 @@
 #'   \code{\link[stats]{p.adjust}} for details
 #' @param return.all Whether to return results for all terms or only significant
 #'   terms
-#' @param cytoscape.filenames a vector of 2 or 3 filenames denoting where
+#' @param cytoscape.filenames a vector of 3 or 4 filenames denoting where
 #'   information for Cytoscape will be written to (see section Cytoscape). If
 #'   NULL, do not write any files.
 #'
@@ -75,6 +75,8 @@
 #'     column to test for enrichment analysis}
 #'     \item{cytoscape.filenames[3]}{A Shortened version of the supplied gmt
 #'     file, containing only the terms in \code{cytoscape.filenames[1]}}
+#'     \item{cytoscape.filenames[4]}{A legend with colours matching contributions
+#'     from columns in \code{scores}}
 #'   }
 #'
 #'   How to use: Create an enrichment map in Cytoscape with the file of terms
@@ -107,133 +109,133 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
                             correction.method = c("holm", "fdr", "hochberg", "hommel",
                                                   "bonferroni", "BH", "BY", "none"),
                             return.all=FALSE, cytoscape.filenames = NULL) {
-        
-    merge.method <- match.arg(merge.method)
-    correction.method <- match.arg(correction.method)
-
-    ##### Validation #####
-    # scores
-    if (!(is.matrix(scores) && is.numeric(scores))) stop("scores must be a numeric matrix")
-    if (any(is.na(scores))) stop("scores may not contain missing values")
-    if (any(scores < 0) || any(scores > 1)) stop("All values in scores must be in [0,1]")
-    if (any(duplicated(rownames(scores)))) stop("scores contains duplicated genes. rownames must be unique")
-    
-    # cutoff and significant
-    stopifnot(length(cutoff) == 1)
-    stopifnot(is.numeric(cutoff))
-    if (cutoff < 0 || cutoff > 1) stop("cutoff must be a value in [0,1]")
-    stopifnot(length(significant) == 1)
-    stopifnot(is.numeric(significant))
-    if (significant < 0 || significant > 1) stop("significant must be a value in [0,1]")
-    
-    # gmt
-    if (!is.GMT(gmt)) gmt <- read.GMT(gmt)
+  
+  merge.method <- match.arg(merge.method)
+  correction.method <- match.arg(correction.method)
+  
+  ##### Validation #####
+  # scores
+  if (!(is.matrix(scores) && is.numeric(scores))) stop("scores must be a numeric matrix")
+  if (any(is.na(scores))) stop("scores may not contain missing values")
+  if (any(scores < 0) || any(scores > 1)) stop("All values in scores must be in [0,1]")
+  if (any(duplicated(rownames(scores)))) stop("scores contains duplicated genes. rownames must be unique")
+  
+  # cutoff and significant
+  stopifnot(length(cutoff) == 1)
+  stopifnot(is.numeric(cutoff))
+  if (cutoff < 0 || cutoff > 1) stop("cutoff must be a value in [0,1]")
+  stopifnot(length(significant) == 1)
+  stopifnot(is.numeric(significant))
+  if (significant < 0 || significant > 1) stop("significant must be a value in [0,1]")
+  
+  # gmt
+  if (!is.GMT(gmt)) gmt <- read.GMT(gmt)
+  if (length(gmt) == 0) stop("No pathways in gmt made the geneset.filter")
+  if (!(is.character(background) && is.vector(background))) {
+    stop("background must be a character vector")
+  } 
+  
+  # geneset.filter
+  if (!is.null(geneset.filter)) {
+    if (!(is.numeric(geneset.filter) && is.vector(geneset.filter))) {
+      stop("geneset.filter must be a numeric vector")
+    }
+    if (length(geneset.filter) != 2) stop("geneset.filter must be length 2")
+    if (!is.numeric(geneset.filter)) stop("geneset.filter must be numeric")
+    if (any(geneset.filter < 0, na.rm=TRUE)) stop("geneset.filter limits must be positive")
+  }
+  
+  contribution <- TRUE
+  # contribution
+  if (ncol(scores) == 1) {
+    contribution <- FALSE
+    message("scores contains only one column. Column contributions will not be calculated")
+  }
+  
+  # cytoscape.filenames
+  if (!is.null(cytoscape.filenames)){
+    if (contribution == TRUE && length(cytoscape.filenames) != 4) {
+      stop("Must supply 4 file names to cytoscape.filenames")
+    }
+    if (!contribution){
+      if (!length(cytoscape.filenames) %in% c(3,4)) {
+        stop("Must supply 3 file names to cytoscape.filenames")
+      }
+      if (length(cytoscape.filenames) == 4) {
+        message(paste("Column contributions will not be evaluated so the",
+                      "contribution matrix is not being written.",
+                      "cytoscape.filenames[2] will be ignored"))
+        cytoscape.filenames <- cytoscape.filenames[-2]
+      }
+    }
+  }
+  
+  ##### filtering and sorting #####
+  
+  # Filter the GMT
+  if(!is.null(geneset.filter)) {
+    orig.length <- length(gmt)
+    if (!is.na(geneset.filter[1])) {
+      gmt <- Filter(function(x) length(x$genes) >= geneset.filter[1], gmt)
+    }
+    if (!is.na(geneset.filter[2])) {
+      gmt <- Filter(function(x) length(x$genes) <= geneset.filter[2], gmt)
+    }
     if (length(gmt) == 0) stop("No pathways in gmt made the geneset.filter")
-    if (!(is.character(background) && is.vector(background))) {
-        stop("background must be a character vector")
-    } 
-
-    # geneset.filter
-    if (!is.null(geneset.filter)) {
-        if (!(is.numeric(geneset.filter) && is.vector(geneset.filter))) {
-            stop("geneset.filter must be a numeric vector")
-        }
-        if (length(geneset.filter) != 2) stop("geneset.filter must be length 2")
-        if (!is.numeric(geneset.filter)) stop("geneset.filter must be numeric")
-        if (any(geneset.filter < 0, na.rm=TRUE)) stop("geneset.filter limits must be positive")
+    if (length(gmt) < orig.length) {
+      message(paste(orig.length - length(gmt), "terms were removed from gmt", 
+                    "because they did not make the geneset.filter"))
     }
-   
-    contribution <- TRUE
-    # contribution
-    if (ncol(scores) == 1) {
-        contribution <- FALSE
-        message("scores contains only one column. Column contributions will not be calculated")
-    }
-    
-    # cytoscape.filenames
-    if (!is.null(cytoscape.filenames)){
-        if (contribution == TRUE && length(cytoscape.filenames) != 3) {
-            stop("Must supply 3 file names to cytoscape.filenames")
-        }
-        if (!contribution){
-            if (!length(cytoscape.filenames) %in% c(2,3)) {
-                stop("Must supply 2 file names to cytoscape.filenames")
-            }
-            if (length(cytoscape.filenames) == 3) {
-                message(paste("Column contributions will not be evaluated so the",
-                              "contribution matrix is not being written.",
-                              "cytoscape.filenames[2] will be ignored"))
-                cytoscape.filenames <- cytoscape.filenames[-2]
-            }
-        }
-    }
-
-    ##### filtering and sorting #####
-    
-    # Filter the GMT
-    if(!is.null(geneset.filter)) {
-        orig.length <- length(gmt)
-        if (!is.na(geneset.filter[1])) {
-            gmt <- Filter(function(x) length(x$genes) >= geneset.filter[1], gmt)
-        }
-        if (!is.na(geneset.filter[2])) {
-            gmt <- Filter(function(x) length(x$genes) <= geneset.filter[2], gmt)
-        }
-        if (length(gmt) == 0) stop("No pathways in gmt made the geneset.filter")
-        if (length(gmt) < orig.length) {
-            message(paste(orig.length - length(gmt), "terms were removed from gmt", 
-                          "because they did not make the geneset.filter"))
-        }
-    }
-
-    # Remove any genes not found in the background
-    orig.length <- nrow(scores)
-    scores <- scores[rownames(scores) %in% background, , drop=FALSE]
-    if (nrow(scores) == 0) {
-        stop("scores does not contain any genes in the background")
-    }
-    if (nrow(scores) < orig.length) {
-        message(paste(orig.length - nrow(scores), "rows were removed from scores",
-                      "because they are not found in the background"))
-    }
-
-    # merge p-values to get a single score for each gene and remove any genes
-    # that don't make the cutoff
-    merged.scores <- merge_p_values(scores, merge.method)
-    merged.scores <- merged.scores[merged.scores <= cutoff]
-    
-    if (length(merged.scores) == 0) stop("No genes made the cutoff")
-
-    # Sort genes by p-value
-    ordered.scores <- names(merged.scores)[order(merged.scores)]
-
-    ##### enrichmentAnalysis and column contribution #####
-
-    res <- enrichmentAnalysis(ordered.scores, gmt, background)
-    res[, adjusted.p.val := p.adjust(adjusted.p.val, method=correction.method)]
-
-    significant.indeces <- which(res$adjusted.p.val <= significant)
-    if (length(significant.indeces) == 0) {
-        warning("No significant terms were found")
-        if (!is.null(cytoscape.filenames)) warning("Cytoscape files were not written")
-    }
-    
-    if (contribution) {
-        sig.cols <- columnSignificance(scores, gmt, background, cutoff,
-                                       significant, correction.method, res$adjusted.p.val)
-        res <- cbind(res, sig.cols[, -1])
-    } else {
-        sig.cols <- NULL
-    }
-
-    if (!is.null(cytoscape.filenames) && length(significant.indeces) > 0) {
-        prepareCytoscape(res[significant.indeces, .(term.id, term.name, adjusted.p.val)],
-                         gmt[significant.indeces], cytoscape.filenames, 
-                         sig.cols[significant.indeces,])
-    }
-
-    if(return.all) return(res)
-    res[significant.indeces]
+  }
+  
+  # Remove any genes not found in the background
+  orig.length <- nrow(scores)
+  scores <- scores[rownames(scores) %in% background, , drop=FALSE]
+  if (nrow(scores) == 0) {
+    stop("scores does not contain any genes in the background")
+  }
+  if (nrow(scores) < orig.length) {
+    message(paste(orig.length - nrow(scores), "rows were removed from scores",
+                  "because they are not found in the background"))
+  }
+  
+  # merge p-values to get a single score for each gene and remove any genes
+  # that don't make the cutoff
+  merged.scores <- merge_p_values(scores, merge.method)
+  merged.scores <- merged.scores[merged.scores <= cutoff]
+  
+  if (length(merged.scores) == 0) stop("No genes made the cutoff")
+  
+  # Sort genes by p-value
+  ordered.scores <- names(merged.scores)[order(merged.scores)]
+  
+  ##### enrichmentAnalysis and column contribution #####
+  
+  res <- enrichmentAnalysis(ordered.scores, gmt, background)
+  res[, adjusted.p.val := p.adjust(adjusted.p.val, method=correction.method)]
+  
+  significant.indeces <- which(res$adjusted.p.val <= significant)
+  if (length(significant.indeces) == 0) {
+    warning("No significant terms were found")
+    if (!is.null(cytoscape.filenames)) warning("Cytoscape files were not written")
+  }
+  
+  if (contribution) {
+    sig.cols <- columnSignificance(scores, gmt, background, cutoff,
+                                   significant, correction.method, res$adjusted.p.val)
+    res <- cbind(res, sig.cols[, -1])
+  } else {
+    sig.cols <- NULL
+  }
+  
+  if (!is.null(cytoscape.filenames) && length(significant.indeces) > 0) {
+    prepareCytoscape(res[significant.indeces, .(term.id, term.name, adjusted.p.val)],
+                     gmt[significant.indeces], cytoscape.filenames, 
+                     sig.cols[significant.indeces,])
+  }
+  
+  if(return.all) return(res)
+  res[significant.indeces]
 }
 
 
@@ -261,20 +263,20 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
 #'     enrichmentAnalysis(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt, makeBackground(gmt))
 #' }
 enrichmentAnalysis <- function(genelist, gmt, background) {
-    dt <- data.table(term.id=names(gmt))
-
-    for (i in 1:length(gmt)) {
-        term <- gmt[[i]]
-        tmp <- orderedHypergeometric(genelist, background, term$genes)
-        overlap <- genelist[1:tmp$ind]
-        overlap <- overlap[overlap %in% term$genes]
-        if (length(overlap) == 0) overlap <- NA
-        set(dt, i, 'term.name', term$name)
-        set(dt, i, 'adjusted.p.val', tmp$p.val)
-        set(dt, i, 'term.size', length(term$genes))
-        set(dt, i, 'overlap', list(list(overlap)))
-    }
-    dt
+  dt <- data.table(term.id=names(gmt))
+  
+  for (i in 1:length(gmt)) {
+    term <- gmt[[i]]
+    tmp <- orderedHypergeometric(genelist, background, term$genes)
+    overlap <- genelist[1:tmp$ind]
+    overlap <- overlap[overlap %in% term$genes]
+    if (length(overlap) == 0) overlap <- NA
+    set(dt, i, 'term.name', term$name)
+    set(dt, i, 'adjusted.p.val', tmp$p.val)
+    set(dt, i, 'term.size', length(term$genes))
+    set(dt, i, 'overlap', list(list(overlap)))
+  }
+  dt
 }
 
 #' Determine which pathways are found to be significant using each column
@@ -288,35 +290,35 @@ enrichmentAnalysis <- function(genelist, gmt, background) {
 #' significant(TRUE) or not(FALSE) when considering only that column
 
 columnSignificance <- function(scores, gmt, background, cutoff, significant, correction.method, pvals) {
-    dt <- data.table(term.id=names(gmt), evidence=NA)
-    for (col in colnames(scores)) {
-        col.scores <- scores[, col, drop=TRUE]
-        col.scores <- col.scores[col.scores <= cutoff]
-        col.scores <- names(col.scores)[order(col.scores)]
-        
-        res <- enrichmentAnalysis(col.scores, gmt, background)
-		set(res, i=NULL, "adjusted.p.val", p.adjust(res$adjusted.p.val, correction.method))
-		set(res, i=which(res$adjusted.p.val>significant), "overlap", list(list(NA)))
-		set(dt, i=NULL, col, res$overlap)
-    }
-   
-    ev_names = colnames(dt[,-1:-2])
-    set_evidence <- function(x) {
-        ev <- ev_names[!is.na(dt[x, -1:-2])]
-        if(length(ev) == 0) {
-            if (pvals[x] <= significant) {
-                ev <- 'combined'
-            } else {
-                ev <- 'none'
-            }
-        }
-        ev
-    }
-    evidence <- lapply(1:nrow(dt), set_evidence)
+  dt <- data.table(term.id=names(gmt), evidence=NA)
+  for (col in colnames(scores)) {
+    col.scores <- scores[, col, drop=TRUE]
+    col.scores <- col.scores[col.scores <= cutoff]
+    col.scores <- names(col.scores)[order(col.scores)]
     
-    set(dt, i=NULL, "evidence", evidence)
-    colnames(dt)[-1:-2] = paste0("Genes_", colnames(dt)[-1:-2])
-
-    dt
+    res <- enrichmentAnalysis(col.scores, gmt, background)
+    set(res, i=NULL, "adjusted.p.val", p.adjust(res$adjusted.p.val, correction.method))
+    set(res, i=which(res$adjusted.p.val>significant), "overlap", list(list(NA)))
+    set(dt, i=NULL, col, res$overlap)
+  }
+  
+  ev_names = colnames(dt[,-1:-2])
+  set_evidence <- function(x) {
+    ev <- ev_names[!is.na(dt[x, -1:-2])]
+    if(length(ev) == 0) {
+      if (pvals[x] <= significant) {
+        ev <- 'combined'
+      } else {
+        ev <- 'none'
+      }
+    }
+    ev
+  }
+  evidence <- lapply(1:nrow(dt), set_evidence)
+  
+  set(dt, i=NULL, "evidence", evidence)
+  colnames(dt)[-1:-2] = paste0("Genes_", colnames(dt)[-1:-2])
+  
+  dt
 }
 

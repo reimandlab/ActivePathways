@@ -12,7 +12,7 @@ prepareCytoscape(terms, gmt, filenames, col.significance)
 \item{gmt}{an abridged gmt object containing only the pathways that were
 found to be significant}
 
-\item{filenames}{vector of 2 or 3 filesnames denoting where to write fles to}
+\item{filenames}{vector of 3 or 4 filesnames denoting where to write files to}
 
 \item{col.significance}{a data.table with a column 'term.id' and a column
 for each test indicating whether a pathway is signficiant (TRUE) or not
@@ -25,7 +25,7 @@ None
 \description{
 This function writes three files that are used to build an network using
 Cytoscape and the EnrichmentMap app.
-  The three fies written are:
+  The four files written are:
   \describe{
     \item{cytoscape.filenames[1]}{A list of significant terms and the
       associated adjusted p-value. Only terms with \code{adjusted.p.val <= significant} are
@@ -36,5 +36,7 @@ Cytoscape and the EnrichmentMap app.
       contribution==FALSE and therefore col.significance==NULL
     \item{cytoscape.filenames[3]}{A Shortened version of the supplied gmt
       file, containing only the terms in \code{cytoscape.filenames[1]}}
+    \item{cytoscape.filenames[4]}{A legend with colours matching contributions
+    from columns in \code{scores}}
   }
 }

@@ -6,7 +6,7 @@
 individually}
 \usage{
 columnSignificance(scores, gmt, background, cutoff, significant,
-  correction.method)
+  correction.method, pvals)
 }
 \arguments{
 \item{scores}{A numerical matrix of p-values where each row is a gene and
@@ -29,6 +29,8 @@ pathway to be considered significantly enriched.}
 
 \item{correction.method}{Method to correct p-values. See
 \code{\link[stats]{p.adjust}} for details}
+
+\item{pvals}{p-value for the pathways calculated by activePathways}
 }
 \value{
 a data.table with columns 'term.id' and a column for each column

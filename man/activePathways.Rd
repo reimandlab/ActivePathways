@@ -45,7 +45,7 @@ pathway to be considered significantly enriched.}
 \item{return.all}{Whether to return results for all terms or only significant
 terms}
 
-\item{cytoscape.filenames}{a vector of 2 or 3 filenames denoting where
+\item{cytoscape.filenames}{a vector of 3 or 4 filenames denoting where
 information for Cytoscape will be written to (see section Cytoscape). If
 NULL, do not write any files.}
 }
@@ -103,6 +103,8 @@ for more details
     column to test for enrichment analysis}
     \item{cytoscape.filenames[3]}{A Shortened version of the supplied gmt
     file, containing only the terms in \code{cytoscape.filenames[1]}}
+    \item{cytoscape.filenames[4]}{A legend with colours matching contributions
+    from columns in \code{scores}}
   }
 
   How to use: Create an enrichment map in Cytoscape with the file of terms

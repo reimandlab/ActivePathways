@@ -62,15 +62,15 @@ prepareCytoscape <- function(terms, gmt, filenames, col.significance) {
                                      "value" = 1), aes(tests, fill = tests)) +
         geom_bar() +
         scale_fill_manual(name = "Contribution", values=col.colors)
-      pdf(file = NULL) # Suppressing Blank Display Device from ggplot_build
+      pdf(file = NULL) # Suppressing Blank Display Device from ggplot_gtable
       dummy_table = ggplot_gtable(ggplot_build(dummy_plot))
       dev.off()
       legend = dummy_table$grobs[[which(sapply(dummy_table$grobs, function(x) x$name) == "guide-box")]]
       
       # Estimating height & width
       legend_height = ifelse(length(tests) > 20, 
-                             5, 
-                             length(tests)*0.2+1.2)
+                             5.5, 
+                             length(tests)*0.25+1)
       legend_width = ifelse(length(tests) > 20, 
                             ceiling(length(tests)/20)*(max(nchar(tests))*0.05+1), 
                             max(nchar(tests))*0.05+1)

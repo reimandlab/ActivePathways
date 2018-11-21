@@ -25,6 +25,7 @@
 #' for each test indicating whether a pathway is signficiant (TRUE) or not
 #' (FALSE) when considering only that column. If contribution==TRUE, use
 #' col.significance=NULL and this will be skipped
+#' @import ggplot2
 #'
 #' @return None
 
@@ -55,15 +56,31 @@ prepareCytoscape <- function(terms, gmt, filenames, col.significance) {
     write.GMT(gmt, filenames[3])
     
     # Making a Legend
-    require(ggplot2)
-    dummy_plot = ggplot(data.frame(tests, 1), aes(tests, fill = tests)) +
-      geom_bar() +
-      scale_fill_manual(name = "Contribution", values=col.colors)
-    dummy_table = ggplot_gtable(ggplot_build(dummy_plot))
-    legend = dummy_table$grobs[[which(sapply(dummy_table$grobs, function(x) x$name) == "guide-box")]]
-    legend_height = ifelse(length(tests) > 19, 5, length(tests)*0.2 +1)
-    legend_width = ifelse(length(tests) > 20, ceiling(length(tests)/20)*(max(nchar(tests))*0.05+1), max(nchar(tests))*0.05+1)
-    ggsave(legend, filename = filenames[4], height = legend_height, width = legend_width, scale = 1)
+    if (requireNamespace("ggplot2", quietly = TRUE)) {
+      require(ggplot2)
+      dummy_plot = ggplot(data.frame(tests, 1), aes(tests, fill = tests)) +
+        geom_bar() +
+        scale_fill_manual(name = "Contribution", values=col.colors)
+      dummy_table = ggplot_gtable(ggplot_build(dummy_plot))
+      legend = dummy_table$grobs[[which(sapply(dummy_table$grobs, function(x) x$name) == "guide-box")]]
+      
+      # Estimating height & width
+      legend_height = ifelse(length(tests) > 20, 
+                             5, 
+                             length(tests)*0.2+1.2)
+      legend_width = ifelse(length(tests) > 20, 
+                            ceiling(length(tests)/20)*(max(nchar(tests))*0.05+1), 
+                            max(nchar(tests))*0.05+1)
+      ggsave(legend, 
+             filename = filenames[4], 
+             height = legend_height, 
+             width = legend_width, 
+             scale = 1)
+    } else {
+      stop("Package ggplot2 needed for this function to work. Please install it.",
+           call. = FALSE)
+    }
+    
     
   } else {
     write.table(terms, file=filenames[1], row.names=FALSE, sep="\t", quote=FALSE)

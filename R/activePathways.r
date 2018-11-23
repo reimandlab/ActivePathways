@@ -66,7 +66,7 @@
 #' @section Cytoscape:
 #'   If \code{cytoscape.file.tag} is supplied, activePathways will write four
 #'   files that can be used to build a network using Cytoscape and the
-#'   EnrichmentMap and enhancedGraphics apps. The three fies written are:
+#'   EnrichmentMap and enhancedGraphics apps. The four files written are:
 #'   \describe{
 #'     \item{\code{cytoscape.file.tag}_pathways.txt}{A list of significant terms and the
 #'     associated p-value. Only terms with \code{adjusted.p.val <= significant} are
@@ -162,9 +162,9 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
     stop("cytoscape.file.dir must be a string")
   }
   if(cytoscape.file.dir != "" & !is.null(cytoscape.file.tag)){
-    if (!dir.exists(file.path(getwd(), cytoscape.file.dir)) & !dir.exists(cytoscape.file.dir)){
-      dir.create(file.path(getwd(), cytoscape.file.dir))
-      message(paste0("Creating ", cytoscape.file.dir, " folder in your current directory"))
+    if (!dir.exists(cytoscape.file.dir)){
+      dir.create(cytoscape.file.dir)
+      message(paste0("Creating ", cytoscape.file.dir))
       }
   }
   if(!endsWith(cytoscape.file.dir, "[/]")){

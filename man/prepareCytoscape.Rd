@@ -4,7 +4,7 @@
 \alias{prepareCytoscape}
 \title{Prepare files for building an Enrichment Map in Cytoscape}
 \usage{
-prepareCytoscape(terms, gmt, filenames, col.significance)
+prepareCytoscape(terms, gmt, file_tag, file_dir, col.significance)
 }
 \arguments{
 \item{terms}{a data.table with columns 'term.id', 'term.name', 'adjusted.p.val'}
@@ -12,7 +12,9 @@ prepareCytoscape(terms, gmt, filenames, col.significance)
 \item{gmt}{an abridged gmt object containing only the pathways that were
 found to be significant}
 
-\item{filenames}{vector of 3 or 4 filesnames denoting where to write files to}
+\item{file_tag}{user defined tag used to identify content}
+
+\item{file_dir}{user defined directory to write output files}
 
 \item{col.significance}{a data.table with a column 'term.id' and a column
 for each test indicating whether a pathway is signficiant (TRUE) or not
@@ -23,20 +25,20 @@ col.significance=NULL and this will be skipped}
 None
 }
 \description{
-This function writes three files that are used to build an network using
+This function writes four files that are used to build an network using
 Cytoscape and the EnrichmentMap app.
   The four files written are:
   \describe{
-    \item{cytoscape.filenames[1]}{A list of significant terms and the
-      associated adjusted p-value. Only terms with \code{adjusted.p.val <= significant} are
-      written to this file}
-    \item{cytoscape.filenames[2]}{A matrix of column contributions to each
-      term. A \code{1} indicates that that term is significant using only
-      that column to test for enrichment analysis}. Left out if
-      contribution==FALSE and therefore col.significance==NULL
-    \item{cytoscape.filenames[3]}{A Shortened version of the supplied gmt
-      file, containing only the terms in \code{cytoscape.filenames[1]}}
-    \item{cytoscape.filenames[4]}{A legend with colours matching contributions
+    \item{\code{cytoscape.file.tag}_pathways.txt}{A list of significant terms and the
+    associated p-value. Only terms with \code{adjusted.p.val <= significant} are
+    written to this file}
+    \item{\code{cytoscape.file.tag}_subgroups.txt}{A matrix indicating whether the significant
+    pathways are found to be significant when considering only one column from
+    \code{scores}. A 1 indicates that that term is significant using only that
+    column to test for enrichment analysis}
+    \item{\code{cytoscape.file.tag}.gmt}{A Shortened version of the supplied gmt
+    file, containing only the terms in \code{cytoscape.file.tag}_pathways.txt}
+    \item{\code{cytoscape.file.tag}_legend.pdf}{A legend with colours matching contributions
     from columns in \code{scores}}
   }
 }

@@ -9,7 +9,7 @@ activePathways(scores, gmt, background = makeBackground(gmt),
   merge.method = c("Brown", "Fisher", "logitp", "meanp", "sump", "sumz",
   "sumlog"), correction.method = c("holm", "fdr", "hochberg", "hommel",
   "bonferroni", "BH", "BY", "none"), return.all = FALSE,
-  cytoscape.filenames = NULL)
+  cytoscape.file.tag = NULL, cytoscape.file.dir = "")
 }
 \arguments{
 \item{scores}{A numerical matrix of p-values where each row is a gene and
@@ -45,9 +45,12 @@ pathway to be considered significantly enriched.}
 \item{return.all}{Whether to return results for all terms or only significant
 terms}
 
-\item{cytoscape.filenames}{a vector of 3 or 4 filenames denoting where
-information for Cytoscape will be written to (see section Cytoscape). If
-NULL, do not write any files.}
+\item{cytoscape.file.tag}{a user-chosen tag to identify this instance of ActivePathways and
+used to name cytoscape output files. If NULL, do not write any files.}
+
+\item{cytoscape.file.dir}{the directory to which the output files should be written, if unspecified,
+files will be written to the current directory. If directory does not exist, it will be automatically
+created.}
 }
 \value{
 A data.table of terms containing the following columns:
@@ -90,29 +93,29 @@ for more details
 
 \section{Cytoscape}{
 
-  If \code{cytoscape.filenames} is supplied, activePathways will write three
+  If \code{cytoscape.file.tag} is supplied, activePathways will write four
   files that can be used to build a network using Cytoscape and the
   EnrichmentMap and enhancedGraphics apps. The three fies written are:
   \describe{
-    \item{cytoscape.filenames[1]}{A list of significant terms and the
+    \item{\code{cytoscape.file.tag}_pathways.txt}{A list of significant terms and the
     associated p-value. Only terms with \code{adjusted.p.val <= significant} are
     written to this file}
-    \item{cytoscape.filenames[2]}{A matrix indicating whether the significant
+    \item{\code{cytoscape.file.tag}_subgroups.txt}{A matrix indicating whether the significant
     pathways are found to be significant when considering only one column from
     \code{scores}. A 1 indicates that that term is significant using only that
     column to test for enrichment analysis}
-    \item{cytoscape.filenames[3]}{A Shortened version of the supplied gmt
-    file, containing only the terms in \code{cytoscape.filenames[1]}}
-    \item{cytoscape.filenames[4]}{A legend with colours matching contributions
+    \item{\code{cytoscape.file.tag}.gmt}{A Shortened version of the supplied gmt
+    file, containing only the terms in \code{cytoscape.file.tag}_pathways.txt}
+    \item{\code{cytoscape.file.tag}_legend.pdf}{A legend with colours matching contributions
     from columns in \code{scores}}
   }
 
   How to use: Create an enrichment map in Cytoscape with the file of terms
-  (cytoscape.filenames[1]) and the shortened gmt file
-  (cytoscape.filenames[3]). Upload (File > import > table > file) the
-  subgroups file (cytoscape.filenames[2]) as a table. Under the 'style'
+  (\code{cytoscape.file.tag}_pathways.txt) and the shortened gmt file
+  (\code{cytoscape.file.tag}.gmt). Upload (File > import > table > file) the
+  subgroups file (\code{cytoscape.file.tag}_subgroups.txt) as a table. Under the 'style'
   panel, set image/Chart1 to use the column `instruct` and the passthrough
-  mapping type.
+  mapping type. Use \code{cytoscape.file.tag}_legend.pdf as a reference in final figure.
 }
 
 \examples{
@@ -120,7 +123,8 @@ for more details
     dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
     dat[is.na(dat)] <- 1
     activePathways(dat, 'path/to/gmt.gmt', return.all=TRUE,
-         cytoscape.filenames=c('terms.txt', 'groups.txt', 'abridged.gmt'))
+         cytoscape.file.tag="dat",
+         cytoscape.file.dir="results")
 }
 
 }

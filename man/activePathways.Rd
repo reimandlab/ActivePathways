@@ -9,7 +9,7 @@ activePathways(scores, gmt, background = makeBackground(gmt),
   merge.method = c("Brown", "Fisher", "logitp", "meanp", "sump", "sumz",
   "sumlog"), correction.method = c("holm", "fdr", "hochberg", "hommel",
   "bonferroni", "BH", "BY", "none"), return.all = FALSE,
-  cytoscape.file.tag = NULL, cytoscape.file.dir = "")
+  cytoscape.file.dir = "", reanalyze = FALSE)
 }
 \arguments{
 \item{scores}{A numerical matrix of p-values where each row is a gene and
@@ -45,12 +45,13 @@ pathway to be considered significantly enriched.}
 \item{return.all}{Whether to return results for all terms or only significant
 terms}
 
-\item{cytoscape.file.tag}{a user-chosen tag to identify this instance of ActivePathways and
-used to name cytoscape output files. If NULL, do not write any files.}
-
 \item{cytoscape.file.dir}{the directory to which the output files should be written, if unspecified,
-files will be written to the current directory. If directory does not exist, it will be automatically
+files will be written to a directory called "ActivePathways.cytoscape.files". If directory does not exist, it will be automatically
 created.}
+
+\item{reanalyze}{a boolean indicating whether the dataset will be reanalyzed with parameter or data changes.
+If TRUE, ActivePathways will write subdirectories in the format of Version1A, Version1B, etc to indicate sequential
+analyses. If FALSE, ActivePathways will write output files to the indicated directory.}
 }
 \value{
 A data.table of terms containing the following columns:

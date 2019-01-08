@@ -24,11 +24,12 @@
 #'   \code{\link[stats]{p.adjust}} for details
 #' @param return.all Whether to return results for all terms or only significant
 #'   terms
-#' @param cytoscape.file.tag a user-chosen tag to identify this instance of ActivePathways and
-#'   used to name cytoscape output files. If NULL, do not write any files.
 #' @param cytoscape.file.dir the directory to which the output files should be written, if unspecified,
-#'   files will be written to the current directory. If directory does not exist, it will be automatically
+#'   files will be written to a directory called "ActivePathways.cytoscape.files". If directory does not exist, it will be automatically
 #'   created.
+#' @param reanalyze a boolean indicating whether the dataset will be reanalyzed with parameter or data changes.
+#' If TRUE, ActivePathways will write subdirectories in the format of Version1A, Version1B, etc to indicate sequential
+#' analyses. If FALSE, ActivePathways will write output files to the indicated directory. 
 #'
 #' @return A data.table of terms containing the following columns:
 #'   \describe{
@@ -112,8 +113,8 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
                             correction.method = c("holm", "fdr", "hochberg", "hommel",
                                                   "bonferroni", "BH", "BY", "none"),
                             return.all=FALSE, 
-                            cytoscape.file.tag = NULL,
-                            cytoscape.file.dir = "") {
+                            cytoscape.file.dir = "",
+                            reanalyze = FALSE) {
   
   merge.method <- match.arg(merge.method)
   correction.method <- match.arg(correction.method)
@@ -161,40 +162,35 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
   if(!is.character(cytoscape.file.dir) | length(cytoscape.file.dir) != 1){
     stop("cytoscape.file.dir must be a string")
   }
-  if(cytoscape.file.dir != "" & !is.null(cytoscape.file.tag)){
-    if (!dir.exists(cytoscape.file.dir)){
-      dir.create(cytoscape.file.dir)
-      message(paste0("Creating ", cytoscape.file.dir))
-      }
+  if(cytoscape.file.dir == ""){
+    cytoscape.file.dir = "ActivePathways.cytoscape.files"
+  }
+  if (!dir.exists(cytoscape.file.dir)){
+    dir.create(cytoscape.file.dir)
+    message(paste0("Creating ", cytoscape.file.dir))
   }
   if(!endsWith(cytoscape.file.dir, "[/]")){
     cytoscape.file.dir = paste0(cytoscape.file.dir, "/")
   }
   
-  # cytoscape.file.tag
-  if(!is.character(cytoscape.file.tag) | length(cytoscape.file.tag) != 1){
-    stop("cytoscape.file.tag must be a string")
+  # Creating subdirectories
+  if(reanalyze){
+    subdir.order = expand.grid( LETTERS, 1:1000)
+    subdir.order = paste("Version", subdir.order[,2], subdir.order[,1], sep = "")
+    cytoscape.subdir = list.files(cytoscape.file.dir)
+    cytoscape.subdir = cytoscape.subdir[cytoscape.subdir %in% subdir.order]
+    if(length(cytoscape.subdir) == 0){
+      cytoscape.file.dir = paste0(cytoscape.file.dir, "Version1A/")
+    }else{
+      cytoscape.file.dir = paste0(cytoscape.file.dir, subdir.order[max(unlist(lapply(cytoscape.subdir, function(x) grep(x, subdir.order))))+1], "/")
+      # cytoscape.file.dir = paste0()
+    }
+    dir.create(cytoscape.file.dir)
+    message(paste0("Creating ", cytoscape.file.dir))
   }
   
-  # cytoscape.filenames # No longer in use
-  # if (!is.null(cytoscape.filenames)){
-  #   if (contribution == TRUE && length(cytoscape.filenames) != 4) {
-  #     stop("Must supply 4 file names to cytoscape.filenames")
-  #   }
-  #   if (!contribution){
-  #     if (!length(cytoscape.filenames) %in% c(3,4)) {
-  #       stop("Must supply 3 file names to cytoscape.filenames")
-  #     }
-  #     if (length(cytoscape.filenames) == 4) {
-  #       message(paste("Column contributions will not be evaluated so the",
-  #                     "contribution matrix is not being written.",
-  #                     "cytoscape.filenames[2] will be ignored"))
-  #       cytoscape.filenames <- cytoscape.filenames[-2]
-  #     }
-  #   }
-  # }
-  
   ##### filtering and sorting #####
+
   
   # Filter the GMT
   if(!is.null(geneset.filter)) {
@@ -255,7 +251,6 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
   if (!is.null(cytoscape.file.tag) && length(significant.indeces) > 0) {
     prepareCytoscape(res[significant.indeces, .(term.id, term.name, adjusted.p.val)],
                      gmt[significant.indeces], 
-                     cytoscape.file.tag,
                      cytoscape.file.dir,
                      sig.cols[significant.indeces,])
   }

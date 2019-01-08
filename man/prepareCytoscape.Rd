@@ -4,15 +4,13 @@
 \alias{prepareCytoscape}
 \title{Prepare files for building an Enrichment Map in Cytoscape}
 \usage{
-prepareCytoscape(terms, gmt, file_tag, file_dir, col.significance)
+prepareCytoscape(terms, gmt, file_dir, col.significance)
 }
 \arguments{
 \item{terms}{a data.table with columns 'term.id', 'term.name', 'adjusted.p.val'}
 
 \item{gmt}{an abridged gmt object containing only the pathways that were
 found to be significant}
-
-\item{file_tag}{user defined tag used to identify content}
 
 \item{file_dir}{user defined directory to write output files}
 
@@ -29,16 +27,16 @@ This function writes four files that are used to build an network using
 Cytoscape and the EnrichmentMap app.
   The four files written are:
   \describe{
-    \item{\code{cytoscape.file.tag}_pathways.txt}{A list of significant terms and the
+    \item{pathways.txt}{A list of significant terms and the
     associated p-value. Only terms with \code{adjusted.p.val <= significant} are
     written to this file}
-    \item{\code{cytoscape.file.tag}_subgroups.txt}{A matrix indicating whether the significant
+    \item{subgroups.txt}{A matrix indicating whether the significant
     pathways are found to be significant when considering only one column from
     \code{scores}. A 1 indicates that that term is significant using only that
     column to test for enrichment analysis}
-    \item{\code{cytoscape.file.tag}.gmt}{A Shortened version of the supplied gmt
-    file, containing only the terms in \code{cytoscape.file.tag}_pathways.txt}
-    \item{\code{cytoscape.file.tag}_legend.pdf}{A legend with colours matching contributions
+    \item{pathways.gmt}{A Shortened version of the supplied gmt
+    file, containing only the terms in pathways.txt}
+    \item{legend.pdf}{A legend with colours matching contributions
     from columns in \code{scores}}
   }
 }

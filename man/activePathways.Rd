@@ -94,29 +94,28 @@ for more details
 
 \section{Cytoscape}{
 
-  If \code{cytoscape.file.tag} is supplied, activePathways will write four
-  files that can be used to build a network using Cytoscape and the
+  activePathways will write four files that can be used to build a network using Cytoscape and the
   EnrichmentMap and enhancedGraphics apps. The four files written are:
   \describe{
-    \item{\code{cytoscape.file.tag}_pathways.txt}{A list of significant terms and the
+    \item{pathways.txt}{A list of significant terms and the
     associated p-value. Only terms with \code{adjusted.p.val <= significant} are
     written to this file}
-    \item{\code{cytoscape.file.tag}_subgroups.txt}{A matrix indicating whether the significant
+    \item{subgroups.txt}{A matrix indicating whether the significant
     pathways are found to be significant when considering only one column from
     \code{scores}. A 1 indicates that that term is significant using only that
     column to test for enrichment analysis}
-    \item{\code{cytoscape.file.tag}.gmt}{A Shortened version of the supplied gmt
-    file, containing only the terms in \code{cytoscape.file.tag}_pathways.txt}
-    \item{\code{cytoscape.file.tag}_legend.pdf}{A legend with colours matching contributions
+    \item{pathways.gmt}{A Shortened version of the supplied gmt
+    file, containing only the terms in pathways.txt}
+    \item{legend.pdf}{A legend with colours matching contributions
     from columns in \code{scores}}
   }
 
   How to use: Create an enrichment map in Cytoscape with the file of terms
-  (\code{cytoscape.file.tag}_pathways.txt) and the shortened gmt file
-  (\code{cytoscape.file.tag}.gmt). Upload (File > import > table > file) the
-  subgroups file (\code{cytoscape.file.tag}_subgroups.txt) as a table. Under the 'style'
+  (pathways.txt) and the shortened gmt file
+  (pathways.gmt). Upload (File > import > table > file) the
+  subgroups file (subgroups.txt) as a table. Under the 'style'
   panel, set image/Chart1 to use the column `instruct` and the passthrough
-  mapping type. Use \code{cytoscape.file.tag}_legend.pdf as a reference in final figure.
+  mapping type. Use legend.pdf as a reference in final figure.
 }
 
 \examples{
@@ -124,7 +123,6 @@ for more details
     dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
     dat[is.na(dat)] <- 1
     activePathways(dat, 'path/to/gmt.gmt', return.all=TRUE,
-         cytoscape.file.tag="dat",
          cytoscape.file.dir="results")
 }
 

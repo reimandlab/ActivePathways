@@ -221,7 +221,7 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
   merged.scores <- merge_p_values(scores, merge.method)
   merged.scores <- merged.scores[merged.scores <= cutoff]
   
-  if (length(merged.scores) == 0) stop("No genes made the cutoff")
+  if (length(merged.scores) == 0) warning("No genes made the cutoff")
   
   # Sort genes by p-value
   ordered.scores <- names(merged.scores)[order(merged.scores)]

@@ -1,5 +1,5 @@
 ---
-title: "Creating Enrichment Maps with Results from activePathways"
+title: "Creating Enrichment Maps with Results from ActivePathways"
 author: "Jonathan Barenboim"
 date: "`r Sys.Date()`"
 output: 
@@ -18,35 +18,39 @@ knitr::opts_chunk$set(warning=FALSE,
 
 # Introduction 
 
-This vignette will show how to create a pathway enrichment map using the results from `activePathways`. In this example we will be using the results from the main activePathways vignette. To follow along with this vignette, use any Cytoscape files written by `activePathways` or follow the main activePathways vignette, making sure to save the Cytoscape files in an accessible location.
+This vignette will show how to create a pathway enrichment map using the results from `ActivePathways`. In this example we will be using the results from the main ActivePathways vignette. To follow along with this vignette, use any Cytoscape files written by `ActivePathways` or follow the main ActivePathways vignette, making sure to save the Cytoscape files in an accessible location.
 
 # Required Files
 
-Recall that `activePathways` writes three files to be used in Cytoscape.
+Recall that `ActivePathways` writes four files to be used in Cytoscape.
 ```{r}
-files <- c(system.file('extdata', 'cytoscape_terms.txt', package='activePathways'),
-           system.file('extdata', 'cytoscape_groups.txt', package='activePathways'),
-           system.file('extdata', 'cytoscape_abridged.gmt', package='activePathways'))
+files <- c(system.file('extdata', 'pathways.txt', package='ActivePathways'),
+           system.file('extdata', 'subgroups.txt', package='ActivePathways'),
+           system.file('extdata', 'pathways.gmt', package='ActivePathways'),
+           system.file('extdata', 'legend.pdf', package ='ActivePathways'))
 ```
 ```{r, eval=FALSE}
 # Not run. 
-res <- activePathways(dat, gmt, cytoscape.filenames=files)
+res <- ActivePathways(dat, gmt, cytoscape.file.dir='path/to/results/directory')
 ```
 The files written are:
 
-* `cytoscape.filenames[1]`: a list of significant terms and the associated p-values. Note that only terms with `p.val <= significant` are written, even if you use the option `return.all=TRUE`.
+* `pathways.txt` contains the list of significant terms and the associated p-values. Note that only terms with `p.val <= significant` are written, even if you use the option `return.all=TRUE`.
 
-* `cytoscape.filenames[2]`: a matrix indicating which columns the pathways are significant in. A 1 indicates that that pathway is significant if `activePathways` is run on the data in just that one column. Note that this isn't the same as the column contribution. This file is skipped if you use the option `contribution=FALSE`.
+* `subgroups.txt` contains a matrix indicating which columns the pathways are significant in. A 1 indicates that that pathway is significant if `ActivePathways` is run on the data in just that one column. Note that this isn't the same as the column contribution. However, this file will be skipped if you use the option `contribution=FALSE`, since the assumption is that the individual columns aren't of interest.
 
-* `cytoscape.filenames[3]`: a shortened version of the supplied GMT file which contains only the significant pathways. You don't need to use this file, but it helps speed up the process of creating the network inside Cytoscape.
+* `pathways.gmt` contains a shortened version of the supplied GMT file which consists of only the significant pathways. You don't have to use this file, but it helps speed up the process of creating the network inside Cytoscape.
+
+* `legend.pdf` a pdf file of a legend which can be used as reference to the generated cytoscape plot.
+
 ```{r}
 cat(paste(readLines(files[1])[1:5], collapse='\n'))
 cat(paste(readLines(files[2])[1:5], collapse='\n'))
-cat(paste(readLines(files[3])[1:2], collapse='\n'))
+cat(paste(readLines(files[3])[1], collapse='\n'))
 ```
 
-# Creating the enrichment map.
-Open Cytoscape and ensure the *EnrichmentMap* and *enchancedGraphics* apps are installed. Apps may be installed by clicking *Apps -> App Manager* in Cytoscape. When the apps are installed, open the Apps menu again and click Enrichment Map. In the window that opens click the *Add Data Set from Files* button (The '+') in the top left, change the Analysis Type to Generic/gProfiler and upload the cytoscape_terms.txt and cytoscape_abridged.gmt files.
+# Creating the Enrichment Map.
+Open Cytoscape and ensure the *EnrichmentMap* and *enchancedGraphics* apps are installed. Apps may be installed by clicking *Apps -> App Manager* in Cytoscape. When the apps are installed, open the Apps menu again and click Enrichment Map. In the window that opens click the *Add Data Set from Files* button (The '+') in the top left, change the Analysis Type to Generic/gProfiler and upload the pathways.txt and pathways.gmt files.
 
 ![](CreateEnrichmentMapDialogue.jpg)
 
@@ -54,17 +58,17 @@ Click Build to create the network
 
 ![](NetworkStep1.jpg)
 
-(ps: to make network a little prettier you can increase the Edge Cutoff slider to reduce the number of edges, increase the scale (View > Show Tool Panel), and change the layout to organic (Layout > yFilesLayouts))
+**PS**: to make network a little prettier you can increase the Edge Cutoff slider to reduce the number of edges, increase the scale (View > Show Tool Panel), and change the layout to organic (Layout > yFilesLayouts)
 
-# Colour the nodes **change title**
-To upload the groups table, go to file > import > table > file and import the cytoscape_groups.txt file
+# Colour the Nodes by Subgroup
+To upload the groups table, go to file > import > table > file and import the subgroups.txt file
 
-Click the style tab in the left panel and ensure the image/Chart1 property is available
+Click the style tab in the left panel and ensure the Image/Chart1 property is available
 
 
 ![](PropertiesDropDown2.jpg)
 
-Under the image/Chart 1 property, set the column on 'instruct' and the mapping type to passthrough
+Under the Image/Chart 1 property, set the column on 'instruct' and the mapping type to passthrough
 
 ![](StylePanel.jpg)
 
@@ -72,8 +76,6 @@ This colours the pathway nodes according to which columns the pathway is found t
 
 ![](NetworkStep2.jpg)
 
-As of yet there is no functionality for automatically generating a legend, but it can be inferred from the cytoscape_groups.txt file. We can look at the first two lines of this file
-```{r}
-cat(paste(readLines(files[2])[1:2], collapse='\n'))
-```
-The `instruct` column contains the attributelist "X3UTR,X5UTR,CDS,promCore,none" and the colorlist "#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF,#CCCCCC". This means that a node will be coloured #FF0000 (red) if it is enriched only in the X3UTR column, #FF0000 (red) and #80FF00 (green) if it is enriched in both the X3UTR and X5UTR columns, and so on. A pathway that is not enriched in any one column but is found to be significantly enriched when considering the data as a whole will be coloured #CCCCCC (grey)
+For the sake of convenience, ActivePathways generates Legend.pdf which can be added to the enrichment map using a image editting tool.
+
+![](legend.jpg)

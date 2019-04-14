@@ -5,7 +5,7 @@ dat[is.na(dat)] <- 1
 background <- makeBackground(gmt)
 
 # filenames for cytoscape
-file.names <- paste(c('terms', 'groups', 'smallgmt'), '.txt', sep="")
+file.names <- c(paste(c('terms', 'groups', 'smallgmt'), '.txt', sep=""), "legend.pdf")
 
 # Run activePathways quickly
 run_ap_short <- function(dat) activePathways(dat, gmt[1:3], cutoff=1, significant=1, contribution=FALSE)

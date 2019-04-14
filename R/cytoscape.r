@@ -45,12 +45,7 @@ prepareCytoscape <- function(terms,
     
     # Use pichart
     col.colors <- rainbow(length(tests))
-    instruct.str <- paste('piechart:',
-                          ' attributelist="', 
-                          paste(tests, collapse=','),
-                          '" colorlist="', 
-                          paste(col.colors, collapse=','), 
-                          '" showlabels=FALSE', sep='')
+    instruct.str <- paste('piechart:', ' attributelist="', paste(tests, collapse=','), '" colorlist="', paste(col.colors, collapse=','), '" showlabels=FALSE', sep='')
     col.significance[, instruct := instruct.str]
     
     # Writing the Files
@@ -68,34 +63,26 @@ prepareCytoscape <- function(terms,
               paste0(file_dir, "pathways.gmt"))
     
     # Making a Legend
-    if (requireNamespace("ggplot2", quietly = TRUE)) {
-      require(ggplot2)
-      dummy_plot = ggplot(data.frame("tests" = factor(tests, levels = tests),
-                                     "value" = 1), aes(tests, fill = tests)) +
-        geom_bar() +
-        scale_fill_manual(name = "Contribution", values=col.colors)
-      pdf(file = NULL) # Suppressing Blank Display Device from ggplot_gtable
-      dummy_table = ggplot_gtable(ggplot_build(dummy_plot))
-      dev.off()
-      legend = dummy_table$grobs[[which(sapply(dummy_table$grobs, function(x) x$name) == "guide-box")]]
+    dummy_plot = ggplot(data.frame("tests" = factor(tests, levels = tests), "value" = 1), aes(tests, fill = tests)) +
+      geom_bar() +
+      scale_fill_manual(name = "Contribution", values=col.colors)
+    
+    pdf(file = NULL) # Suppressing Blank Display Device from ggplot_gtable
+    dummy_table = ggplot_gtable(ggplot_build(dummy_plot))
+    dev.off()
+    
+    legend = dummy_table$grobs[[which(sapply(dummy_table$grobs, function(x) x$name) == "guide-box")]]
       
-      # Estimating height & width
-      legend_height = ifelse(length(tests) > 20, 
-                             5.5, 
-                             length(tests)*0.25+1)
-      legend_width = ifelse(length(tests) > 20, 
-                            ceiling(length(tests)/20)*(max(nchar(tests))*0.05+1), 
-                            max(nchar(tests))*0.05+1)
-      ggsave(legend,
-             device = "pdf",
-             filename = paste0(file_dir, "legend.pdf"), 
-             height = legend_height, 
-             width = legend_width, 
-             scale = 1)
-    } else {
-      stop("Package ggplot2 needed for this function to work. Please install it.",
-           call. = FALSE)
-    }
+    # Estimating height & width
+    legend_height = ifelse(length(tests) > 20, 5.5, length(tests)*0.25+1)
+    legend_width = ifelse(length(tests) > 20, ceiling(length(tests)/20)*(max(nchar(tests))*0.05+1), max(nchar(tests))*0.05+1)
+    
+    ggsave(legend,
+           device = "pdf",
+           filename = paste0(file_dir, "legend.pdf"), 
+           height = legend_height, 
+           width = legend_width, 
+           scale = 1)
     
     
   } else {

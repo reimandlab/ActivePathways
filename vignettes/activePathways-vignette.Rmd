@@ -174,7 +174,8 @@ However, `data.table::fread` isn't quite smart enough to get the table back from
 
 
 # Visualizing the Results in Cytoscape
-The Cytoscape program, combined with the enrichmentMap app, provide a powerful tool to visualize pathway enrichment analysis as a network. `ActivePathways` can help speed up this process by automatically writing the files that will be uploaded to Cytoscape to create a map. To create these files, a list of file names must be supplied to `ActivePathways`
+The Cytoscape program, combined with the enrichmentMap app, provide a powerful tool to visualize pathway enrichment analysis as a network. `ActivePathways` can help speed up this process by automatically writing the files that will be uploaded to Cytoscape to create a map. To create these files, a file directory must be supplied to `ActivePathways` using the parameter `cytoscape.file.dir`. If the user plans on reanalyzing the same data with changes to the parameters, the parameter `reanalyze` can be set to `TRUE` and subdirectories of the form `Version1A`, `Version1B`, etc will be created in the `cytoscape.file.dir` to ensure that each version of the analysis is stored. 
+
 ```{r}
 
 res <- ActivePathways(scores, gmt.file, cytoscape.file.dir = system.file('extdata', package='ActivePathways'))

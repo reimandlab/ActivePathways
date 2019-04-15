@@ -1,4 +1,4 @@
 library(testthat)
-library(activePathways)
+library(ActivePathways)
 
-test_check("activePathways")
+test_check("ActivePathways")

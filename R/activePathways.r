@@ -1,3 +1,5 @@
+if(getRversion() >= "2.15.1")  utils::globalVariables(c(".", "adjusted.p.val", "term.id", "term.name"))
+
 #' ActivePathways
 #'
 #' @param scores A numerical matrix of p-values where each row is a gene and
@@ -105,7 +107,7 @@
 # TODO: enter citations for article on merging p-values
 # http://www.jstor.org/stable/2529826
 # TODO: enter citations for Cytoscape, enrichmentMap, and enhancedGraphics
-ActivePathways <-  function(scores, gmt, background = "",
+ActivePathways <-  function(scores, gmt, background = NULL,
                             geneset.filter = c(5, 1000), cutoff = 0.1, significant = 0.05,
                             merge.method = c("Brown", "Fisher", "logitp", "meanp", 
                                              "sump", "sumz", "sumlog"),
@@ -138,13 +140,13 @@ ActivePathways <-  function(scores, gmt, background = "",
   if (length(gmt) == 0) stop("No pathways in gmt made the geneset.filter")
   
   # background
-  if (!(is.character(background) && is.vector(background))) {
-    stop("background must be a character vector")
-  }
-  if (background == ""){
+  if (is.null(background)){
     background = makeBackground(gmt)
     message(paste("background gene set of ", length(background),  " genes derived from GMT file"))
   } else {
+    if (!(is.character(background) && is.vector(background))) {
+      stop("background must be a character vector")
+    }
     message(paste("background gene set of ", length(background),  " genes derived from user-defined list"))
   }
 
@@ -238,7 +240,7 @@ ActivePathways <-  function(scores, gmt, background = "",
   ##### enrichmentAnalysis and column contribution #####
   
   res <- enrichmentAnalysis(ordered.scores, gmt, background)
-  res[, adjusted.p.val := p.adjust(adjusted.p.val, method=correction.method)]
+  res[, adjusted.p.val := stats::p.adjust(adjusted.p.val, method=correction.method)]
   
   significant.indeces <- which(res$adjusted.p.val <= significant)
   if (length(significant.indeces) == 0) {
@@ -323,7 +325,7 @@ columnSignificance <- function(scores, gmt, background, cutoff, significant, cor
     col.scores <- names(col.scores)[order(col.scores)]
     
     res <- enrichmentAnalysis(col.scores, gmt, background)
-    set(res, i=NULL, "adjusted.p.val", p.adjust(res$adjusted.p.val, correction.method))
+    set(res, i=NULL, "adjusted.p.val", stats::p.adjust(res$adjusted.p.val, correction.method))
     set(res, i=which(res$adjusted.p.val>significant), "overlap", list(list(NA)))
     set(dt, i=NULL, col, res$overlap)
   }

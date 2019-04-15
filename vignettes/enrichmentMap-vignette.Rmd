@@ -18,7 +18,7 @@ knitr::opts_chunk$set(warning=FALSE,
 
 # Introduction 
 
-This vignette will show how to create a pathway enrichment map using the results from `ActivePathways`. In this example we will be using the results from the main ActivePathways vignette. To follow along with this vignette, use any Cytoscape files written by `ActivePathways` or follow the main ActivePathways vignette, making sure to save the Cytoscape files in an accessible location.
+This tutorial will demonstrate how to create a pathway enrichment map using the results from `ActivePathways`. The results from the main ActivePathways vignette will be used. To follow along with this vignette, use any Cytoscape files written by `ActivePathways` or follow the main ActivePathways vignette, ensuring that the Cytoscape files are saved in an accessible location.
 
 # Required Files
 
@@ -35,13 +35,13 @@ res <- ActivePathways(dat, gmt, cytoscape.file.dir='path/to/results/directory')
 ```
 The files written are:
 
-* `pathways.txt` contains the list of significant terms and the associated p-values. Note that only terms with `p.val <= significant` are written, even if you use the option `return.all=TRUE`.
+* `pathways.txt` contains the list of significant pathways and the associated p-values. Note that only terms with `p.val <= significant` are written, even if the option `return.all=TRUE` is specified.
 
-* `subgroups.txt` contains a matrix indicating which columns the pathways are significant in. A 1 indicates that that pathway is significant if `ActivePathways` is run on the data in just that one column. Note that this isn't the same as the column contribution. However, this file will be skipped if you use the option `contribution=FALSE`, since the assumption is that the individual columns aren't of interest.
+* `subgroups.txt` contains a matrix indicating the columns of the original scores matrix which contributed signficant pathways. A 1 indicates that the pathway is significant if `ActivePathways` is run on the p-values in that column.
 
-* `pathways.gmt` contains a shortened version of the supplied GMT file which consists of only the significant pathways. You don't have to use this file, but it helps speed up the process of creating the network inside Cytoscape.
+* `pathways.gmt` contains a shortened version of the supplied GMT file which consists of only the significant pathways. This file can accelerate process of creating the network using Cytoscape.
 
-* `legend.pdf` a pdf file of a legend which can be used as reference to the generated cytoscape plot.
+* `legend.pdf` a pdf file of a legend which can be used as reference to the generated Cytoscape network.
 
 ```{r}
 cat(paste(readLines(files[1])[1:5], collapse='\n'))
@@ -50,32 +50,31 @@ cat(paste(readLines(files[3])[1], collapse='\n'))
 ```
 
 # Creating the Enrichment Map.
-Open Cytoscape and ensure the *EnrichmentMap* and *enchancedGraphics* apps are installed. Apps may be installed by clicking *Apps -> App Manager* in Cytoscape. When the apps are installed, open the Apps menu again and click Enrichment Map. In the window that opens click the *Add Data Set from Files* button (The '+') in the top left, change the Analysis Type to Generic/gProfiler and upload the pathways.txt and pathways.gmt files.
+Open Cytoscape and ensure the *EnrichmentMap* and *enchancedGraphics* apps are installed. Apps may be installed by clicking *Apps -> App Manager* in Cytoscape. When the apps are installed, open the Apps menu again and click Enrichment Map. In the window that opens, click the *Add Data Set from Files* button (The '+') in the top left, change the Analysis Type to Generic/gProfiler and upload the `pathways.txt` and `pathways.gmt` files.
 
 ![](CreateEnrichmentMapDialogue.jpg)
 
-Click Build to create the network
+Click Build to create the network.
 
 ![](NetworkStep1.jpg)
 
-**PS**: to make network a little prettier you can increase the Edge Cutoff slider to reduce the number of edges, increase the scale (View > Show Tool Panel), and change the layout to organic (Layout > yFilesLayouts)
+**P.S.** To make network a little more visually appealing, the Edge Cutoff slider in the EnrichmentMap panel can be adjusted to reduce the number of edges, the scale in the Tool Panel (View > Show Tool Panel) can be used to resize nodes, and the layout can be changed in the Layout tab (yFilesLayouts can be installed in apps, Layout > yFilesLayouts).
 
 # Colour the Nodes by Subgroup
-To upload the groups table, go to file > import > table > file and import the subgroups.txt file
+To upload the `subgroups.txt` table, go to file > import > table > file and import the `subgroups.txt` file.
 
-Click the style tab in the left panel and ensure the Image/Chart1 property is available
-
+Click the style tab in the left panel and ensure the Image/Chart1 property is available.
 
 ![](PropertiesDropDown2.jpg)
 
-Under the Image/Chart 1 property, set the column on 'instruct' and the mapping type to passthrough
+Under the Image/Chart 1 property, set the column to 'instruct' and the mapping type to 'passthrough'.
 
 ![](StylePanel.jpg)
 
-This colours the pathway nodes according to which columns the pathway is found to be enriched in if considering the data in only one column at a time. 
+This setting colours the pathway nodes according to the columns (types of evidence) in which the pathway is found to be enriched when considering the initial p-value matrix only one column at a time. 
 
 ![](NetworkStep2.jpg)
 
-For the sake of convenience, ActivePathways generates Legend.pdf which can be added to the enrichment map using a image editting tool.
+For the sake of convenience, ActivePathways generates Legend.pdf which can be added to the enrichment map using an image editting tool.
 
 ![](legend.jpg)

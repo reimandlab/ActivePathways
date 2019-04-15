@@ -4,7 +4,7 @@
 \alias{ActivePathways}
 \title{ActivePathways}
 \usage{
-ActivePathways(scores, gmt, background = "", geneset.filter = c(5,
+ActivePathways(scores, gmt, background = NULL, geneset.filter = c(5,
   1000), cutoff = 0.1, significant = 0.05, merge.method = c("Brown",
   "Fisher", "logitp", "meanp", "sump", "sumz", "sumlog"),
   correction.method = c("holm", "fdr", "hochberg", "hommel",

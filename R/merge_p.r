@@ -47,7 +47,7 @@ merge_p_values <- function(scores, method=c("Fisher", "Brown", "logitp",
         
         # Some metap functions don't like p-values that are 0 or 1 so make them (0, 1) to avoid errors
         scores <- sapply(scores, function(x) if (x == 0) 1e-16 else if (x==1) 1-1e-16 else x)
-        func <- function(x) getFromNamespace(method, 'metap')(x)$p
+        func <- function(x) utils::getFromNamespace(method, 'metap')(x)$p
         return(func(scores))
     }
     
@@ -60,7 +60,7 @@ merge_p_values <- function(scores, method=c("Fisher", "Brown", "logitp",
     }
     
     scores <- apply(scores, c(1,2), function(x) if (x == 0) 1e-16 else if (x==1) 1-1e-16 else x)
-    func <- function(x) getFromNamespace(method, 'metap')(x)$p
+    func <- function(x) utils::getFromNamespace(method, 'metap')(x)$p
     return (apply(scores, 1, func))
 }
 
@@ -94,17 +94,17 @@ brownsMethod <- function(p.values, data.matrix=NULL, cov.matrix=NULL) {
     N <- ncol(cov.matrix)
     expected <- 2 * N
     cov.sum <- 2 * sum(cov.matrix[lower.tri(cov.matrix, diag=FALSE)])
-    var <- (4 * N) + cov.sum
-    sf <- var / (2 * expected)
+    variance <- (4 * N) + cov.sum
+    sf <- variance / (2 * expected)
 
-    df <- (2 * expected^2) / var
+    df <- (2 * expected^2) / variance
     if (df > 2 * N) {
         df <- 2 * N
         sf <- 1
     }
 
     x <- 2 * sum(-log(p.values), na.rm=TRUE)
-    p.brown <- pchisq(df=df, q=x/sf, lower.tail=FALSE)
+    p.brown <- stats::pchisq(df=df, q=x/sf, lower.tail=FALSE)
     p.brown
 }
 
@@ -117,15 +117,15 @@ transformData <- function(dat) {
     dvm <- mean(dat, na.rm=TRUE)
     dvsd <- pop.sd(dat)
     s <- (dat - dvm) / dvsd
-    distr <- ecdf(s)
+    distr <- stats::ecdf(s)
     sapply(s, function(a) -2 * log(distr(a)))
 }
 
 
 calculateCovariances <- function(data.matrix) {
     transformed.data.matrix <- apply(data.matrix, 1, transformData)
-    cov(transformed.data.matrix)
+    stats::cov(transformed.data.matrix)
 }
 
-pop.var <- function(x) var(x, na.rm=TRUE) * (length(x) - 1) / length(x)
+pop.var <- function(x) stats::var(x, na.rm=TRUE) * (length(x) - 1) / length(x)
 pop.sd <- function(x) sqrt(pop.var(x))

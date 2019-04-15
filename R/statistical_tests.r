@@ -19,7 +19,7 @@ hypergeometric <- function(counts) {
     n <- counts[1, 2] + counts[2, 2]
     k <- counts[1, 1] + counts[1, 2]
     x <- counts[1, 1]
-    phyper(x-1, m, n, k, lower.tail=FALSE)
+    stats::phyper(x-1, m, n, k, lower.tail=FALSE)
 }
 
 

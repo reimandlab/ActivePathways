@@ -1,3 +1,5 @@
+if(getRversion() >= "2.15.1")  utils::globalVariables(c("instruct"))
+
 #' Prepare files for building an Enrichment Map in Cytoscape
 #'
 #' This function writes four files that are used to build an network using
@@ -44,21 +46,21 @@ prepareCytoscape <- function(terms,
     col.significance = cbind(col.significance[,"term.id"], evidence.columns)
     
     # Use pichart
-    col.colors <- rainbow(length(tests))
+    col.colors <- grDevices::rainbow(length(tests))
     instruct.str <- paste('piechart:', ' attributelist="', paste(tests, collapse=','), '" colorlist="', paste(col.colors, collapse=','), '" showlabels=FALSE', sep='')
     col.significance[, instruct := instruct.str]
     
     # Writing the Files
-    write.table(terms, 
-                file=paste0(file_dir, "pathways.txt"), 
-                row.names=FALSE, 
-                sep="\t", 
-                quote=FALSE)
-    write.table(col.significance, 
-                file=paste0(file_dir, "subgroups.txt"), 
-                row.names=FALSE, 
-                sep="\t", 
-                quote=FALSE)
+    utils::write.table(terms, 
+                       file=paste0(file_dir, "pathways.txt"), 
+                       row.names=FALSE, 
+                       sep="\t", 
+                       quote=FALSE)
+    utils::write.table(col.significance, 
+                       file=paste0(file_dir, "subgroups.txt"), 
+                       row.names=FALSE, 
+                       sep="\t", 
+                       quote=FALSE)
     write.GMT(gmt, 
               paste0(file_dir, "pathways.gmt"))
     
@@ -67,9 +69,9 @@ prepareCytoscape <- function(terms,
       geom_bar() +
       scale_fill_manual(name = "Contribution", values=col.colors)
     
-    pdf(file = NULL) # Suppressing Blank Display Device from ggplot_gtable
+    grDevices::pdf(file = NULL) # Suppressing Blank Display Device from ggplot_gtable
     dummy_table = ggplot_gtable(ggplot_build(dummy_plot))
-    dev.off()
+    grDevices::dev.off()
     
     legend = dummy_table$grobs[[which(sapply(dummy_table$grobs, function(x) x$name) == "guide-box")]]
       
@@ -86,11 +88,11 @@ prepareCytoscape <- function(terms,
     
     
   } else {
-    write.table(terms, 
-                file=paste0(file_dir, "pathways.txt"),
-                row.names=FALSE, 
-                sep="\t", 
-                quote=FALSE)
+    utils::write.table(terms, 
+                       file=paste0(file_dir, "pathways.txt"),
+                       row.names=FALSE, 
+                       sep="\t", 
+                       quote=FALSE)
     write.GMT(gmt, 
               paste0(file_dir, "pathways.gmt"))
   }

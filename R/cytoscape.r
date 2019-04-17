@@ -1,4 +1,3 @@
-if(getRversion() >= "2.15.1")  utils::globalVariables(c("instruct"))
 
 #' Prepare files for building an Enrichment Map in Cytoscape
 #'
@@ -48,7 +47,7 @@ prepareCytoscape <- function(terms,
     # Use pichart
     col.colors <- grDevices::rainbow(length(tests))
     instruct.str <- paste('piechart:', ' attributelist="', paste(tests, collapse=','), '" colorlist="', paste(col.colors, collapse=','), '" showlabels=FALSE', sep='')
-    col.significance[, instruct := instruct.str]
+    col.significance[, "instruct" := instruct.str]
     
     # Writing the Files
     utils::write.table(terms, 

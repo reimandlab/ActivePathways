@@ -1,4 +1,3 @@
-if(getRversion() >= "2.15.1")  utils::globalVariables(c(".", "adjusted.p.val", "term.id", "term.name"))
 
 #' ActivePathways
 #'
@@ -240,8 +239,8 @@ ActivePathways <-  function(scores, gmt, background = NULL,
   ##### enrichmentAnalysis and column contribution #####
   
   res <- enrichmentAnalysis(ordered.scores, gmt, background)
-  res[, adjusted.p.val := stats::p.adjust(adjusted.p.val, method=correction.method)]
-  
+  res[, "adjusted.p.val" := stats::p.adjust(res$adjusted.p.val, method=correction.method)]
+
   significant.indeces <- which(res$adjusted.p.val <= significant)
   if (length(significant.indeces) == 0) {
     warning("No significant terms were found")
@@ -256,8 +255,12 @@ ActivePathways <-  function(scores, gmt, background = NULL,
   }
   
   if (!is.null(cytoscape.file.dir) && length(significant.indeces) > 0) {
-    prepareCytoscape(res[significant.indeces, .(term.id, term.name, adjusted.p.val)],
-                     gmt[significant.indeces], 
+    # prepareCytoscape(res[significant.indeces, .(term.id, term.name, adjusted.p.val)],
+    #                  gmt[significant.indeces], 
+    #                  cytoscape.file.dir,
+    #                  sig.cols[significant.indeces,])
+    prepareCytoscape(res[significant.indeces, 1:3],
+                     gmt[significant.indeces],
                      cytoscape.file.dir,
                      sig.cols[significant.indeces,])
   }

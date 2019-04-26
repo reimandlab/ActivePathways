@@ -18,8 +18,3 @@ table with a 'greater' alternative hypothesis. That is, find the
 probability that counts[1, 1] or more genes would be found in annotations,
 assuming the null hypothesis.
 }
-\examples{
-\dontrun{
-  hypergeometric(matrix(data=c(1, 8, 14, 836), nrow=2))
-}
-}

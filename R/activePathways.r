@@ -91,21 +91,21 @@
 #'   mapping type. Use (legend.pdf) as a reference in final figure.
 #'
 #' @examples
-#' \dontrun{
-#'     dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
-#'     dat[is.na(dat)] <- 1
-#'     ActivePathways(dat, 'path/to/gmt.gmt', return.all=TRUE,
-#'          cytoscape.file.dir="results")
-#' }
+#' dat <- as.matrix(read.table(system.file('extdata', 
+#'                                         'Adenocarcinoma_scores_subset.tsv', 
+#'                                          package='ActivePathways'), 
+#'                  header=TRUE, 
+#'                  row.names='Gene'))
+#' dat[is.na(dat)] <- 1
+#' ActivePathways(dat, 
+#'                system.file('extdata', 'hsapiens_REAC_subset.gmt', package='ActivePathways'), 
+#'                return.all=TRUE, 
+#'                cytoscape.file.dir=NULL)
 #'
 #' @import data.table
 #' @import metap
 #'
 #' @export
-
-# TODO: enter citations for article on merging p-values
-# http://www.jstor.org/stable/2529826
-# TODO: enter citations for Cytoscape, enrichmentMap, and enhancedGraphics
 ActivePathways <-  function(scores, gmt, background = NULL,
                             geneset.filter = c(5, 1000), cutoff = 0.1, significant = 0.05,
                             merge.method = c("Brown", "Fisher", "logitp", "meanp", 
@@ -290,7 +290,7 @@ ActivePathways <-  function(scores, gmt, background = NULL,
 #' @keywords internal
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'     enrichmentAnalysis(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt, makeBackground(gmt))
 #' }
 enrichmentAnalysis <- function(genelist, gmt, background) {

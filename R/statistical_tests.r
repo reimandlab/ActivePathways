@@ -8,11 +8,6 @@
 #' @param counts a 2x2 numerical matrix representing a contingency table
 #'
 #' @return a p-value
-#'
-#' @examples
-#' \dontrun{
-#'   hypergeometric(matrix(data=c(1, 8, 14, 836), nrow=2))
-#' }
 hypergeometric <- function(counts) {
     if (any(counts < 0)) stop('counts contains negative values. Something went very wrong.')
     m <- counts[1, 1] + counts[2, 1]
@@ -45,11 +40,6 @@ hypergeometric <- function(counts) {
 #'       gives the lowest p-value}
 #'  }
 #'
-#' @examples
-#' \dontrun{
-#'    orderedHypergeometric(c('HERC2', 'SP100'), c('PHC2', 'BLM', 'XPC', 'SMC3', 'HERC2', 'SP100'),
-#'                          c('HERC2', 'PHC2', 'BLM'))
-#' }
 orderedHypergeometric <- function(genelist, background, annotations) {
     # Only test subsets of genelist that end with a gene in annotations since
     # these are the only tests for which the p-value can decrease

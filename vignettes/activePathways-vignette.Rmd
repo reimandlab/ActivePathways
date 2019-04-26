@@ -56,7 +56,7 @@ ActivePathways(scores, gmt.file)
 ```
 
 ## Significance Threshold and Returning All Results
-A pathway is considered to be significantly enriched if the associated p-value is less than the significance threshold (i.e. `p.val <= significant`). The `significant` parameter represents the maximum p-value for a result to be considered statistically significant after multiple testing correction. By default, only the significant pathways are returned. If all results are desired, the user can set the `return.all` parameter to `TRUE`. ActivePathways conducts multiple testing correction by default using the [Holm method](https://www.jstor.org/stable/4615733?seq=1#page_scan_tab_contents).
+A pathway is considered to be significantly enriched if the associated p-value is less than the significance threshold (i.e. `p.val <= significant`). The `significant` parameter represents the maximum p-value for a result to be considered statistically significant after multiple testing correction. By default, only the significant pathways are returned. If all results are desired, the user can set the `return.all` parameter to `TRUE`. ActivePathways conducts multiple testing correction by default using the [Holm method](https://www.jstor.org/stable/4615733).
 
 ```{r}
 nrow(ActivePathways(scores, gmt.file, return.all=FALSE, significant=0.05))

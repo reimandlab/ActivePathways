@@ -120,11 +120,15 @@ for more details
 }
 
 \examples{
-\dontrun{
-    dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
-    dat[is.na(dat)] <- 1
-    ActivePathways(dat, 'path/to/gmt.gmt', return.all=TRUE,
-         cytoscape.file.dir="results")
-}
+dat <- as.matrix(read.table(system.file('extdata', 
+                                        'Adenocarcinoma_scores_subset.tsv', 
+                                         package='ActivePathways'), 
+                 header=TRUE, 
+                 row.names='Gene'))
+dat[is.na(dat)] <- 1
+ActivePathways(dat, 
+               system.file('extdata', 'hsapiens_REAC_subset.gmt', package='ActivePathways'), 
+               return.all=TRUE, 
+               cytoscape.file.dir=NULL)
 
 }

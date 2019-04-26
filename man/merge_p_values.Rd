@@ -40,8 +40,8 @@ for more details
 }
 
 \examples{
-  merge_p_values(c(0.05, 0.09, 0.01))
-  merge_p_values(list(a=0.01, b=1, c=0.0015, d=0.025), method='meanp')
-  merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow=2), method='Brown')
+merge_p_values(c(0.05, 0.09, 0.01))
+merge_p_values(list(a=0.01, b=1, c=0.0015, d=0.025), method='meanp')
+merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow=2), method='Brown')
 
 }

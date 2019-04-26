@@ -30,7 +30,7 @@ a data.table of terms with the following columns:
 Perform Gene Set Enrichment Analysis on an ordered list of genes
 }
 \examples{
-\dontrun{
+\donttest{
     enrichmentAnalysis(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt, makeBackground(gmt))
 }
 }

@@ -29,7 +29,6 @@
 #' @import ggplot2
 #'
 #' @return None
-
 prepareCytoscape <- function(terms, 
                              gmt, 
                              file_dir, 

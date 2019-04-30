@@ -4,7 +4,7 @@ Version: 1.0.1
 Authors@R: c(person("Helen", "Zhu", email = "helen.zhu@oicr.on.ca", role = c("aut", "cre")),
 	     person("Juri", "Reimand", email = "juri.reimand@utoronto.ca", role = "aut"),
              person("Jonathan", "Barenboim", email = "jon.barenboim@gmail.com", role = "aut"))
-Description: An integrative method of analyzing multi omics data that conducts enrichment analysis of annotated gene sets. ‘ActivePathways’ uses a statistical data fusion approach, rationalizes contributing evidence and highlights associated genes, improving systems-level understanding of cellular organization in health and disease.
+Description: An integrative method of analyzing multi omics data that conducts enrichment analysis of annotated gene sets. 'ActivePathways' uses a statistical data fusion approach, rationalizes contributing evidence and highlights associated genes, improving systems-level understanding of cellular organization in health and disease.
 Depends: R (>= 3.2.3)
 Imports:
     metap,

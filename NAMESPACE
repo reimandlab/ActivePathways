@@ -3,7 +3,6 @@
 S3method("$",GMT)
 S3method("[",GMT)
 S3method("[[",GMT)
-S3method(print,GMT)
 export(ActivePathways)
 export(is.GMT)
 export(makeBackground)

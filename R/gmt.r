@@ -22,6 +22,7 @@
 #' @param filename Location of the gmt file
 #' @param gmt a GMT object
 #' @param x object to test
+#' @param i index of GMT object
 #'
 #' @return \code{read.GMT} returns a GMT object. \cr
 #' \code{write.GMT} returns NULL. \cr
@@ -30,6 +31,7 @@
 #'
 #' @examples
 #' gmt <- read.GMT(system.file('extdata', 'hsapiens_REAC_subset.gmt', package='ActivePathways'))
+#' is.GMT(gmt)
 #' gmt[1:10]
 #' gmt[[1]]
 #' gmt[1]$id
@@ -41,6 +43,7 @@
 #' }
 NULL
 
+#' Reading GMT files
 #' @rdname GMT
 #' @export
 read.GMT <- function(filename) {
@@ -51,6 +54,7 @@ read.GMT <- function(filename) {
     gmt
 }
 
+#' Writing GMT files
 #' @rdname GMT
 #' @export
 write.GMT <- function(gmt, filename) {
@@ -61,6 +65,33 @@ write.GMT <- function(gmt, filename) {
     }
     sink()
 }
+
+#####  Subsetting functions #####
+# Treat as a list but return an object of "GMT" class
+#' @rdname GMT
+#' @export
+`[.GMT` <- function(x, i) {
+    x <- unclass(x)
+    res <- x[i]
+    class(res) <- c('GMT')
+    res
+}
+#' @rdname GMT
+#' @export
+`[[.GMT` <- function(x, i) {
+    x <- unclass(x)
+    x[[i, exact = TRUE]]
+}
+#' @rdname GMT
+#' @export
+`$.GMT` <- function(x, i) {
+    x[[i]]
+}
+
+#' Checks whether an object is a GMT
+#' @rdname GMT
+#' @export
+is.GMT <- function(x) inherits(x, 'GMT')
 
 #' Make a background list of genes
 #'
@@ -74,44 +105,6 @@ write.GMT <- function(gmt, filename) {
 #' gmt <- read.GMT(system.file('extdata', 'hsapiens_REAC_subset.gmt', package='ActivePathways'))
 #' makeBackground(gmt)
 makeBackground <- function(gmt) {
-    if (!is.GMT(gmt)) stop('gmt is not a valid GMT object')
-    unlist(Reduce(function(x, y) union(x, y$genes), gmt, gmt[[1]]$genes))
-}
-
-#####  Subsetting functions #####
-# Treat as a list but return an object of "GMT" class
-#' @export
-`[.GMT` <- function(x, i) {
-    x <- unclass(x)
-    res <- x[i]
-    class(res) <- c('GMT')
-    res
-}
-#' @export
-`[[.GMT` <- function(x, i, exact = TRUE) {
-    x <- unclass(x)
-    x[[i, exact = exact]]
-}
-
-#' @export
-`$.GMT` <- function(x, i) {
-    x[[i]]
-}
-
-#' @export
-#' @rdname GMT
-is.GMT <- function(x) inherits(x, 'GMT')
-
-# Print a GMT object
-#' @export
-print.GMT <- function(x, ...) {
-    num.lines <- min(length(x), getOption("max.print", 99999))
-    num.trunc <- length(x) - num.lines
-    cat(sapply(x[1:num.lines], function(a) paste(a$id, "-", a$name, "\n",
-                                                 paste(a$genes, collapse=", "), '\n\n')))
-    if (num.trunc == 1) {
-        cat('[ reached getOption("max.print") -- omitted 1 term ]')
-    } else if (num.trunc > 1) {
-        cat(paste('[ reached getOption("max.print") -- ommitted', num.trunc, 'terms ]'))
-    }
+  if (!is.GMT(gmt)) stop('gmt is not a valid GMT object')
+  unlist(Reduce(function(x, y) union(x, y$genes), gmt, gmt[[1]]$genes))
 }

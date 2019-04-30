@@ -5,6 +5,9 @@
 \alias{gmt}
 \alias{read.GMT}
 \alias{write.GMT}
+\alias{[.GMT}
+\alias{[[.GMT}
+\alias{$.GMT}
 \alias{is.GMT}
 \title{Read and Write GMT files}
 \format{A GMT object is a named list of terms, where each term is a list with the items:
@@ -18,6 +21,12 @@ read.GMT(filename)
 
 write.GMT(gmt, filename)
 
+\method{[}{GMT}(x, i)
+
+\method{[[}{GMT}(x, i)
+
+\method{$}{GMT}(x, i)
+
 is.GMT(x)
 }
 \arguments{
@@ -26,6 +35,8 @@ is.GMT(x)
 \item{gmt}{a GMT object}
 
 \item{x}{object to test}
+
+\item{i}{index of GMT object}
 }
 \value{
 \code{read.GMT} returns a GMT object. \cr
@@ -43,6 +54,7 @@ term.
 }
 \examples{
 gmt <- read.GMT(system.file('extdata', 'hsapiens_REAC_subset.gmt', package='ActivePathways'))
+is.GMT(gmt)
 gmt[1:10]
 gmt[[1]]
 gmt[1]$id

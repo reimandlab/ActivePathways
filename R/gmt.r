@@ -19,10 +19,11 @@
 #' @name GMT
 #' @aliases GMT gmt
 #'
-#' @param filename Location of the gmt file
+#' @param filename name of the GMT file
 #' @param gmt a GMT object
 #' @param x object to test
 #' @param i index of GMT object
+#' @param path location of the GMT file
 #'
 #' @return \code{read.GMT} returns a GMT object. \cr
 #' \code{write.GMT} returns NULL. \cr
@@ -39,7 +40,7 @@
 #' gmt[1]$name
 #' gmt$`REAC:3108214`
 #' \donttest{
-#'   write.GMT(gmt, 'filename.gmt')
+#'   write.GMT(gmt, 'filename.gmt', path = tempdir())
 #' }
 NULL
 
@@ -57,13 +58,16 @@ read.GMT <- function(filename) {
 #' Writing GMT files
 #' @rdname GMT
 #' @export
-write.GMT <- function(gmt, filename) {
-    if (!is.GMT(gmt)) stop("gmt is not a valid GMT object")
-    sink(filename)
-    for (term in gmt) {
-        cat(term$id, term$name, paste(term$genes, collapse="\t"), "\n", sep="\t")
-    }
-    sink()
+write.GMT <- function(gmt, filename, path = "." ){
+  if (!is.GMT(gmt)) stop("gmt is not a valid GMT object")
+  if(!endsWith(path, "[/]")){
+    path = paste0(path, "/")
+  }
+  sink(paste0(path, filename))
+  for (term in gmt){
+    cat(term$id, term$name, paste(term$genes, collapse="\t"), "\n", sep="\t")
+  }
+  sink()
 }
 
 #####  Subsetting functions #####

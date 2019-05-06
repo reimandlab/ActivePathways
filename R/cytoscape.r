@@ -60,7 +60,8 @@ prepareCytoscape <- function(terms,
                        sep="\t", 
                        quote=FALSE)
     write.GMT(gmt, 
-              paste0(file_dir, "pathways.gmt"))
+              "pathways.gmt",
+              file_dir)
     
     # Making a Legend
     dummy_plot = ggplot(data.frame("tests" = factor(tests, levels = tests), "value" = 1), aes(tests, fill = tests)) +
@@ -92,7 +93,8 @@ prepareCytoscape <- function(terms,
                        sep="\t", 
                        quote=FALSE)
     write.GMT(gmt, 
-              paste0(file_dir, "pathways.gmt"))
+              "pathways.gmt",
+              file_dir)
   }
 }
 

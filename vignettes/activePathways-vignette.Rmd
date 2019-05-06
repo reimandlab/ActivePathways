@@ -91,7 +91,7 @@ gmt <- Filter(function(term) length(term$genes) <= 500, gmt)
 
 This GMT object can be written to a file.
 ```{r, eval=FALSE}
-write.GMT(gmt, 'hsapiens_REAC_subset_filtered.gmt')
+write.GMT(gmt, 'hsapiens_REAC_subset_filtered.gmt', path = ".")
 ```
 
 This filtering can also be done automatically using the `geneset.filter` parameter in the `ActivePathways` function by specifying a vector of length 2 containing the minimum and maximum pathway size desired by the user. For example, the above task can be completed by setting `geneset.filter=c(10, 500)`. By default, `ActivePathways` removes any pathways with less than 5 or more than 1000 annotated genes. 

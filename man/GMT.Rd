@@ -19,7 +19,7 @@
 \usage{
 read.GMT(filename)
 
-write.GMT(gmt, filename)
+write.GMT(gmt, filename, path = ".")
 
 \method{[}{GMT}(x, i)
 
@@ -30,9 +30,11 @@ write.GMT(gmt, filename)
 is.GMT(x)
 }
 \arguments{
-\item{filename}{Location of the gmt file}
+\item{filename}{name of the GMT file}
 
 \item{gmt}{a GMT object}
+
+\item{path}{location of the GMT file}
 
 \item{x}{object to test}
 
@@ -62,6 +64,6 @@ gmt[1]$genes
 gmt[1]$name
 gmt$`REAC:3108214`
 \donttest{
-  write.GMT(gmt, 'filename.gmt')
+  write.GMT(gmt, 'filename.gmt', path = tempdir())
 }
 }

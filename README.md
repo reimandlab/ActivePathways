@@ -1,6 +1,6 @@
-# activePathways
+# ActivePathways
 
-activePathways is a tool for multivariate pathway enrichment analysis. Pathway enrichment analysis identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. activePathways implements an algorithm to perform pathway enrichment analysis on a data set that contains multiple variables for each gene. For example, the data may contain the confidence that the gene is a driver as reported by several tools, or it may contain differential expression values across different genetic regions such as coding regions and promoter regions.
+ActivePathways is a tool for multivariate pathway enrichment analysis. Pathway enrichment analysis identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. Using this strategy, we can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
 
 ActivePathways is published in Nature Communications with the PCAWG Pan-Cancer project. 
 
@@ -8,18 +8,23 @@ Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Hel
 
 ## Installation
 
-#### devtools:
+#### From CRAN
+Open R and run `install.packages('ActivePathways')`
+
+#### Using devtools on our GitHub repository
 Using the R package `devtools`, run
 `devtools::install_github('https://github.com/reimandlab/activePathways')`
 
-#### From source
+#### From source on our GitHub repository
 Clone the repository: `https://github.com/reimandlab/activePathways.git`
 Open R in the directory you cloned the package in and run `install.packages('activePathways', repos=NULL)`
 
-## Using activePathways
+
+
+## Using ActivePathways
 
 ### Examples
-The simplest use of activeDriver requires only a data table and a list of gene sets in the form of a GMT [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file. The data must be in the form of numerical matrix and cannot contain any missing values
+The simplest use of ActivePathways requires only a data table (matrix of p-values) and a list of gene sets in the form of a GMT [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file. The data table must be in the form of numerical matrix and cannot contain any missing values.
 ```
 scores <- read.table('example_data.txt', header=TRUE, row.names='Gene')
 scores <- as.matrix(scores)

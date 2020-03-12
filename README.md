@@ -4,7 +4,9 @@ ActivePathways is a tool for multivariate pathway enrichment analysis. Pathway e
 
 ActivePathways is published in Nature Communications with the PCAWG Pan-Cancer project. 
 
-Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, Jüri Reimand & PCAWG Consortium. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11 735 (2020) https://www.nature.com/articles/s41467-019-13983-9 https://www.ncbi.nlm.nih.gov/pubmed/32024846 (^ - co-first authors)
+Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, Jüri Reimand & PCAWG Consortium. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11 735 (2020) (^ - co-first authors)
+https://www.nature.com/articles/s41467-019-13983-9
+https://www.ncbi.nlm.nih.gov/pubmed/32024846 
 
 ## Installation
 

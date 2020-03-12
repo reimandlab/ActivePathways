@@ -20,6 +20,11 @@ knitr::opts_chunk$set(warning=FALSE,
 
 This vignette will show how to create a pathway enrichment map using the results from `activePathways`. In this example we will be using the results from the main activePathways vignette. To follow along with this vignette, use any Cytoscape files written by `activePathways` or follow the main activePathways vignette, making sure to save the Cytoscape files in an accessible location.
 
+# Required Software
+1.	Cytoscape, see https://cytoscape.org/download.html 
+2.	EnrichmentMap app of Cytoscape, see menu Apps>App manager or http://apps.cytoscape.org/apps/enrichmentmap 
+3.	EhancedGraphics app of Cytoscape, see menu Apps>App manager or http://apps.cytoscape.org/apps/enhancedGraphics 
+
 # Required Files
 
 Recall that `activePathways` writes three files to be used in Cytoscape.

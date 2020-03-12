@@ -37,7 +37,7 @@ scores
 ## ABCC1         0.9383431571 9.198887e-01 2.599319e-01 2.980455e-01
 ##  [ reached getOption("max.print") -- omitted 2410 rows ]
 
-res <- activePathways(scores, 'example_genesets.gmt')
+res <- ActivePathways(scores, 'example_genesets.gmt')
 ```
 
-More thorough documentation of the activePathways function can be found in R with `?activePathways`, and complete tutorials can be found with `browseVignettes(package='activePathways')`
+More thorough documentation of the ActivePathways function can be found in R with `?ActivePathways`, and complete tutorials can be found with `browseVignettes(package='ActivePathways')`.

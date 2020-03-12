@@ -41,3 +41,10 @@ res <- ActivePathways(scores, 'example_genesets.gmt')
 ```
 
 More thorough documentation of the ActivePathways function can be found in R with `?ActivePathways`, and complete tutorials can be found with `browseVignettes(package='ActivePathways')`.
+
+### Creating enrichment maps in Cytoscape
+
+In R, type in `browseVignettes(package='ActivePathways')` for a link to a tutorial with screenshots. 
+
+
+

@@ -2,7 +2,9 @@
 
 activePathways is a tool for multivariate pathway enrichment analysis. Pathway enrichment analysis identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. activePathways implements an algorithm to perform pathway enrichment analysis on a data set that contains multiple variables for each gene. For example, the data may contain the confidence that the gene is a driver as reported by several tools, or it may contain differential expression values across different genetic regions such as coding regions and promoter regions.
 
-Check out our preprint at: https://www.biorxiv.org/content/early/2018/08/23/399113
+ActivePathways is published in Nature Communications with the PCAWG Pan-Cancer project. 
+
+Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, Jüri Reimand & PCAWG Consortium. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11 735 (2020) https://www.nature.com/articles/s41467-019-13983-9 https://www.ncbi.nlm.nih.gov/pubmed/32024846 (^ - co-first authors)
 
 ## Installation
 

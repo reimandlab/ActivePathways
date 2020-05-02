@@ -4,8 +4,7 @@
 \alias{merge_p_values}
 \title{Merge a list or matrix of p-values}
 \usage{
-merge_p_values(scores, method = c("Fisher", "Brown", "logitp", "meanp",
-  "sump", "sumz", "sumlog"))
+merge_p_values(scores, method = "Fisher")
 }
 \arguments{
 \item{scores}{Either a list of p-values or a matrix where each column is a test}
@@ -21,10 +20,9 @@ Merge a list or matrix of p-values
 }
 \section{Methods}{
 
-There are multiple methods available that can be used to merge a list of
-  p-values. The main methods encouraged by this package are:
+Two methods are available to merge a list of p-values:
 \describe{
- \item{Fisher or sumlog}{Fisher's method assumes p-values are uniformly
+ \item{Fisher}{Fisher's method (default) assumes p-values are uniformly
  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
  This method is most appropriate when the columns in \code{scores} are
  independent.}
@@ -33,15 +31,13 @@ There are multiple methods available that can be used to merge a list of
  tests of significance used to create the columns in \code{scores} are not
  necessarily independent. Note that the "Brown" method cannot be used with a 
  single list of p-values. However, in this case Brown's method is identical 
- to Fisher's method.}
+ to Fisher's method and should be used instead.}
 }
-Other methods are also available. See \code{\link[metap]{metap-package}}
-for more details
 }
 
 \examples{
   merge_p_values(c(0.05, 0.09, 0.01))
-  merge_p_values(list(a=0.01, b=1, c=0.0015, d=0.025), method='meanp')
+  merge_p_values(list(a=0.01, b=1, c=0.0015, d=0.025), method='Fisher')
   merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow=2), method='Brown')
 
 }

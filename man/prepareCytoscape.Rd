@@ -4,15 +4,15 @@
 \alias{prepareCytoscape}
 \title{Prepare files for building an Enrichment Map in Cytoscape}
 \usage{
-prepareCytoscape(terms, gmt, file_dir, col.significance)
+prepareCytoscape(terms, gmt, cytoscape.file.tag, col.significance)
 }
 \arguments{
 \item{terms}{a data.table with columns 'term.id', 'term.name', 'adjusted.p.val'}
 
-\item{gmt}{an abridged gmt object containing only the pathways that were
+\item{gmt}{an abridged GMT object containing only the pathways that were
 found to be significant}
 
-\item{file_dir}{user defined directory to write output files}
+\item{cytoscape.file.tag}{user defined file prefix and/or directory to write output files}
 
 \item{col.significance}{a data.table with a column 'term.id' and a column
 for each test indicating whether a pathway is signficiant (TRUE) or not
@@ -34,7 +34,7 @@ Cytoscape and the EnrichmentMap app.
     pathways are found to be significant when considering only one column from
     \code{scores}. A 1 indicates that that term is significant using only that
     column to test for enrichment analysis}
-    \item{pathways.gmt}{A Shortened version of the supplied gmt
+    \item{pathways.gmt}{A Shortened version of the supplied GMT
     file, containing only the terms in pathways.txt}
     \item{legend.pdf}{A legend with colours matching contributions
     from columns in \code{scores}}

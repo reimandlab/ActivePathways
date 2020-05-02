@@ -4,12 +4,18 @@
 \alias{activePathways}
 \title{activePathways}
 \usage{
-activePathways(scores, gmt, background = makeBackground(gmt),
-  geneset.filter = c(5, 1000), cutoff = 0.1, significant = 0.05,
-  merge.method = c("Brown", "Fisher", "logitp", "meanp", "sump", "sumz",
-  "sumlog"), correction.method = c("holm", "fdr", "hochberg", "hommel",
-  "bonferroni", "BH", "BY", "none"), return.all = FALSE,
-  cytoscape.file.dir = "", reanalyze = FALSE)
+activePathways(
+  scores,
+  gmt,
+  background = makeBackground(gmt),
+  geneset.filter = c(5, 1000),
+  cutoff = 0.1,
+  significant = 0.05,
+  merge.method = c("Brown", "Fisher"),
+  correction.method = c("holm", "fdr", "hochberg", "hommel", "bonferroni", "BH", "BY",
+    "none"),
+  cytoscape.file.tag = NA
+)
 }
 \arguments{
 \item{scores}{A numerical matrix of p-values where each row is a gene and
@@ -42,16 +48,9 @@ pathway to be considered significantly enriched.}
 \item{correction.method}{Method to correct p-values. See
 \code{\link[stats]{p.adjust}} for details}
 
-\item{return.all}{Whether to return results for all terms or only significant
-terms}
-
-\item{cytoscape.file.dir}{the directory to which the output files should be written, if unspecified,
-files will be written to a directory called "ActivePathways.cytoscape.files". If directory does not exist, it will be automatically
-created.}
-
-\item{reanalyze}{a boolean indicating whether the dataset will be reanalyzed with parameter or data changes.
-If TRUE, ActivePathways will write subdirectories in the format of Version1A, Version1B, etc to indicate sequential
-analyses. If FALSE, ActivePathways will write output files to the indicated directory.}
+\item{cytoscape.file.tag}{the directory and/or file prefix to which the output files
+ for generating enrichment maps should be written. 
+If NA, files will not be written.}
 }
 \value{
 A data.table of terms containing the following columns:
@@ -66,9 +65,6 @@ A data.table of terms containing the following columns:
          enrichment of the pathway. Each column is evaluated separately for 
          enrichments and added to the evidence field if the pathway is found.}
   }
-  If \code{return.all == FALSE} then only terms with
-    \code{adjusted.p.val <= significant} will be returned, otherwise all terms will be
-    returned.
 }
 \description{
 activePathways
@@ -76,10 +72,9 @@ activePathways
 \section{Merging p Values}{
 
 In order to obtain a single score for each gene, the p-values in \code{scores}
-are merged row-wise. There are multiple methods available that can be used
-to obtain this merged score. The main methods are:
+are merged row-wise. The two methods are:
 \describe{
- \item{Fisher or sumlog}{Fisher's method assumes p-values are uniformly
+ \item{Fisher}{Fisher's method assumes p-values are uniformly
  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
  This method is most appropriate when the columns in \code{scores} are
  independent.}
@@ -88,8 +83,6 @@ to obtain this merged score. The main methods are:
  tests of significance used to create the columns in \code{scores} are not
  necessarily independent.}
 }
-Other methods are also available. See \code{\link[metap]{metap-package}}
-for more details
 }
 
 \section{Cytoscape}{
@@ -122,8 +115,7 @@ for more details
 \dontrun{
     dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
     dat[is.na(dat)] <- 1
-    activePathways(dat, 'path/to/gmt.gmt', return.all=TRUE,
-         cytoscape.file.dir="results")
+    activePathways(dat, 'path/to/gmt.gmt', cytoscape.file.tag="results")
 }
 
 }

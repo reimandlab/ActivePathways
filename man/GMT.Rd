@@ -7,12 +7,14 @@
 \alias{write.GMT}
 \alias{is.GMT}
 \title{Read and Write GMT files}
-\format{A GMT object is a named list of terms, where each term is a list with the items:
+\format{
+A GMT object is a named list of terms, where each term is a list with the items:
 \describe{
     \item{id}{The term id}
     \item{name}{The full name of the term}
     \item{genes}{A character vector of genes annotated to this term}
-  }}
+  }
+}
 \usage{
 read.GMT(filename)
 

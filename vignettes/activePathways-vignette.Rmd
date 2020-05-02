@@ -1,6 +1,6 @@
 ---
 title: "activePathways"
-author: "Jonathan Barenboim"
+author: "Jonathan Barenboim, Juri Reimand"
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
@@ -54,13 +54,12 @@ activePathways(scores, gmt.file)
 
 
 ## Significance Threshold and returning all results
-A pathway is considered to be significantly enriched if it has `p.val <= significant`. The `significant` option represents the maximum p-value for a result to be considered statistically significant. By default, only the significant pathways are returned. If you want all pathways to be returned, you can use the `return.all` option. 
+A pathway is considered to be significantly enriched if it has `p.val <= significant`. The `significant` option represents the maximum p-value for a result to be considered statistically significant. By default, only the significant pathways are returned. 
 ```{r}
-nrow(activePathways(scores, gmt.file, return.all=FALSE, significant=0.05))
-nrow(activePathways(scores, gmt.file, return.all=FALSE, significant=0.1))
-nrow(activePathways(scores, gmt.file, return.all=TRUE, significant=0.05))
+nrow(activePathways(scores, gmt.file, significant=0.05))
+nrow(activePathways(scores, gmt.file, significant=0.1))
+nrow(activePathways(scores, gmt.file, significant=0.05))
 ```
-Note that while setting `significant=1` gives the same result as `return.all=TRUE`, it is strongly recommended to use the latter because the results written to `cytoscape.filenames` use the `singificant` value to determine which pathways to include in the network. Thus `activePathways(scores, gmt.file, return.all=TRUE, cytoscape.filenames=files)` and `activePathways(scores, gmt.file, significant=1, cytoscape.filenames=files)` will return the same result table but will create very different enrichment maps.
 
 
 ## GMT objects
@@ -142,7 +141,7 @@ Lets take a look again at the results from the basic case
 res <- activePathways(scores, gmt.file)
 res
 ```
-The `term.id`, `term.name`, and `term.size` column give information about each pathway. The `p.val` column gives the adjusted p-value for each column indicating the confidence that the pathway is enriched Since the `return.all` options is `FALSE` by default, all of these p-values will be smaller than the default significance cutoff, 0.05, and the table contains only the pathways that were found to be significant enriched. 
+The `term.id`, `term.name`, and `term.size` column give information about each pathway. The `adjusted.p.val` column gives the adjusted p-value for each column indicating the confidence that the pathway is enriched after multiple testing correction. 
 
 The `overlap` column gives the intersection between the genes annotated to the term and the subset of the `genelist` that gave us this p.value.
 ```{r}
@@ -150,7 +149,7 @@ res$overlap[1:3]
 ```
 The overlaps are in the same order as the `genelist`, meaning that the most significant genes from `scores` are placed first. This column is very useful in further analysis on the data, going back from pathway space to gene space and identifying significant genes in each pathway.
 
-The `evidence` column gives the individual gene lists in `scores` in which the pathway is found to be enriched. For example, the majority of the pathways have only 'CDS' as their evidence, meaning that the pathway is enriched either in this column or in the combined data. Pathway `REAC:422475` has as evidence `list('X3UTR', 'promCore')`, which means that the pathway is found to be enriched when considering either the `X3UTR` column, the `promCore` column, or the combined data. If a pathway is found to be enriched only with the combined data and not in any individual column, 'combined' will be listed as the evidence. If a pathway is not found to be enriched in any individual column or in the combined data (only possible if `return.all==TRUE`) then the evidence will be 'none'.  
+The `evidence` column gives the individual gene lists in `scores` in which the pathway is found to be enriched. For example, the majority of the pathways have only 'CDS' as their evidence, meaning that the pathway is enriched either in this column or in the combined data. Pathway `REAC:422475` has as evidence `list('X3UTR', 'promCore')`, which means that the pathway is found to be enriched when considering either the `X3UTR` column, the `promCore` column, or the combined data. If a pathway is found to be enriched only with the combined data and not in any individual column, 'combined' will be listed as the evidence.
 
 The rest of the columns are named as `Genes_{column}`, and represent the overlaps of each individual column if a pathway is found to be enriched according only to that gene list. Otherwise the column is `NA`
 
@@ -165,24 +164,18 @@ However, `data.table::fread` isn't quite smart enough to get the table back from
 
 
 # Visualizing the results in Cytoscape
-The Cytoscape program, combined with the enrichmentMap app, provide a powerful tool to visualize pathway enrichment analysis as a network. `activePathways` can help speed up this process by automatically writing the files that will be uploaded to Cytoscape to create a map. To create these files, a list of file names must be supplied to `activePathways`
+The Cytoscape program, combined with the enrichmentMap app, provide a powerful tool to visualize pathway enrichment analysis as a network. `activePathways` can help speed up this process by automatically writing the files that will be uploaded to Cytoscape to create a map. To create these files, a file prefix must be supplied to `activePathways` using the argument `cytoscape.file.tag`. The prefix can include a directory if it exists previously and is writable. 
 ```{r}
-files <- paste(system.file('extdata', package='activePathways'), c('cytoscape_terms.txt', 'cytoscape_groups.txt', 'cytoscape_abridged.txt', 'legend.pdf'), sep='/')
-res <- activePathways(scores, gmt.file, cytoscape.filenames=files)
+res <- activePathways(scores, gmt.file, cytoscape.file.tag="enrichmentMap_")
 ```
-Four files are written:
+Four files are written using the prefix:
 
-* `cytoscape.filenames[1]` contains the list of significant terms and the associated p-values. Note that only terms with `p.val <= significant` are written, even if you use the option `return.all=TRUE`.
+* `pathways.txt` contains the list of significant terms and the associated p-values. Note that only terms with `p.val <= significant` are written.
 
-* `cytoscape.filenames[2]` contains a matrix indicating which columns the pathways are significant in. A 1 indicates that that pathway is significant if `activePathways` is run on the data in just that one column. Note that this isn't the same as the column contribution. However, this file will be skipped if you use the option `contribution=FALSE`, since the assumption is that the individual columns aren't of interest.
+* `subgroups.txt` contains a matrix indicating which columns the pathways are significant in. A 1 indicates that that pathway is significant if `activePathways` is run on the data in just that one column. Note that this isn't the same as the column contribution. However, this file will be skipped if you use the option `contribution=FALSE`, since the assumption is that the individual columns aren't of interest.
 
-* `cytoscape.filenames[3]` contains a shortened version of the supplied GMT file which consists of only the significant pathways. You don't have to use this file, but it helps speed up the process of creating the network inside Cytoscape.
+* `pathways.gmt` contains a shortened version of the supplied GMT file which consists of only the significant pathways. 
 
-* `cytoscape.filenames[4]` a pdf file of a legend which can be used as reference to the generated cytoscape plot.
-
-```{r}
-cat(paste(readLines(files[1])[1:5], collapse='\n'))
-cat(paste(readLines(files[2])[1:5], collapse='\n'))
-```
+* `legend.pdf` is a pdf file of a color legend of different omics datasets analyzed that can be used as reference to the generated enrichment map.
 
 To see how to use these files to create an enrichment map, take a look at the `enrichmentMap-vignette` included with this package.

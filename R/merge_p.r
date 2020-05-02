@@ -7,10 +7,9 @@
 #'   matrix, returns a named list of p-values merged by row
 #'
 #' @section Methods:
-#' There are multiple methods available that can be used to merge a list of
-#'   p-values. The main methods encouraged by this package are:
+#' Two methods are available to merge a list of p-values:
 #' \describe{
-#'  \item{Fisher or sumlog}{Fisher's method assumes p-values are uniformly
+#'  \item{Fisher}{Fisher's method (default) assumes p-values are uniformly
 #'  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
 #'  This method is most appropriate when the columns in \code{scores} are
 #'  independent.}
@@ -19,39 +18,38 @@
 #'  tests of significance used to create the columns in \code{scores} are not
 #'  necessarily independent. Note that the "Brown" method cannot be used with a 
 #'  single list of p-values. However, in this case Brown's method is identical 
-#'  to Fisher's method.}
+#'  to Fisher's method and should be used instead.}
 #' }
-#' Other methods are also available. See \code{\link[metap]{metap-package}}
-#' for more details
 #'
 #' @examples
 #'   merge_p_values(c(0.05, 0.09, 0.01))
-#'   merge_p_values(list(a=0.01, b=1, c=0.0015, d=0.025), method='meanp')
+#'   merge_p_values(list(a=0.01, b=1, c=0.0015, d=0.025), method='Fisher')
 #'   merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow=2), method='Brown')
 #' 
 #' @export
-merge_p_values <- function(scores, method=c("Fisher", "Brown", "logitp",
-                                            "meanp", "sump", "sumz", "sumlog")) {
+merge_p_values <- function(scores, method = "Fisher") {
     # Validation on scores
     if (is.list(scores)) scores <- unlist(scores, recursive=FALSE)
-    if (!(is.vector(scores) || is.matrix(scores))) stop("scores must be a matrix or list")
-    if (any(is.na(scores))) stop("scores may not contain missing values")
-    if (!is.numeric(scores)) stop("scores must be numeric")
-    if (any(scores < 0 | scores > 1)) stop("All values in scores must be in [0,1]")
-        
-    method <- match.arg(method)
-    if(method == "Fisher") method <- "sumlog"
+    if (!(is.vector(scores) || is.matrix(scores))) stop("scores must be a matrix or list.")
+    if (any(is.na(scores))) stop("scores may not contain missing values.")
+    if (!is.numeric(scores)) stop("scores must be numeric.")
+    if (any(scores < 0 | scores > 1)) stop("All values in scores must be in [0,1].")
+	if (!method %in% c("Fisher", "Brown")) stop("Only Fisher's and Brown's methods are currently supported.")
 
     if (is.vector(scores)) {
-        if (method == "Brown") stop("Brown's method cannot be used with a single list of p-values")
+
+        if (method == "Brown") {
+        	stop("Brown's method cannot be used with a single list of p-values")
+        }
         
-        # Some metap functions don't like p-values that are 0 or 1 so make them (0, 1) to avoid errors
-        scores <- sapply(scores, function(x) if (x == 0) 1e-16 else if (x==1) 1-1e-16 else x)
-        func <- function(x) getFromNamespace(method, 'metap')(x)$p
-        return(func(scores))
+        # convert zeroes to smallest available doubles
+        scores <- sapply(scores, function(x) ifelse (x == 0, 1e-300, x))
+        
+        # if not brown, then fisher
+        return(fishersMethod(scores))
     }
     
-    # scores is a matrix
+    # scores is a matrix with one column, then no transformatino needed
     if (ncol(scores) == 1) return (scores[, 1, drop=TRUE])
     
     if (method == "Brown") {
@@ -59,9 +57,17 @@ merge_p_values <- function(scores, method=c("Fisher", "Brown", "logitp",
         return(apply(scores, 1, brownsMethod, cov.matrix=cov.matrix))
     }
     
-    scores <- apply(scores, c(1,2), function(x) if (x == 0) 1e-16 else if (x==1) 1-1e-16 else x)
-    func <- function(x) getFromNamespace(method, 'metap')(x)$p
-    return (apply(scores, 1, func))
+    scores <- apply(scores, c(1,2), function(x) ifelse (x == 0, 1e-300, x))
+
+    return (apply(scores, 1, fishersMethod))
+}
+
+
+fishersMethod <- function(p.values) {
+    lnp <- log(p.values)
+    chisq <- (-2) * sum(lnp)
+    df <- 2 * length(lnp)
+    pchisq(chisq, df, lower.tail = FALSE)
 }
 
 
@@ -80,8 +86,6 @@ merge_p_values <- function(scores, method=c("Fisher", "Brown", "logitp",
 # Only significant differences are the removal of extra_info and allowing a
 # pre-calculated covariance matrix
 # 
-# TODO: submit pull request to IlyaLab/CombiningDependentPvaluesUsingEBM
-# and change this method to use their package if/when it is accepted
 brownsMethod <- function(p.values, data.matrix=NULL, cov.matrix=NULL) {
     if (missing(data.matrix) && missing(cov.matrix)) {
         stop ("Either data.matrix or cov.matrix must be supplied")

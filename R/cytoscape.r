@@ -11,16 +11,16 @@
 #'     pathways are found to be significant when considering only one column from
 #'     \code{scores}. A 1 indicates that that term is significant using only that
 #'     column to test for enrichment analysis}
-#'     \item{pathways.gmt}{A Shortened version of the supplied gmt
+#'     \item{pathways.gmt}{A Shortened version of the supplied GMT
 #'     file, containing only the terms in pathways.txt}
 #'     \item{legend.pdf}{A legend with colours matching contributions
 #'     from columns in \code{scores}}
 #'   }
 #'
 #' @param terms a data.table with columns 'term.id', 'term.name', 'adjusted.p.val'
-#' @param gmt an abridged gmt object containing only the pathways that were
+#' @param gmt an abridged GMT object containing only the pathways that were
 #' found to be significant
-#' @param file_dir user defined directory to write output files
+#' @param cytoscape.file.tag user defined file prefix and/or directory to write output files
 #' @param col.significance a data.table with a column 'term.id' and a column
 #' for each test indicating whether a pathway is signficiant (TRUE) or not
 #' (FALSE) when considering only that column. If contribution==TRUE, use
@@ -31,7 +31,7 @@
 
 prepareCytoscape <- function(terms, 
                              gmt, 
-                             file_dir, 
+                             cytoscape.file.tag, 
                              col.significance) {
   if (!is.null(col.significance)) {
     tests <- unique(unlist(col.significance$evidence))
@@ -55,21 +55,21 @@ prepareCytoscape <- function(terms,
     
     # Writing the Files
     write.table(terms, 
-                file=paste0(file_dir, "pathways.txt"), 
+                file=paste0(cytoscape.file.tag, "pathways.txt"), 
                 row.names=FALSE, 
                 sep="\t", 
                 quote=FALSE)
     write.table(col.significance, 
-                file=paste0(file_dir, "subgroups.txt"), 
+                file=paste0(cytoscape.file.tag, "subgroups.txt"), 
                 row.names=FALSE, 
                 sep="\t", 
                 quote=FALSE)
     write.GMT(gmt, 
-              paste0(file_dir, "pathways.gmt"))
+              paste0(cytoscape.file.tag, "pathways.gmt"))
     
     # Making a Legend
-    if (requireNamespace("ggplot2", quietly = TRUE)) {
-      require(ggplot2)
+#    if (requireNamespace("ggplot2", quietly = TRUE)) {
+#      require(ggplot2)
       dummy_plot = ggplot(data.frame("tests" = factor(tests, levels = tests),
                                      "value" = 1), aes(tests, fill = tests)) +
         geom_bar() +
@@ -88,24 +88,24 @@ prepareCytoscape <- function(terms,
                             max(nchar(tests))*0.05+1)
       ggsave(legend,
              device = "pdf",
-             filename = paste0(file_dir, "legend.pdf"), 
+             filename = paste0(cytoscape.file.tag, "legend.pdf"), 
              height = legend_height, 
              width = legend_width, 
              scale = 1)
-    } else {
-      stop("Package ggplot2 needed for this function to work. Please install it.",
-           call. = FALSE)
-    }
+#    } else {
+#      stop("Package ggplot2 needed for this function to work. Please install it.",
+#           call. = FALSE)
+#    }
     
     
   } else {
     write.table(terms, 
-                file=paste0(file_dir, "pathways.txt"),
+                file=paste0(cytoscape.file.tag, "pathways.txt"),
                 row.names=FALSE, 
                 sep="\t", 
                 quote=FALSE)
     write.GMT(gmt, 
-              paste0(file_dir, "pathways.gmt"))
+              paste0(cytoscape.file.tag, "pathways.gmt"))
   }
 }
 

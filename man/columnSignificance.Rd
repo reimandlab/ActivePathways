@@ -5,8 +5,15 @@
 \title{Determine which pathways are found to be significant using each column
 individually}
 \usage{
-columnSignificance(scores, gmt, background, cutoff, significant,
-  correction.method, pvals)
+columnSignificance(
+  scores,
+  gmt,
+  background,
+  cutoff,
+  significant,
+  correction.method,
+  pvals
+)
 }
 \arguments{
 \item{scores}{A numerical matrix of p-values where each row is a gene and

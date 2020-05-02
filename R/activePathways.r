@@ -22,14 +22,9 @@
 #' @param merge.method Method to merge p-values. See section Merging p Values
 #' @param correction.method Method to correct p-values. See
 #'   \code{\link[stats]{p.adjust}} for details
-#' @param return.all Whether to return results for all terms or only significant
-#'   terms
-#' @param cytoscape.file.dir the directory to which the output files should be written, if unspecified,
-#'   files will be written to a directory called "ActivePathways.cytoscape.files". If directory does not exist, it will be automatically
-#'   created.
-#' @param reanalyze a boolean indicating whether the dataset will be reanalyzed with parameter or data changes.
-#' If TRUE, ActivePathways will write subdirectories in the format of Version1A, Version1B, etc to indicate sequential
-#' analyses. If FALSE, ActivePathways will write output files to the indicated directory. 
+#' @param cytoscape.file.tag the directory and/or file prefix to which the output files
+#'   for generating enrichment maps should be written. 
+#'	 If NA, files will not be written. 
 #'
 #' @return A data.table of terms containing the following columns:
 #'   \describe{
@@ -43,16 +38,12 @@
 #'          enrichment of the pathway. Each column is evaluated separately for 
 #'          enrichments and added to the evidence field if the pathway is found.}
 #'   }
-#'   If \code{return.all == FALSE} then only terms with
-#'     \code{adjusted.p.val <= significant} will be returned, otherwise all terms will be
-#'     returned.
 #'
 #' @section Merging p Values:
 #' In order to obtain a single score for each gene, the p-values in \code{scores}
-#' are merged row-wise. There are multiple methods available that can be used
-#' to obtain this merged score. The main methods are:
+#' are merged row-wise. The two methods are:
 #' \describe{
-#'  \item{Fisher or sumlog}{Fisher's method assumes p-values are uniformly
+#'  \item{Fisher}{Fisher's method assumes p-values are uniformly
 #'  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
 #'  This method is most appropriate when the columns in \code{scores} are
 #'  independent.}
@@ -61,8 +52,6 @@
 #'  tests of significance used to create the columns in \code{scores} are not
 #'  necessarily independent.}
 #' }
-#' Other methods are also available. See \code{\link[metap]{metap-package}}
-#' for more details
 #'
 #' @section Cytoscape:
 #'   activePathways will write four files that can be used to build a network using Cytoscape and the
@@ -92,12 +81,10 @@
 #' \dontrun{
 #'     dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
 #'     dat[is.na(dat)] <- 1
-#'     activePathways(dat, 'path/to/gmt.gmt', return.all=TRUE,
-#'          cytoscape.file.dir="results")
+#'     activePathways(dat, 'path/to/gmt.gmt', cytoscape.file.tag="results")
 #' }
 #'
 #' @import data.table
-#' @import metap
 #'
 #' @export
 
@@ -106,13 +93,10 @@
 # TODO: enter citations for Cytoscape, enrichmentMap, and enhancedGraphics
 activePathways <-  function(scores, gmt, background = makeBackground(gmt),
                             geneset.filter = c(5, 1000), cutoff = 0.1, significant = 0.05,
-                            merge.method = c("Brown", "Fisher", "logitp", "meanp", 
-                                             "sump", "sumz", "sumlog"),
+                            merge.method = c("Brown", "Fisher"),
                             correction.method = c("holm", "fdr", "hochberg", "hommel",
                                                   "bonferroni", "BH", "BY", "none"),
-                            return.all=FALSE, 
-                            cytoscape.file.dir = "",
-                            reanalyze = FALSE) {
+                            cytoscape.file.tag = NA) {
   
   merge.method <- match.arg(merge.method)
   correction.method <- match.arg(correction.method)
@@ -155,39 +139,39 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
     contribution <- FALSE
     message("scores contains only one column. Column contributions will not be calculated")
   }
+ 
+#  
+#  # cytoscape.file.dir
+#  if(!is.character(cytoscape.file.dir) | length(cytoscape.file.dir) != 1){
+#    stop("cytoscape.file.dir must be a string")
+#  }
+#  if(cytoscape.file.dir == ""){
+#    cytoscape.file.dir = "ActivePathways.cytoscape.files"
+#  }
+#  if (!dir.exists(cytoscape.file.dir)){
+#    dir.create(cytoscape.file.dir)
+#    message(paste0("Creating ", cytoscape.file.dir))
+#  }
+#  if(!endsWith(cytoscape.file.dir, "[/]")){
+#    cytoscape.file.dir = paste0(cytoscape.file.dir, "/")
+#  }
+#
+#  # Creating subdirectories
+#  if(reanalyze){
+#    subdir.order = expand.grid( LETTERS, 1:1000)
+#    subdir.order = paste("Version", subdir.order[,2], subdir.order[,1], sep = "")
+#    cytoscape.subdir = list.files(cytoscape.file.dir)
+#    cytoscape.subdir = cytoscape.subdir[cytoscape.subdir %in% subdir.order]
+#    if(length(cytoscape.subdir) == 0){
+#      cytoscape.file.dir = paste0(cytoscape.file.dir, "Version1A/")
+#    }else{
+#      cytoscape.file.dir = paste0(cytoscape.file.dir, subdir.order[max(unlist(lapply(cytoscape.subdir, function(x) grep(x, subdir.order))))+1], "/")
+#    }
+#    dir.create(cytoscape.file.dir)
+#    message(paste0("Creating ", cytoscape.file.dir))
+#  }
   
-  # cytoscape.file.dir
-  if(!is.character(cytoscape.file.dir) | length(cytoscape.file.dir) != 1){
-    stop("cytoscape.file.dir must be a string")
-  }
-  if(cytoscape.file.dir == ""){
-    cytoscape.file.dir = "ActivePathways.cytoscape.files"
-  }
-  if (!dir.exists(cytoscape.file.dir)){
-    dir.create(cytoscape.file.dir)
-    message(paste0("Creating ", cytoscape.file.dir))
-  }
-  if(!endsWith(cytoscape.file.dir, "[/]")){
-    cytoscape.file.dir = paste0(cytoscape.file.dir, "/")
-  }
-  
-  # Creating subdirectories
-  if(reanalyze){
-    subdir.order = expand.grid( LETTERS, 1:1000)
-    subdir.order = paste("Version", subdir.order[,2], subdir.order[,1], sep = "")
-    cytoscape.subdir = list.files(cytoscape.file.dir)
-    cytoscape.subdir = cytoscape.subdir[cytoscape.subdir %in% subdir.order]
-    if(length(cytoscape.subdir) == 0){
-      cytoscape.file.dir = paste0(cytoscape.file.dir, "Version1A/")
-    }else{
-      cytoscape.file.dir = paste0(cytoscape.file.dir, subdir.order[max(unlist(lapply(cytoscape.subdir, function(x) grep(x, subdir.order))))+1], "/")
-    }
-    dir.create(cytoscape.file.dir)
-    message(paste0("Creating ", cytoscape.file.dir))
-  }
-  
-  ##### filtering and sorting #####
-
+  ##### filtering and sorting ####
   
   # Filter the GMT
   if(!is.null(geneset.filter)) {
@@ -233,8 +217,8 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
   
   significant.indeces <- which(res$adjusted.p.val <= significant)
   if (length(significant.indeces) == 0) {
-    warning("No significant terms were found")
-    # if (!is.null(cytoscape.file.tag)) warning("Cytoscape files were not written")
+    warning("No significant terms were found.")
+    return()
   }
   
   if (contribution) {
@@ -245,15 +229,14 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
     sig.cols <- NULL
   }
   
-  # if (!is.null(cytoscape.file.tag) && length(significant.indeces) > 0) {
-  if (length(significant.indeces) > 0) {
+  # if significant result were found and cytoscape file tag exists, proceed with writing files in the working directory
+  if (length(significant.indeces) > 0 & !is.na(cytoscape.file.tag)) {
     prepareCytoscape(res[significant.indeces, .(term.id, term.name, adjusted.p.val)],
                      gmt[significant.indeces], 
-                     cytoscape.file.dir,
+                     cytoscape.file.tag,
                      sig.cols[significant.indeces,])
   }
   
-  if(return.all) return(res)
   res[significant.indeces]
 }
 

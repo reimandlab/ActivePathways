@@ -139,37 +139,6 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
     contribution <- FALSE
     message("scores contains only one column. Column contributions will not be calculated")
   }
- 
-#  
-#  # cytoscape.file.dir
-#  if(!is.character(cytoscape.file.dir) | length(cytoscape.file.dir) != 1){
-#    stop("cytoscape.file.dir must be a string")
-#  }
-#  if(cytoscape.file.dir == ""){
-#    cytoscape.file.dir = "ActivePathways.cytoscape.files"
-#  }
-#  if (!dir.exists(cytoscape.file.dir)){
-#    dir.create(cytoscape.file.dir)
-#    message(paste0("Creating ", cytoscape.file.dir))
-#  }
-#  if(!endsWith(cytoscape.file.dir, "[/]")){
-#    cytoscape.file.dir = paste0(cytoscape.file.dir, "/")
-#  }
-#
-#  # Creating subdirectories
-#  if(reanalyze){
-#    subdir.order = expand.grid( LETTERS, 1:1000)
-#    subdir.order = paste("Version", subdir.order[,2], subdir.order[,1], sep = "")
-#    cytoscape.subdir = list.files(cytoscape.file.dir)
-#    cytoscape.subdir = cytoscape.subdir[cytoscape.subdir %in% subdir.order]
-#    if(length(cytoscape.subdir) == 0){
-#      cytoscape.file.dir = paste0(cytoscape.file.dir, "Version1A/")
-#    }else{
-#      cytoscape.file.dir = paste0(cytoscape.file.dir, subdir.order[max(unlist(lapply(cytoscape.subdir, function(x) grep(x, subdir.order))))+1], "/")
-#    }
-#    dir.create(cytoscape.file.dir)
-#    message(paste0("Creating ", cytoscape.file.dir))
-#  }
   
   ##### filtering and sorting ####
   

@@ -13,7 +13,7 @@ https://www.ncbi.nlm.nih.gov/pubmed/32024846
 ## Installation
 
 #### From CRAN (not available temporarily)
-# Open R and run `install.packages('ActivePathways')`
+Open R and run `install.packages('ActivePathways')`
 
 #### Using devtools on our GitHub repository
 Using the R package `devtools`, run

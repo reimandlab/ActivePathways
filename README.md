@@ -20,8 +20,8 @@ Using the R package `devtools`, run
 `devtools::install_github('https://github.com/reimandlab/ActivePathways')`
 
 #### From source on our GitHub repository
-Clone the repository: `https://github.com/reimandlab/ActivePathways.git`
-Open R in the directory you cloned the package in and run `install.packages('ActivePathways', repos = NULL)`
+Clone the repository, gor example using `git clone`: `https://github.com/reimandlab/ActivePathways.git`
+Open R in the directory you cloned the package in and run `install.packages("ActivePathways", repos = NULL, type "source")`
 
 
 

@@ -2,23 +2,23 @@
 % Please edit documentation in R/merge_p.r
 \name{brownsMethod}
 \alias{brownsMethod}
-\title{Merge p-values using Brown's method}
+\title{Merge p-values using the Brown's method.}
 \usage{
 brownsMethod(p.values, data.matrix = NULL, cov.matrix = NULL)
 }
 \arguments{
-\item{p.values}{A vector of m p-values}
+\item{p.values}{A vector of m p-values.}
 
-\item{data.matrix}{An m x n matrix representing m tests and n samples}
+\item{data.matrix}{An m x n matrix representing m tests and n samples. NA's are not allowed.}
 
-\item{cov.matrix}{A pre-calculated covariance matrix of data.matrix. More
+\item{cov.matrix}{A pre-calculated covariance matrix of \code{data.matrix}. This is more
 efficient when making many calls with the same data.matrix.
-Only one of data.matrix and cov.matrix must be given. If both are supplied,
-data.matrix is ignored}
+Only one of \code{data.matrix} and \code{cov.matrix} must be given. If both are supplied,
+\code{data.matrix} is ignored.}
 }
 \value{
-a p-value
+A single p-value representing the merged significance of multiple p-values.
 }
 \description{
-Merge p-values using Brown's method
+Merge p-values using the Brown's method.
 }

@@ -7,13 +7,13 @@
 merge_p_values(scores, method = "Fisher")
 }
 \arguments{
-\item{scores}{Either a list of p-values or a matrix where each column is a test}
+\item{scores}{Either a list of p-values or a matrix where each column is a test.}
 
 \item{method}{Method to merge p-values. See 'methods' section below.}
 }
 \value{
-If scores is a vector or list, returns a number. If scores is a
-  matrix, returns a named list of p-values merged by row
+If \code{scores} is a vector or list, returns a number. If \code{scores} is a
+  matrix, returns a named list of p-values merged by row.
 }
 \description{
 Merge a list or matrix of p-values
@@ -22,7 +22,7 @@ Merge a list or matrix of p-values
 
 Two methods are available to merge a list of p-values:
 \describe{
- \item{Fisher}{Fisher's method (default) assumes p-values are uniformly
+ \item{Fisher}{Fisher's method (default) assumes that p-values are uniformly
  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
  This method is most appropriate when the columns in \code{scores} are
  independent.}

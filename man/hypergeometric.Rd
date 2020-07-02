@@ -2,21 +2,21 @@
 % Please edit documentation in R/statistical_tests.r
 \name{hypergeometric}
 \alias{hypergeometric}
-\title{Hypergemoetric Test}
+\title{Hypergemoetric test}
 \usage{
 hypergeometric(counts)
 }
 \arguments{
-\item{counts}{a 2x2 numerical matrix representing a contingency table}
+\item{counts}{A 2x2 numerical matrix representing a contingency table.}
 }
 \value{
-a p-value
+a p-value of enrichment of genes in a term or pathway.
 }
 \description{
-Perform a Hypergeometric test, aka Fisher's exact test, on a 2x2 contingency
-table with a 'greater' alternative hypothesis. That is, find the
-probability that counts[1, 1] or more genes would be found in annotations,
-assuming the null hypothesis.
+Perform a hypergeometric test, also known as the Fisher's exact test, on a 2x2 contingency
+table with the alternative hypothesis 'greater' . In this application, the test finds the
+probability that counts[1, 1] or more genes would be found to be annotated to a term (pathway),
+assuming the null hypothesis of genes being distributed randomly to terms.
 }
 \examples{
 \dontrun{

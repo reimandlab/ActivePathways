@@ -2,8 +2,8 @@
 % Please edit documentation in R/ActivePathways.r
 \name{columnSignificance}
 \alias{columnSignificance}
-\title{Determine which pathways are found to be significant using each column
-individually}
+\title{Determine which terms are found to be significant using each column
+individually.}
 \usage{
 columnSignificance(
   scores,
@@ -17,34 +17,36 @@ columnSignificance(
 }
 \arguments{
 \item{scores}{A numerical matrix of p-values where each row is a gene and
-each column is a test. Rownames should be the genes and colnames the names
-of the tests. All values must be 0<=p<=1 with missing values removed or
-converted to 1}
+each column represents an omics dataset (evidence). Rownames correspond to the genes 
+and colnames to the datasets. All values must be 0<=p<=1. We recommend converting 
+missing values to ones.}
 
 \item{gmt}{A GMT object to be used for enrichment analysis. If a filename, a
-GMT object will be read from the file}
+GMT object will be read from the file.}
 
 \item{background}{A character vector of gene names to be used as a
 statistical background. By default, the background is all genes that appear
-in \code{gmt}}
+in \code{gmt}.}
 
-\item{cutoff}{A maximum p-value for a gene to be used for enrichment analysis.
-Any genes with \code{adjusted.p.val > significant} will be discarded before testing}
+\item{cutoff}{A maximum merged p-value for a gene to be used for analysis.
+Any genes with merged, unadjusted \code{p > significant} will be discarded 
+before testing.}
 
-\item{significant}{A number in [0,1] denoting the maximum p-value for a
-pathway to be considered significantly enriched.}
+\item{significant}{Significance cutoff for selecting enriched pathways. Pathways with
+\code{adjusted.p.val < significant} will be selected as results.}
 
-\item{correction.method}{Method to correct p-values. See
-\code{\link[stats]{p.adjust}} for details}
+\item{correction.method}{Statistical method to correct p-values. See
+\code{\link[stats]{p.adjust}} for details.}
 
 \item{pvals}{p-value for the pathways calculated by ActivePathways}
 }
 \value{
 a data.table with columns 'term.id' and a column for each column
-in \code{scores}, indicating whether each pathway was found to be
-significant(TRUE) or not(FALSE) when considering only that column
+in \code{scores}, indicating whether each term (pathway) was found to be
+significant or not when considering only that column. For each term, 
+either report the list of related genes if that term was significant, or NA if not.
 }
 \description{
-Determine which pathways are found to be significant using each column
-individually
+Determine which terms are found to be significant using each column
+individually.
 }

@@ -2,18 +2,18 @@
 % Please edit documentation in R/gmt.r
 \name{makeBackground}
 \alias{makeBackground}
-\title{Make a background list of genes}
+\title{Make a background list of genes (i.e., the statistical universe) based on all the terms (gene sets, pathways) considered.}
 \usage{
 makeBackground(gmt)
 }
 \arguments{
-\item{gmt}{a \link{GMT} object}
+\item{gmt}{A \link{GMT} object.}
 }
 \value{
-a character vector containing all genes in GMT
+A character vector containing all genes in GMT.
 }
 \description{
-Returns a character vector of all genes in a GMT object
+Returns A character vector of all genes in a GMT object.
 }
 \examples{
 \dontrun{

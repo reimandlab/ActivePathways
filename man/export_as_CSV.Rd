@@ -2,20 +2,17 @@
 % Please edit documentation in R/ActivePathways.r
 \name{export_as_CSV}
 \alias{export_as_CSV}
-\title{Export results from ActivePathways as a CSV file}
+\title{Export the results from ActivePathways as a comma-separated values (CSV) file.}
 \usage{
 export_as_CSV(res, file_name)
 }
 \arguments{
-\item{res}{the object of ActivePathways result}
+\item{res}{the data.table object with ActivePathways results.}
 
-\item{file_name}{location and name of the CSV file}
-}
-\value{
-a character vector containing all genes in GMT
+\item{file_name}{location and name of the CSV file to write to.}
 }
 \description{
-Returns a character vector of all genes in a GMT object
+Export the results from ActivePathways as a comma-separated values (CSV) file.
 }
 \examples{
 \dontrun{

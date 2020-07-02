@@ -10,9 +10,9 @@
 \format{
 A GMT object is a named list of terms, where each term is a list with the items:
 \describe{
-    \item{id}{The term id}
-    \item{name}{The full name of the term}
-    \item{genes}{A character vector of genes annotated to this term}
+    \item{id}{The term ID.}
+    \item{name}{The full name or description of the term.}
+    \item{genes}{A character vector of genes annotated to this term.}
   }
 }
 \usage{
@@ -23,25 +23,25 @@ write.GMT(gmt, filename)
 is.GMT(x)
 }
 \arguments{
-\item{filename}{Location of the gmt file}
+\item{filename}{Location of the gmt file.}
 
-\item{gmt}{a GMT object}
+\item{gmt}{A GMT object.}
 
-\item{x}{object to test}
+\item{x}{The object to test.}
 }
 \value{
 \code{read.GMT} returns a GMT object. \cr
 \code{write.GMT} returns NULL. \cr
-\code{is.GMT} returns TRUE if \code{x} is a GMT object, else FALSE
+\code{is.GMT} returns TRUE if \code{x} is a GMT object, else FALSE.
 }
 \description{
-Functions to read and Write Gene Matrix Transposed (GMT) files and to test if
-an object inherits from GMT
+Functions to read and write Gene Matrix Transposed (GMT) files and to test if
+an object inherits from GMT.
 }
 \details{
-A GMT file describes gene sets, such as pathways. GMT files are tab delimeted
-and each row contains a term id, a term name, and all genes annotated to the
-term.
+A GMT file describes gene sets, such as biological terms and pathways. GMT files are 
+tab delimited text files. Each row of a GMT file contains a single term with its 
+database ID and a term name, followed all genes annotated to the term.
 }
 \examples{
 \dontrun{

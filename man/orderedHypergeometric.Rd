@@ -7,14 +7,12 @@
 orderedHypergeometric(genelist, background, annotations)
 }
 \arguments{
-\item{genelist}{character vector of gene names. List of differentially
-expressed genes being tested for enrichment}
+\item{genelist}{Character vector of gene names, assumed to be ordered by decreasing importance. 
+For example, the genes could be ranked by decreasing significance of differential expression.}
 
-\item{background}{character vector of gene names. List of all genes being
-used as a statistical background}
+\item{background}{Character vector of gene names. List of all genes used as a statistical background (i.e., the universe)}
 
-\item{annotations}{character vector of gene names. List of genes annotated to
-the term being tested.}
+\item{annotations}{Character vector of gene names. A gene set representing a functional term, process or biological pathway.}
 }
 \value{
 a list with the items:
@@ -25,12 +23,11 @@ a list with the items:
  }
 }
 \description{
-Perform a Hypergeometric, aka Fisher's Exact test, on a list of genes ordered
-by significance against a list of annotation genes
-}
-\details{
-The hypergeometric test is run with increasingly large numbers of genes
-starting from the top, and the lowest p-value is returned
+Perform a series of hypergeometric tests (a.k.a. Fisher's Exact tests), on a ranked list of genes ordered
+by significance against a list of annotation genes. The hypergeometric tests are executed with 
+increasingly larger numbers of genes representing the top genes in order of decreasing scores. 
+The lowest p-value of the series is returned as the optimal enriched intersection of the ranked list of genes
+and the biological term (pathway).
 }
 \examples{
 \dontrun{

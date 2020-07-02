@@ -2,7 +2,7 @@
 % Please edit documentation in R/ActivePathways.r
 \name{enrichmentAnalysis}
 \alias{enrichmentAnalysis}
-\title{Perform Gene Set Enrichment Analysis on an ordered list of genes}
+\title{Perform pathway enrichment analysis on an ordered list of genes}
 \usage{
 enrichmentAnalysis(genelist, gmt, background)
 }
@@ -27,7 +27,7 @@ a data.table of terms with the following columns:
   }
 }
 \description{
-Perform Gene Set Enrichment Analysis on an ordered list of genes
+Perform pathway enrichment analysis on an ordered list of genes
 }
 \examples{
 \dontrun{

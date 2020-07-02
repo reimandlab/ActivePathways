@@ -1,14 +1,12 @@
-# ActivePathways 1.0.3
+# ActivePathways 1.0.2
 
 ## Major Changes
 
-* Renaming package to ActivePathways from activePathways for consistency with function and publication
-
-
-# activePathways 1.0.2
-
-## Major Changes
-
+* Renaming package to ActivePathways from activePathways for consistency 
+with function and publication
+* Adding new function export_as_CSV(res, file_name) to save data in 
+spreadsheet-friendly formats
+* Updating README-file with an actionable step-by-step tutorial
 * Changed logic of creating files for Enrichment Map: the user can provide 
 the parameter "cytoscape.file.tag" for creating the required files. If the 
 parameter is NA (default), no files are created. No directories are created. 

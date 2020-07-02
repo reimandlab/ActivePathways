@@ -113,9 +113,15 @@ are merged row-wise. The two methods are:
 
 \examples{
 \dontrun{
-    dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
+    fname_scores <- system.file("extdata", "Adenocarcinoma_scores_subset.tsv", 
+         package <- "ActivePathways")
+    fname_GMT = system.file("extdata", "hsapiens_REAC_subset.gmt",
+         package = "ActivePathways")
+
+    dat <- as.matrix(read.table(fname_scores, header = TRUE, row.names = 'Gene'))
     dat[is.na(dat)] <- 1
-    ActivePathways(dat, 'path/to/gmt.gmt', cytoscape.file.tag="results")
+
+    ActivePathways(dat, fname_GMT)
 }
 
 }

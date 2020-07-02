@@ -67,7 +67,7 @@ fishersMethod <- function(p.values) {
     lnp <- log(p.values)
     chisq <- (-2) * sum(lnp)
     df <- 2 * length(lnp)
-    pchisq(chisq, df, lower.tail = FALSE)
+    stats::pchisq(chisq, df, lower.tail = FALSE)
 }
 
 
@@ -108,7 +108,7 @@ brownsMethod <- function(p.values, data.matrix=NULL, cov.matrix=NULL) {
     }
 
     x <- 2 * sum(-log(p.values), na.rm=TRUE)
-    p.brown <- pchisq(df=df, q=x/sf, lower.tail=FALSE)
+    p.brown <- stats::pchisq(df=df, q=x/sf, lower.tail=FALSE)
     p.brown
 }
 
@@ -121,15 +121,15 @@ transformData <- function(dat) {
     dvm <- mean(dat, na.rm=TRUE)
     dvsd <- pop.sd(dat)
     s <- (dat - dvm) / dvsd
-    distr <- ecdf(s)
+    distr <- stats::ecdf(s)
     sapply(s, function(a) -2 * log(distr(a)))
 }
 
 
 calculateCovariances <- function(data.matrix) {
     transformed.data.matrix <- apply(data.matrix, 1, transformData)
-    cov(transformed.data.matrix)
+    stats::cov(transformed.data.matrix)
 }
 
-pop.var <- function(x) var(x, na.rm=TRUE) * (length(x) - 1) / length(x)
+pop.var <- function(x) stats::var(x, na.rm=TRUE) * (length(x) - 1) / length(x)
 pop.sd <- function(x) sqrt(pop.var(x))

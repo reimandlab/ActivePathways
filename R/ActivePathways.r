@@ -79,9 +79,15 @@
 #'
 #' @examples
 #' \dontrun{
-#'     dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
+#'     fname_scores <- system.file("extdata", "Adenocarcinoma_scores_subset.tsv", 
+#'          package <- "ActivePathways")
+#'     fname_GMT = system.file("extdata", "hsapiens_REAC_subset.gmt",
+#'          package = "ActivePathways")
+#'
+#'     dat <- as.matrix(read.table(fname_scores, header = TRUE, row.names = 'Gene'))
 #'     dat[is.na(dat)] <- 1
-#'     ActivePathways(dat, 'path/to/gmt.gmt', cytoscape.file.tag="results")
+#'
+#'     ActivePathways(dat, fname_GMT)
 #' }
 #'
 #' @import data.table
@@ -182,7 +188,8 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   ##### enrichmentAnalysis and column contribution #####
   
   res <- enrichmentAnalysis(ordered.scores, gmt, background)
-  res[, adjusted.p.val := p.adjust(adjusted.p.val, method=correction.method)]
+  adjusted_p <- stats::p.adjust(res$adjusted.p.val, method = correction.method)
+  res[, "adjusted.p.val" := adjusted_p]
   
   significant.indeces <- which(res$adjusted.p.val <= significant)
   if (length(significant.indeces) == 0) {
@@ -201,7 +208,7 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   # if significant result were found and cytoscape file tag exists
   # proceed with writing files in the working directory
   if (length(significant.indeces) > 0 & !is.na(cytoscape.file.tag)) {
-    prepareCytoscape(res[significant.indeces, .(term.id, term.name, adjusted.p.val)],
+    prepareCytoscape(res[significant.indeces, c("term.id", "term.name", "adjusted.p.val")],
                      gmt[significant.indeces], 
                      cytoscape.file.tag,
                      sig.cols[significant.indeces,])
@@ -269,8 +276,8 @@ columnSignificance <- function(scores, gmt, background, cutoff, significant, cor
     col.scores <- names(col.scores)[order(col.scores)]
     
     res <- enrichmentAnalysis(col.scores, gmt, background)
-    set(res, i=NULL, "adjusted.p.val", p.adjust(res$adjusted.p.val, correction.method))
-    set(res, i=which(res$adjusted.p.val>significant), "overlap", list(list(NA)))
+    set(res, i = NULL, "adjusted.p.val", stats::p.adjust(res$adjusted.p.val, correction.method))
+    set(res, i = which(res$adjusted.p.val > significant), "overlap", list(list(NA)))
     set(dt, i=NULL, col, res$overlap)
   }
   
@@ -293,4 +300,45 @@ columnSignificance <- function(scores, gmt, background, cutoff, significant, cor
   
   dt
 }
+
+#' Export results from ActivePathways as a CSV file
+#'
+#' @param res the data.table object with ActivePathways results
+#' @param file_name location and name of the CSV file to write to
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'     fname_scores <- system.file("extdata", "Adenocarcinoma_scores_subset.tsv", 
+#'          package <- "ActivePathways")
+#'     fname_GMT = system.file("extdata", "hsapiens_REAC_subset.gmt",
+#'          package = "ActivePathways")
+#'
+#'     dat <- as.matrix(read.table(fname_scores, header = TRUE, row.names = 'Gene'))
+#'     dat[is.na(dat)] <- 1
+#'
+#'     res <- ActivePathways(dat, fname_GMT)
+#'     export_as_CSV(res, "results_ActivePathways.csv")
+#' }
+export_as_CSV = function (res, file_name) {
+	data.table::fwrite(res, file_name)	
+#	get_evidence_genes = function(x) {
+#		sapply(x, function(xx) {
+#			if (all(is.na(xx))) return(NA)
+#			paste(xx, collapse = ";")
+#		})
+#	}
+#	
+#	constant_columns = c("term.id", "term.name", "adjusted.p.val", "term.size")
+#	res1 = data.frame(res[, constant_columns, with = FALSE], stringsAsFactors = F)
+#
+#	other_cols = setdiff(colnames(res), constant_columns)
+#	res1_other = do.call(cbind, lapply(other_cols, function(x) get_evidence_genes (res[[x]]) ))
+#	colnames(res1_other) = other_cols
+#
+#	res1 = cbind(res1, res1_other, stringsAsFactors = F)
+#	rownames(res1) = NULL
+#
+#	silence = utils::write.csv(res1, file_name)
+} 
 

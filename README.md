@@ -38,15 +38,15 @@ library(ActivePathways)
 # Run an example using the data files included in the ActivePathways package. 
 ##
 
-fname_scores = system.file("extdata", "Adenocarcinoma_scores_subset.tsv", package = "ActivePathways")
-fname_GMT = system.file("extdata", "hsapiens_REAC_subset.gmt", package = "ActivePathways")
+fname_scores <- system.file("extdata", "Adenocarcinoma_scores_subset.tsv", package = "ActivePathways")
+fname_GMT <- system.file("extdata", "hsapiens_REAC_subset.gmt", package = "ActivePathways")
 
 ##
 # Numeric matrix of p-values is required as input. 
 # NA values are converted to P = 1.
 ##
 
-scores = read.table(fname_scores, header = TRUE, row.names = 'Gene')
+scores <- read.table(fname_scores, header = TRUE, row.names = 'Gene')
 scores <- as.matrix(scores)
 scores[is.na(scores)] <- 1
 
@@ -55,7 +55,7 @@ scores[is.na(scores)] <- 1
 # Main call of ActivePathways function:
 ##
 
-enriched_pathways =  ActivePathways(scores, fname_GMT) 
+enriched_pathways <- ActivePathways(scores, fname_GMT) 
 
 #35 terms were removed from gmt because they did not make the geneset.filter
 #91 rows were removed from scores because they are not found in the background
@@ -89,6 +89,15 @@ enriched_pathways[1:3,]
 #3:                                          NA
 
 
+##
+# Save the resulting pathways as a Comma-Separated Values (CSV) file for spreadsheets 
+#  and computational pipelines.
+# the data.table object cannot be saved directly as text.
+##
+
+export_as_CSV(enriched_pathways, "enriched_pathways.csv")
+
+
 ## 
 # Examine a few lines of the two major types of input
 ##
@@ -115,10 +124,10 @@ head(scores, n = 3)
 ##
 
 readLines(fname_GMT)[11:13]
+
 #[1] "REAC:3656535\tTGFBR1 LBD Mutants in Cancer\tTGFB1\tFKBP1A\tTGFBR2\tTGFBR1\t"
 #[2] "REAC:73927\tDepurination\tOGG1\tMPG\tMUTYH\t"
 #[3] "REAC:5602410\tTLR3 deficiency - HSE\tTLR3\t" 
-
 
 
 ```

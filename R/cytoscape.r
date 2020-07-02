@@ -44,22 +44,22 @@ prepareCytoscape <- function(terms,
     col.significance = cbind(col.significance[,"term.id"], evidence.columns)
     
     # Use pichart
-    col.colors <- rainbow(length(tests))
+    col.colors <- grDevices::rainbow(length(tests))
     instruct.str <- paste('piechart:',
                           ' attributelist="', 
                           paste(tests, collapse=','),
                           '" colorlist="', 
                           paste(col.colors, collapse=','), 
                           '" showlabels=FALSE', sep='')
-    col.significance[, instruct := instruct.str]
+    col.significance[, "instruct" := instruct.str]
     
     # Writing the Files
-    write.table(terms, 
+    utils::write.table(terms, 
                 file=paste0(cytoscape.file.tag, "pathways.txt"), 
                 row.names=FALSE, 
                 sep="\t", 
                 quote=FALSE)
-    write.table(col.significance, 
+    utils::write.table(col.significance, 
                 file=paste0(cytoscape.file.tag, "subgroups.txt"), 
                 row.names=FALSE, 
                 sep="\t", 
@@ -68,15 +68,15 @@ prepareCytoscape <- function(terms,
               paste0(cytoscape.file.tag, "pathways.gmt"))
     
     # Making a Legend
-#    if (requireNamespace("ggplot2", quietly = TRUE)) {
-#      require(ggplot2)
       dummy_plot = ggplot(data.frame("tests" = factor(tests, levels = tests),
                                      "value" = 1), aes(tests, fill = tests)) +
         geom_bar() +
         scale_fill_manual(name = "Contribution", values=col.colors)
-      pdf(file = NULL) # Suppressing Blank Display Device from ggplot_gtable
+
+      grDevices::pdf(file = NULL) # Suppressing Blank Display Device from ggplot_gtable
       dummy_table = ggplot_gtable(ggplot_build(dummy_plot))
-      dev.off()
+      grDevices::dev.off()
+
       legend = dummy_table$grobs[[which(sapply(dummy_table$grobs, function(x) x$name) == "guide-box")]]
       
       # Estimating height & width
@@ -92,14 +92,9 @@ prepareCytoscape <- function(terms,
              height = legend_height, 
              width = legend_width, 
              scale = 1)
-#    } else {
-#      stop("Package ggplot2 needed for this function to work. Please install it.",
-#           call. = FALSE)
-#    }
-    
     
   } else {
-    write.table(terms, 
+    utils::write.table(terms, 
                 file=paste0(cytoscape.file.tag, "pathways.txt"),
                 row.names=FALSE, 
                 sep="\t", 

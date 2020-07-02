@@ -1,15 +1,15 @@
 #' Merge a list or matrix of p-values
 #'
-#' @param scores Either a list of p-values or a matrix where each column is a test
+#' @param scores Either a list of p-values or a matrix where each column is a test.
 #' @param method Method to merge p-values. See 'methods' section below.
 #'
-#' @return If scores is a vector or list, returns a number. If scores is a
-#'   matrix, returns a named list of p-values merged by row
+#' @return If \code{scores} is a vector or list, returns a number. If \code{scores} is a
+#'   matrix, returns a named list of p-values merged by row.
 #'
 #' @section Methods:
 #' Two methods are available to merge a list of p-values:
 #' \describe{
-#'  \item{Fisher}{Fisher's method (default) assumes p-values are uniformly
+#'  \item{Fisher}{Fisher's method (default) assumes that p-values are uniformly
 #'  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
 #'  This method is most appropriate when the columns in \code{scores} are
 #'  independent.}
@@ -71,15 +71,16 @@ fishersMethod <- function(p.values) {
 }
 
 
-#' Merge p-values using Brown's method
+#' Merge p-values using the Brown's method. 
 #'
-#' @param p.values A vector of m p-values
-#' @param data.matrix An m x n matrix representing m tests and n samples
-#' @param cov.matrix A pre-calculated covariance matrix of data.matrix. More
+#' @param p.values A vector of m p-values.
+#' @param data.matrix An m x n matrix representing m tests and n samples. NA's are not allowed.
+#' @param cov.matrix A pre-calculated covariance matrix of \code{data.matrix}. This is more
 #'   efficient when making many calls with the same data.matrix.
-#'   Only one of data.matrix and cov.matrix must be given. If both are supplied,
-#'   data.matrix is ignored
-#' @return a p-value
+#'   Only one of \code{data.matrix} and \code{cov.matrix} must be given. If both are supplied,
+#'   \code{data.matrix} is ignored.
+#' @return A single p-value representing the merged significance of multiple p-values.
+#' @export
 
 # Based on the R package EmpiricalBrownsMethod
 # https://github.com/IlyaLab/CombiningDependentPvaluesUsingEBM/blob/master/R/EmpiricalBrownsMethod/R/ebm.R

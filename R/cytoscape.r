@@ -1,30 +1,29 @@
-#' Prepare files for building an Enrichment Map in Cytoscape
+#' Prepare files for building an enrichment map network visualization in Cytoscape
 #'
-#' This function writes four files that are used to build an network using
-#' Cytoscape and the EnrichmentMap app.
+#' This function writes four text files that are used to build an network using
+#' Cytoscape and the EnrichmentMap app. The files are prefixed with \code{cytoscape.file.tag}. 
 #'   The four files written are:
 #'   \describe{
 #'     \item{pathways.txt}{A list of significant terms and the
 #'     associated p-value. Only terms with \code{adjusted.p.val <= significant} are
 #'     written to this file}
 #'     \item{subgroups.txt}{A matrix indicating whether the significant
-#'     pathways are found to be significant when considering only one column from
+#'     pathways are found to be significant when considering only one column (i.e., type of omics evidence) from
 #'     \code{scores}. A 1 indicates that that term is significant using only that
 #'     column to test for enrichment analysis}
-#'     \item{pathways.gmt}{A Shortened version of the supplied GMT
-#'     file, containing only the terms in pathways.txt}
+#'     \item{pathways.gmt}{A shortened version of the supplied GMT
+#'     file, containing only the terms in pathways.txt.}
 #'     \item{legend.pdf}{A legend with colours matching contributions
 #'     from columns in \code{scores}}
 #'   }
 #'
-#' @param terms a data.table with columns 'term.id', 'term.name', 'adjusted.p.val'
-#' @param gmt an abridged GMT object containing only the pathways that were
-#' found to be significant
-#' @param cytoscape.file.tag user defined file prefix and/or directory to write output files
-#' @param col.significance a data.table with a column 'term.id' and a column
-#' for each test indicating whether a pathway is signficiant (TRUE) or not
-#' (FALSE) when considering only that column. If contribution==TRUE, use
-#' col.significance=NULL and this will be skipped
+#' @param terms A data.table object with the columns 'term.id', 'term.name', 'adjusted.p.val'. 
+#' @param gmt An abridged GMT object containing only the pathways that were
+#' found to be significant in the ActivePathways analysis.
+#' @param cytoscape.file.tag The user-defined file prefix and/or directory defining the location of the files.
+#' @param col.significance A data.table object with a column 'term.id' and a column
+#' for each type of omics evidence indicating whether a term was also found to be signficiant or not
+#' when considering only the genes and p-values in the corresponding column of the \code{scores} matrix. If term was not found, NA's are shown in columns, otherwise the relevant lists of genes are shown.
 #' @import ggplot2
 #'
 #' @return None

@@ -1,13 +1,13 @@
-#' Hypergemoetric Test
+#' Hypergemoetric test
 #'
-#' Perform a Hypergeometric test, aka Fisher's exact test, on a 2x2 contingency
-#' table with a 'greater' alternative hypothesis. That is, find the
-#' probability that counts[1, 1] or more genes would be found in annotations,
-#' assuming the null hypothesis.
+#' Perform a hypergeometric test, also known as the Fisher's exact test, on a 2x2 contingency
+#' table with the alternative hypothesis 'greater' . In this application, the test finds the
+#' probability that counts[1, 1] or more genes would be found to be annotated to a term (pathway),
+#' assuming the null hypothesis of genes being distributed randomly to terms. 
 #'
-#' @param counts a 2x2 numerical matrix representing a contingency table
+#' @param counts A 2x2 numerical matrix representing a contingency table.
 #'
-#' @return a p-value
+#' @return a p-value of enrichment of genes in a term or pathway. 
 #'
 #' @examples
 #' \dontrun{
@@ -25,18 +25,16 @@ hypergeometric <- function(counts) {
 
 #' Ordered Hypergeometric Test
 #'
-#' Perform a Hypergeometric, aka Fisher's Exact test, on a list of genes ordered
-#' by significance against a list of annotation genes
+#' Perform a series of hypergeometric tests (a.k.a. Fisher's Exact tests), on a ranked list of genes ordered
+#' by significance against a list of annotation genes. The hypergeometric tests are executed with 
+#' increasingly larger numbers of genes representing the top genes in order of decreasing scores. 
+#' The lowest p-value of the series is returned as the optimal enriched intersection of the ranked list of genes
+#' and the biological term (pathway). 
 #'
-#' The hypergeometric test is run with increasingly large numbers of genes
-#' starting from the top, and the lowest p-value is returned
-#'
-#' @param genelist character vector of gene names. List of differentially
-#'   expressed genes being tested for enrichment
-#' @param background character vector of gene names. List of all genes being
-#'   used as a statistical background
-#' @param annotations character vector of gene names. List of genes annotated to
-#'   the term being tested.
+#' @param genelist Character vector of gene names, assumed to be ordered by decreasing importance. 
+#' For example, the genes could be ranked by decreasing significance of differential expression. 
+#' @param background Character vector of gene names. List of all genes used as a statistical background (i.e., the universe)
+#' @param annotations Character vector of gene names. A gene set representing a functional term, process or biological pathway. 
 #'
 #' @return a list with the items:
 #'   \describe{

@@ -1,47 +1,47 @@
 #' ActivePathways
 #'
 #' @param scores A numerical matrix of p-values where each row is a gene and
-#'   each column is a test. Rownames should be the genes and colnames the names
-#'   of the tests. All values must be 0<=p<=1 with missing values removed or
-#'   converted to 1
+#'   each column represents an omics dataset (evidence). Rownames correspond to the genes 
+#'   and colnames to the datasets. All values must be 0<=p<=1. We recommend converting 
+#'   missing values to ones. 
 #' @param gmt A GMT object to be used for enrichment analysis. If a filename, a
-#'   GMT object will be read from the file
+#'   GMT object will be read from the file.
 #' @param background A character vector of gene names to be used as a
 #'   statistical background. By default, the background is all genes that appear
-#'   in \code{gmt}
+#'   in \code{gmt}.
 #' @param geneset.filter A numeric vector of length two giving the lower and 
 #'   upper limits for the size of the annotated geneset to pathways in gmt.
 #'   Pathways with a geneset shorter than \code{geneset.filter[1]} or longer
 #'   than \code{geneset.filter[2]} will be removed. Set either value to NA to
 #'   to not enforce a minimum or maximum value, or set \code{geneset.filter} to 
-#'   \code{NULL} to skip filtering
-#' @param cutoff A maximum p-value for a gene to be used for enrichment analysis.
-#'   Any genes with \code{adjusted.p.val > significant} will be discarded before testing
-#' @param significant A number in [0,1] denoting the maximum p-value for a
-#'   pathway to be considered significantly enriched.
-#' @param merge.method Method to merge p-values. See section Merging p Values
-#' @param correction.method Method to correct p-values. See
-#'   \code{\link[stats]{p.adjust}} for details
-#' @param cytoscape.file.tag the directory and/or file prefix to which the output files
-#'   for generating enrichment maps should be written. 
-#'	 If NA, files will not be written. 
+#'   \code{NULL} to skip filtering.
+#' @param cutoff A maximum merged p-value for a gene to be used for analysis.
+#'   Any genes with merged, unadjusted \code{p > significant} will be discarded 
+#'   before testing.
+#' @param significant Significance cutoff for selecting enriched pathways. Pathways with
+#'   \code{adjusted.p.val < significant} will be selected as results.
+#' @param merge.method Statistical method to merge p-values. See section on Merging P-Values
+#' @param correction.method Statistical method to correct p-values. See
+#'   \code{\link[stats]{p.adjust}} for details.
+#' @param cytoscape.file.tag The directory and/or file prefix to which the output files
+#'   for generating enrichment maps should be written. If NA, files will not be written. 
 #'
-#' @return A data.table of terms containing the following columns:
+#' @return A data.table of terms (enriched pathways) containing the following columns:
 #'   \describe{
-#'     \item{term.id}{The id of the term}
+#'     \item{term.id}{The database ID of the term}
 #'     \item{term.name}{The full name of the term}
 #'     \item{adjusted.p.val}{The associated p-value, adjusted for multiple testing}
 #'     \item{term.size}{The number of genes annotated to the term}
-#'     \item{overlap}{A character vector of the genes that overlap between the
-#'     term and the query}
-#'     \item{evidence}{Columns of \code{scores} that contributed individually to 
-#'          enrichment of the pathway. Each column is evaluated separately for 
-#'          enrichments and added to the evidence field if the pathway is found.}
+#'     \item{overlap}{A character vector of the genes enriched in the term}
+#'     \item{evidence}{Columns of \code{scores} (i.e., omics datasets) that contributed 
+#'          individually to the enrichment of the term. Each input column is evaluated 
+#'          separately for enrichments and added to the evidence if the term is found.}
 #'   }
 #'
-#' @section Merging p Values:
-#' In order to obtain a single score for each gene, the p-values in \code{scores}
-#' are merged row-wise. The two methods are:
+#' @section Merging P-values:
+#' To obtain a single p-value for each gene across the multiple omics datasets considered, 
+#' the p-values in \code{scores} #' are merged row-wise using a data fusion approach of p-value merging. 
+#' The two available methods are:
 #' \describe{
 #'  \item{Fisher}{Fisher's method assumes p-values are uniformly
 #'  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
@@ -50,32 +50,39 @@
 #'  \item{Brown}{Brown's method extends Fisher's method by accounting for the
 #'  covariance in the columns of \code{scores}. It is more appropriate when the
 #'  tests of significance used to create the columns in \code{scores} are not
-#'  necessarily independent.}
+#'  necessarily independent. The Brown's method is therefore recommended for 
+#'  many omics integration approaches.}
 #' }
 #'
 #' @section Cytoscape:
-#'   ActivePathways will write four files that can be used to build a network using Cytoscape and the
-#'   EnrichmentMap and enhancedGraphics apps. The four files written are:
+#'   To visualize and interpret enriched pathways, ActivePathways provides an option
+#'   to further analyse results as enrichment maps in the Cytoscape software. 
+#'   If \code{!is.na(cytoscape.file.tag)}, four files will be written that can be used 
+#'   to build enrichment maps. This requires the EnrichmentMap and enhancedGraphics apps.
+#'
+#' The four files written are:
 #'   \describe{
 #'     \item{pathways.txt}{A list of significant terms and the
 #'     associated p-value. Only terms with \code{adjusted.p.val <= significant} are
-#'     written to this file}
-#'     \item{subgroups.txt}{A matrix indicating whether the significant
-#'     pathways are found to be significant when considering only one column from
-#'     \code{scores}. A 1 indicates that that term is significant using only that
-#'     column to test for enrichment analysis}
-#'     \item{pathways.gmt}{A Shortened version of the supplied gmt
-#'     file, containing only the terms in pathways.txt}
+#'     written to this file.}
+#'     \item{subgroups.txt}{A matrix indicating whether the significant terms (pathways)
+#'     were also found to be significant when considering only one column from
+#'     \code{scores}. A one indicates that that term was found to be significant 
+#' 			when only p-values in that column were used to select genes.}
+#'     \item{pathways.gmt}{A Shortened version of the supplied GMT
+#'     file, containing only the significantly enriched terms in pathways.txt. }
 #'     \item{legend.pdf}{A legend with colours matching contributions
-#'     from columns in \code{scores}}
+#'     from columns in \code{scores}.}
 #'   }
 #'
 #'   How to use: Create an enrichment map in Cytoscape with the file of terms
 #'   (pathways.txt) and the shortened gmt file
-#'   (pathways.gmt). Upload (File > import > table > file) the
-#'   subgroups file (subgroups.txt) as a table. Under the 'style'
+#'   (pathways.gmt). Upload the subgroups file (subgroups.txt) as a table
+#'   using the menu File > Import > Table from File. To paint nodes according 
+#'   to the type of supporting evidence, use the 'style'
 #'   panel, set image/Chart1 to use the column `instruct` and the passthrough
-#'   mapping type. Use legend.pdf as a reference in final figure.
+#'   mapping type. Make sure the app enhancedGraphics is installed. 
+#'   Lastly, use the file legend.pdf as a reference for colors in the enrichment map.
 #'
 #' @examples
 #' \dontrun{
@@ -218,7 +225,7 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
 }
 
 
-#' Perform Gene Set Enrichment Analysis on an ordered list of genes
+#' Perform pathway enrichment analysis on an ordered list of genes
 #'
 #' @param genelist character vector of gene names, in decreasing order
 #'   of significance
@@ -258,15 +265,16 @@ enrichmentAnalysis <- function(genelist, gmt, background) {
   dt
 }
 
-#' Determine which pathways are found to be significant using each column
-#' individually
+#' Determine which terms are found to be significant using each column
+#' individually. 
 #'
 #' @inheritParams ActivePathways
 #' @param pvals p-value for the pathways calculated by ActivePathways
 #'
 #' @return a data.table with columns 'term.id' and a column for each column
-#' in \code{scores}, indicating whether each pathway was found to be
-#' significant(TRUE) or not(FALSE) when considering only that column
+#' in \code{scores}, indicating whether each term (pathway) was found to be
+#' significant or not when considering only that column. For each term, 
+#' either report the list of related genes if that term was significant, or NA if not. 
 
 columnSignificance <- function(scores, gmt, background, cutoff, significant, correction.method, pvals) {
   dt <- data.table(term.id=names(gmt), evidence=NA)
@@ -301,10 +309,10 @@ columnSignificance <- function(scores, gmt, background, cutoff, significant, cor
   dt
 }
 
-#' Export results from ActivePathways as a CSV file
+#' Export the results from ActivePathways as a comma-separated values (CSV) file. 
 #'
-#' @param res the data.table object with ActivePathways results
-#' @param file_name location and name of the CSV file to write to
+#' @param res the data.table object with ActivePathways results.
+#' @param file_name location and name of the CSV file to write to.
 #' @export
 #'
 #' @examples

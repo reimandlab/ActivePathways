@@ -1,31 +1,31 @@
 #' Read and Write GMT files
 #'
-#' Functions to read and Write Gene Matrix Transposed (GMT) files and to test if
-#' an object inherits from GMT
+#' Functions to read and write Gene Matrix Transposed (GMT) files and to test if
+#' an object inherits from GMT.
 #'
-#' A GMT file describes gene sets, such as pathways. GMT files are tab delimeted
-#' and each row contains a term id, a term name, and all genes annotated to the
-#' term.
+#' A GMT file describes gene sets, such as biological terms and pathways. GMT files are 
+#' tab delimited text files. Each row of a GMT file contains a single term with its 
+#' database ID and a term name, followed all genes annotated to the term.
 #'
 #' @format
 #' A GMT object is a named list of terms, where each term is a list with the items:
 #' \describe{
-#'     \item{id}{The term id}
-#'     \item{name}{The full name of the term}
-#'     \item{genes}{A character vector of genes annotated to this term}
+#'     \item{id}{The term ID.}
+#'     \item{name}{The full name or description of the term.}
+#'     \item{genes}{A character vector of genes annotated to this term.}
 #'   }
 #' @exportClass GMT
 #' @rdname GMT
 #' @name GMT
 #' @aliases GMT gmt
 #'
-#' @param filename Location of the gmt file
-#' @param gmt a GMT object
-#' @param x object to test
+#' @param filename Location of the gmt file.
+#' @param gmt A GMT object.
+#' @param x The object to test.
 #'
 #' @return \code{read.GMT} returns a GMT object. \cr
 #' \code{write.GMT} returns NULL. \cr
-#' \code{is.GMT} returns TRUE if \code{x} is a GMT object, else FALSE
+#' \code{is.GMT} returns TRUE if \code{x} is a GMT object, else FALSE.
 #'
 #'
 #' @examples
@@ -62,12 +62,12 @@ write.GMT <- function(gmt, filename) {
     sink()
 }
 
-#' Make a background list of genes
+#' Make a background list of genes (i.e., the statistical universe) based on all the terms (gene sets, pathways) considered. 
 #'
-#' Returns a character vector of all genes in a GMT object
+#' Returns A character vector of all genes in a GMT object.
 #'
-#' @param gmt a \link{GMT} object
-#' @return a character vector containing all genes in GMT
+#' @param gmt A \link{GMT} object.
+#' @return A character vector containing all genes in GMT.
 #' @export
 #'
 #' @examples

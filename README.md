@@ -17,11 +17,11 @@ Open R and run `install.packages('ActivePathways')`
 
 #### Using devtools on our GitHub repository
 Using the R package `devtools`, run
-`devtools::install_github('https://github.com/reimandlab/activePathways')`
+`devtools::install_github('https://github.com/reimandlab/ActivePathways')`
 
 #### From source on our GitHub repository
-Clone the repository: `https://github.com/reimandlab/activePathways.git`
-Open R in the directory you cloned the package in and run `install.packages('activePathways', repos=NULL)`
+Clone the repository: `https://github.com/reimandlab/ActivePathways.git`
+Open R in the directory you cloned the package in and run `install.packages('ActivePathways', repos = NULL)`
 
 
 
@@ -30,7 +30,7 @@ Open R in the directory you cloned the package in and run `install.packages('act
 ### Examples
 The simplest use of ActivePathways requires only a data table (matrix of p-values) and a list of gene sets in the form of a GMT [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file. The data table must be in the form of numerical matrix and cannot contain any missing values.
 ```
-scores <- read.table('example_data.txt', header=TRUE, row.names='Gene')
+scores <- read.table('example_data.txt', header = TRUE, row.names = 'Gene')
 scores <- as.matrix(scores)
 scores[is.na(scores)] <- 1
 scores

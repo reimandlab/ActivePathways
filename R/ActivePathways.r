@@ -1,4 +1,4 @@
-#' activePathways
+#' ActivePathways
 #'
 #' @param scores A numerical matrix of p-values where each row is a gene and
 #'   each column is a test. Rownames should be the genes and colnames the names
@@ -54,7 +54,7 @@
 #' }
 #'
 #' @section Cytoscape:
-#'   activePathways will write four files that can be used to build a network using Cytoscape and the
+#'   ActivePathways will write four files that can be used to build a network using Cytoscape and the
 #'   EnrichmentMap and enhancedGraphics apps. The four files written are:
 #'   \describe{
 #'     \item{pathways.txt}{A list of significant terms and the
@@ -81,7 +81,7 @@
 #' \dontrun{
 #'     dat <- as.matrix(read.table('path/to/data.txt', header=TRUE, row.names='Gene'))
 #'     dat[is.na(dat)] <- 1
-#'     activePathways(dat, 'path/to/gmt.gmt', cytoscape.file.tag="results")
+#'     ActivePathways(dat, 'path/to/gmt.gmt', cytoscape.file.tag="results")
 #' }
 #'
 #' @import data.table
@@ -91,7 +91,7 @@
 # TODO: enter citations for article on merging p-values
 # http://www.jstor.org/stable/2529826
 # TODO: enter citations for Cytoscape, enrichmentMap, and enhancedGraphics
-activePathways <-  function(scores, gmt, background = makeBackground(gmt),
+ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
                             geneset.filter = c(5, 1000), cutoff = 0.1, significant = 0.05,
                             merge.method = c("Brown", "Fisher"),
                             correction.method = c("holm", "fdr", "hochberg", "hommel",
@@ -106,7 +106,7 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
   if (!(is.matrix(scores) && is.numeric(scores))) stop("scores must be a numeric matrix")
   if (any(is.na(scores))) stop("scores may not contain missing values")
   if (any(scores < 0) || any(scores > 1)) stop("All values in scores must be in [0,1]")
-  if (any(duplicated(rownames(scores)))) stop("scores contains duplicated genes. rownames must be unique")
+  if (any(duplicated(rownames(scores)))) stop("Scores matrix contains duplicated genes - rownames must be unique.")
   
   # cutoff and significant
   stopifnot(length(cutoff) == 1)
@@ -137,7 +137,7 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
   # contribution
   if (ncol(scores) == 1) {
     contribution <- FALSE
-    message("scores contains only one column. Column contributions will not be calculated")
+    message("Scores matrix contains only one column. Column contributions will not be calculated.")
   }
   
   ##### filtering and sorting ####
@@ -198,7 +198,8 @@ activePathways <-  function(scores, gmt, background = makeBackground(gmt),
     sig.cols <- NULL
   }
   
-  # if significant result were found and cytoscape file tag exists, proceed with writing files in the working directory
+  # if significant result were found and cytoscape file tag exists
+  # proceed with writing files in the working directory
   if (length(significant.indeces) > 0 & !is.na(cytoscape.file.tag)) {
     prepareCytoscape(res[significant.indeces, .(term.id, term.name, adjusted.p.val)],
                      gmt[significant.indeces], 
@@ -253,8 +254,8 @@ enrichmentAnalysis <- function(genelist, gmt, background) {
 #' Determine which pathways are found to be significant using each column
 #' individually
 #'
-#' @inheritParams activePathways
-#' @param pvals p-value for the pathways calculated by activePathways
+#' @inheritParams ActivePathways
+#' @param pvals p-value for the pathways calculated by ActivePathways
 #'
 #' @return a data.table with columns 'term.id' and a column for each column
 #' in \code{scores}, indicating whether each pathway was found to be

@@ -1,3 +1,10 @@
+# ActivePathways 1.0.3
+
+## Major Changes
+
+* Renaming package to ActivePathways from activePathways for consistency with function and publication
+
+
 # activePathways 1.0.2
 
 ## Major Changes
@@ -11,17 +18,3 @@ parameter "significance".
 of results up to the user.
 * removing dependency of metap R package. As a result, only Fisher's and Brown's p-value 
 merging options are available.
-
-
-# activePathways 1.0.1
-
-## Major Changes
-
-* Rename to activePathways
-
-# activeDriverPW 1.0.0
-
-## Major Changes
-* Add a geneset.filter option to activeDriverPW to filter the GMT by geneset size
-* Add vignettes
-* Export merge_p_values method

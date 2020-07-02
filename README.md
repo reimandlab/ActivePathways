@@ -31,18 +31,90 @@ Open R in the directory where you cloned the package and run `install.packages("
 ### Examples
 The simplest use of ActivePathways requires only a data table (matrix of p-values) and a list of gene sets in the form of a GMT [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file. The data table must be in the form of numerical matrix and cannot contain any missing values.
 ```
-scores <- read.table('example_data.txt', header = TRUE, row.names = 'Gene')
+
+
+library(ActivePathways)
+
+##
+# run an example using the data files included in the ActivePathways package
+##
+
+fname_scores = system.file("extdata", "Adenocarcinoma_scores_subset.tsv", package = "ActivePathways")
+fname_GMT = system.file("extdata", "hsapiens_REAC_subset.gmt", package = "ActivePathways")
+
+##
+# numeric matrix of p-values is required as input; NA values are converted to P = 1
+##
+
+scores = read.table(fname_scores, header = TRUE, row.names = 'Gene')
 scores <- as.matrix(scores)
 scores[is.na(scores)] <- 1
-scores
-#                      X3UTR        X5UTR          CDS     promCore
-## A2M           1.0000000000 6.679353e-01 9.051708e-01 4.499201e-01
-## AAAS          1.0000000000 8.501202e-01 7.047723e-01 7.257641e-01
-## ABAT          0.9664125635 8.405470e-02 7.600985e-01 1.903789e-01
-## ABCC1         0.9383431571 9.198887e-01 2.599319e-01 2.980455e-01
-##  [ reached getOption("max.print") -- omitted 2410 rows ]
 
-res <- ActivePathways(scores, 'example_genesets.gmt')
+
+##
+# main call of ActivePathways function
+##
+
+enriched_pathways =  ActivePathways(scores, fname_GMT) 
+#35 terms were removed from gmt because they did not make the geneset.filter
+#91 rows were removed from scores because they are not found in the background
+
+
+##
+# list few first results
+##
+
+enriched_pathways[1:3,]
+#        term.id         term.name adjusted.p.val term.size
+#1: REAC:2424491   DAP12 signaling   4.491268e-05       358
+#2:  REAC:422475     Axon guidance   2.028966e-02       555
+#3:  REAC:177929 Signaling by EGFR   6.245734e-04       366
+#                                   overlap       evidence
+#1:     TP53,PIK3CA,KRAS,PTEN,BRAF,NRAS,...            CDS
+#2: PIK3CA,KRAS,BRAF,NRAS,CALM2,RPS6KA3,... X3UTR,promCore
+#3:     TP53,PIK3CA,KRAS,PTEN,BRAF,NRAS,...            CDS
+#                            Genes_X3UTR Genes_X5UTR
+#1:                                   NA          NA
+#2: CALM2,ARPC2,RHOA,NUMB,CALM1,ACTB,...          NA
+#3:                                   NA          NA
+#                             Genes_CDS
+#1: TP53,PTEN,KRAS,PIK3CA,BRAF,NRAS,...
+#2:                                  NA
+#3: TP53,PTEN,KRAS,PIK3CA,BRAF,NRAS,...
+#                                Genes_promCore
+#1:                                          NA
+#2: EFNA1,IQGAP1,COL4A1,SCN2B,RPS6KA3,CALM2,...
+#3:                                          NA
+
+
+
+## 
+# examine few lines of input datasets and files
+##
+
+##
+# scores are p-values for genes (rows) and evidence (columns) of different omics datasets
+##
+
+head(scores, n = 3)
+#         X3UTR      X5UTR       CDS  promCore
+#A2M  1.0000000 0.33396764 0.9051708 0.4499201
+#AAAS 1.0000000 0.42506012 0.7047723 0.7257641
+#ABAT 0.9664126 0.04202735 0.7600985 0.1903789
+
+##
+# GMT files include functional gene sets (pathways, processes)
+# each tab-separated line represents a gene set: gene set ID, description followed by gene symbols
+# gene symbols in the scores table and the GMT file need to match
+##
+
+readLines(fname_GMT)[11:13]
+#[1] "REAC:3656535\tTGFBR1 LBD Mutants in Cancer\tTGFB1\tFKBP1A\tTGFBR2\tTGFBR1\t"
+#[2] "REAC:73927\tDepurination\tOGG1\tMPG\tMUTYH\t"
+#[3] "REAC:5602410\tTLR3 deficiency - HSE\tTLR3\t" 
+
+
+
 ```
 
 More thorough documentation of the ActivePathways function can be found in R with `?ActivePathways`, and complete tutorials can be found with `browseVignettes(package='ActivePathways')`.

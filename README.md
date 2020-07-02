@@ -30,7 +30,7 @@ Open R in the directory where you cloned the package and run `install.packages("
 
 ### Examples
 The simplest use of ActivePathways requires only a data table (matrix of p-values) and a list of gene sets in the form of a GMT [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file. The data table must be in the form of numerical matrix and cannot contain any missing values.
-```
+```R
 
 library(ActivePathways)
 

@@ -14,7 +14,6 @@
 #'     \item{name}{The full name or description of the term.}
 #'     \item{genes}{A character vector of genes annotated to this term.}
 #'   }
-#' @exportClass GMT
 #' @rdname GMT
 #' @name GMT
 #' @aliases GMT gmt

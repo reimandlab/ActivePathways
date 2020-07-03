@@ -39,9 +39,10 @@ test_that("Merged p-values are correct", {
     
     expect_equal(merge_p_values(test.matrix, "Fisher"), apply(comparison.matrix, 1, 
     		function(x) metap::sumlog(x)$p))
-#    expect_equal(merge_p_values(test.matrix, "Brown"), 
-#			apply(test.matrix, 1, function(x) 
-#            	EmpiricalBrownsMethod::empiricalBrownsMethod(t(test.matrix), x, FALSE)))
+
+    expect_equal(merge_p_values(test.matrix, "Brown"), 
+			apply(test.matrix, 1, function(x) 
+            	EmpiricalBrownsMethod::empiricalBrownsMethod(t(test.matrix), x, FALSE)))
     
     expect_equal(merge_p_values(test.matrix[, 1, drop=FALSE], "Fisher"), test.matrix[, 1, drop=TRUE])
     expect_equal(merge_p_values(test.matrix[, 1, drop=FALSE], "Brown"), test.matrix[, 1, drop=TRUE])

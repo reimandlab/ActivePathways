@@ -141,21 +141,22 @@ More thorough documentation of the ActivePathways function can be found in R wit
 The Cytoscape software and the EnrichmentMap app provide powerful tools to visualise the enriched pathways from `ActivePathways` as a network (i.e., an Enrichment Map). To facilitate this visualisation step, `ActivePathways` provides the files needed for building enrichment maps. To create these files, a file prefix must be supplied to `ActivePathways` using the argument `cytoscape.file.tag`. The prefix can be a path to an existing writable directory.
  
 ```{r}
-res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap_")
+res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__")
 ```
 Four files are written using the prefix:
 
-* `pathways.txt` contains the table of significant terms (i.e. molecular pathways, biological processes, other gene sets) and the associated adjusted P-values. Note that only terms with `adjusted.p.val <= significant` are written.
+* `enrichmentMap__pathways.txt` contains the table of significant terms (i.e. molecular pathways, biological processes, other gene sets) and the associated adjusted P-values. Note that only terms with `adjusted.p.val <= significant` are written.
 
-* `subgroups.txt` contains a matrix indicating the columns of the input matrix of P-values that contributed to the discovery of the corresponding pathways. These values correspond to the `evidence` evaluation of input omics datasets discussed above, where a value of one indicates that the pathway was also detectable using a specific input omics dataset. A value of zero indicates otherwise. This file will be not generated if a single-column matrix of scores corresponding to just one omics dataset is provided to `ActivePathways`.
+* `enrichmentMap__subgroups.txt` contains a matrix indicating the columns of the input matrix of P-values that contributed to the discovery of the corresponding pathways. These values correspond to the `evidence` evaluation of input omics datasets discussed above, where a value of one indicates that the pathway was also detectable using a specific input omics dataset. A value of zero indicates otherwise. This file will be not generated if a single-column matrix of scores corresponding to just one omics dataset is provided to `ActivePathways`.
 
-* `pathways.gmt` contains a shortened version of the supplied GMT file which consists of only the significant pathways detected by `ActivePathways`. 
+* `enrichmentMap__pathways.gmt` contains a shortened version of the supplied GMT file which consists of only the significant pathways detected by `ActivePathways`. 
 
-* `legend.pdf` is a pdf file that displays a color legend of different omics datasets visualised in the enrichment map that can be used as a reference to the generated enrichment map.
+* `enrichmentMap__legend.pdf` is a pdf file that displays a color legend of different omics datasets visualised in the enrichment map that can be used as a reference to the generated enrichment map.
 
 ## Creating enrichment maps using results of ActivePathways 
 
-The following sections will discuss how to create a pathway enrichment map using the results from `ActivePathways`. The datasets analysed earlier in the vignette will be used ActivePathways vignette. To follow the steps, save the required files from `ActivePathways` in an accessible location.
+Pathway enrichment analysis often leads to complex and redundant results. Enrichment maps are network-based visualisations of pathway enrichment analyses. Enrichment maps can be generated in the Cytoscape software using the EnrichmentMap app. The enhancedGraphics app is also required. See the vignette for details: `browseVignettes(package='ActivePathways')`.
+
 
 ## Required software
 
@@ -163,57 +164,15 @@ The following sections will discuss how to create a pathway enrichment map using
 2.	EnrichmentMap app of Cytoscape, see menu Apps>App manager or <http://apps.cytoscape.org/apps/enrichmentmap> 
 3.	EhancedGraphics app of Cytoscape, see menu Apps>App manager or <http://apps.cytoscape.org/apps/enhancedGraphics> 
 
-## Required files
-
-`ActivePathways` writes four files that are used to build enrichment maps in Cytoscape. 
-```{r}
-files <- c(system.file('extdata', 'enrichmentMap__pathways.txt', package='ActivePathways'),
-           system.file('extdata', 'enrichmentMap__subgroups.txt', package='ActivePathways'),
-           system.file('extdata', 'enrichmentMap__pathways.gmt', package='ActivePathways'),
-           system.file('extdata', 'enrichmentMap__legend.pdf', package='ActivePathways'))
-```
-
-The following commands will perform the basic analysis again and write output files required for generating enrichment maps into the current working directory of the R session. All file names use the prefix ` enrichmentMap__`. The generated files are also available in the `ActivePathways` R package as shown above. 
-
-```{r}
-gmt.file <- system.file('extdata', 'hsapiens_REAC_subset.gmt', package = 'ActivePathways')
-scores.file <- system.file('extdata', 'Adenocarcinoma_scores_subset.tsv', package = 'ActivePathways')
-
-scores <- read.table(scores.file, header = TRUE, sep = '\t', row.names = 'Gene')
-scores <- as.matrix(scores)
-scores[is.na(scores)] <- 1
-
-res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__")
-```
-
-The four files written are:
-
-* `enrichmentMap__pathways.txt`, a table of significant pathways and the associated adjusted P-values.
-
-* `enrichmentMap__subgroups.txt`, a table of pathways and corresponding omics datasets supporting the enrichment of those pathways. This corresponds to the `evidence` column of the `ActivePathways` result object discussed above. 
-* `enrichmentMap__pathways.gmt`, a shortened version of the supplied GMT file which consists of only the significant pathways detected by `ActivePathways`. 
-
-* `enrichmentMap__legend.pdf`, a reference color legend of different omics datasets visualised in the enrichment map.
-
-The following code will examine a few lines of the files generated by `ActivePathways`. 
-
-```{r}
-cat(paste(readLines(files[1])[1:5], collapse='\n'))
-cat(paste(readLines(files[2])[1:5], collapse='\n'))
-cat(paste(readLines(files[3])[18:19], collapse='\n'))
-```
-
 ## Creating the enrichment map
 
 * Open the Cytoscape software. 
-* Ensure that the apps *EnrichmentMap* and *enchancedGraphics* are installed. Apps may be installed by clicking in the menu *Apps -> App Manager*. 
 * Select *Apps -> EnrichmentMap*. 
 * In the following dialogue, click the button `+` *Add Data Set from Files* in the top left corner of the dialogue.
 * Change the Analysis Type to Generic/gProfiler/Enrichr.
 * Upload the files `enrichmentMap__pathways.txt` and `enrichmentMap__pathways.gmt` in the *Enrichments* and *GMT* fields, respectively. 
 * Click the checkbox *Show Advanced Options* and set *Cutoff* to 0.6.
 * Then click *Build* in the bottom-right corner to create the enrichment map. 
-
 
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/CreateEnrichmentMapDialogue_V2.png)
 
@@ -225,7 +184,6 @@ cat(paste(readLines(files[3])[18:19], collapse='\n'))
 To color nodes in the network (i.e., molecular pathways, biological processes) according to the omics datasets supporting the enrichments, the third file `enrichmentMap__subgroups.txt` needs to be imported to Cytoscape directly. To import the file, activate the menu option *File -> Import -> Table from File* and select the file `enrichmentMap__subgroups.txt`. In the following dialogue, select *To a Network Collection* in the dropdown menu *Where to Import Table data*. Click OK to proceed. 
 
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/ImportStep_V2.png)
-
 
 Next, Cytoscape needs to use the imported information to color nodes using a pie chart visualisation. To enable this click the Style tab in the left control panel and select the Image/Chart1 Property in a series of dropdown menus (*Properties -> Paint -> Custom Paint 1 -> Image/Chart 1*). 
 

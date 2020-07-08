@@ -204,15 +204,15 @@ The following  columns named as `Genes_{column}` help interpret how each pathway
 ## Writing results to a CSV file
 The results are returned as a `data.table` object due to some additional data structures needed to store lists of gene IDs and supporting evidence. The usual R functions `write.table` and `write.csv` will struggle with exporting the data unless the gene and evidence lists are manually transformed as strings. Fortunately, the `fwrite` function of `data.table` can be used to write the file directly and the ActivePathways package includes the function `export_as_CSV` as a shortcut that uses the vertical bar symbol to concatenate gene lists. 
 
-```{r}
-result.file <- paste('ActivePathways_results.txt', sep = '/')
-export_as_CSV (res, result.file)
+```{r, eval = FALSE}
+result.file <- paste('ActivePathways_results.csv', sep = '/')
+export_as_CSV (res, result.file) # remove comment to run
 read.csv(result.file, stringsAsFactors = F)[1:3,]
 ```
 
 The `fwrite` can be called directly for customised output. 
 
-```{r}
+```{r, eval=FALSE}
 result.file <- paste('ActivePathways_results2.txt', sep = '/')
 data.table::fwrite(res, result.file, sep = '\t', sep2 = c('', ',', ''))
 cat(paste(readLines(result.file)[1:2], collapse = '\n'))
@@ -222,18 +222,18 @@ cat(paste(readLines(result.file)[1:2], collapse = '\n'))
 
 The Cytoscape software and the EnrichmentMap app provide powerful tools to visualise the enriched pathways from `ActivePathways` as a network (i.e., an Enrichment Map). To facilitate this visualisation step, `ActivePathways` provides the files needed for building enrichment maps. To create these files, a file prefix must be supplied to `ActivePathways` using the argument `cytoscape.file.tag`. The prefix can be a path to an existing writable directory.
  
-```{r}
-res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap_")
+```{r, eval=FALSE}
+res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__")
 ```
 Four files are written using the prefix:
 
-* `pathways.txt` contains the table of significant terms (i.e. molecular pathways, biological processes, other gene sets) and the associated adjusted P-values. Note that only terms with `adjusted.p.val <= significant` are written.
+* `enrichmentMap__pathways.txt` contains the table of significant terms (i.e. molecular pathways, biological processes, other gene sets) and the associated adjusted P-values. Note that only terms with `adjusted.p.val <= significant` are written.
 
-* `subgroups.txt` contains a matrix indicating the columns of the input matrix of P-values that contributed to the discovery of the corresponding pathways. These values correspond to the `evidence` evaluation of input omics datasets discussed above, where a value of one indicates that the pathway was also detectable using a specific input omics dataset. A value of zero indicates otherwise. This file will be not generated if a single-column matrix of scores corresponding to just one omics dataset is provided to `ActivePathways`.
+* `enrichmentMap__subgroups.txt` contains a matrix indicating the columns of the input matrix of P-values that contributed to the discovery of the corresponding pathways. These values correspond to the `evidence` evaluation of input omics datasets discussed above, where a value of one indicates that the pathway was also detectable using a specific input omics dataset. A value of zero indicates otherwise. This file will be not generated if a single-column matrix of scores corresponding to just one omics dataset is provided to `ActivePathways`.
 
-* `pathways.gmt` contains a shortened version of the supplied GMT file which consists of only the significant pathways detected by `ActivePathways`. 
+* `enrichmentMap__pathways.gmt` contains a shortened version of the supplied GMT file which consists of only the significant pathways detected by `ActivePathways`. 
 
-* `legend.pdf` is a pdf file that displays a color legend of different omics datasets visualised in the enrichment map that can be used as a reference to the generated enrichment map.
+* `enrichmentMap__legend.pdf` is a pdf file that displays a color legend of different omics datasets visualised in the enrichment map that can be used as a reference to the generated enrichment map.
 
 ## Creating enrichment maps using results of ActivePathways 
 
@@ -257,7 +257,7 @@ files <- c(system.file('extdata', 'enrichmentMap__pathways.txt', package='Active
 
 The following commands will perform the basic analysis again and write output files required for generating enrichment maps into the current working directory of the R session. All file names use the prefix ` enrichmentMap__`. The generated files are also available in the `ActivePathways` R package as shown above. 
 
-```{r}
+```{r, eval=FALSE}
 gmt.file <- system.file('extdata', 'hsapiens_REAC_subset.gmt', package = 'ActivePathways')
 scores.file <- system.file('extdata', 'Adenocarcinoma_scores_subset.tsv', package = 'ActivePathways')
 

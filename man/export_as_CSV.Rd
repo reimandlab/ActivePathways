@@ -24,5 +24,7 @@ Export the results from ActivePathways as a comma-separated values (CSV) file.
     dat[is.na(dat)] <- 1
 
     res <- ActivePathways(dat, fname_GMT)
+\donttest{
     export_as_CSV(res, "results_ActivePathways.csv")
+}
 }

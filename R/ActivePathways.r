@@ -320,7 +320,9 @@ columnSignificance <- function(scores, gmt, background, cutoff, significant, cor
 #'     dat[is.na(dat)] <- 1
 #'
 #'     res <- ActivePathways(dat, fname_GMT)
+#'\donttest{
 #'     export_as_CSV(res, "results_ActivePathways.csv")
+#'}
 export_as_CSV = function (res, file_name) {
 	data.table::fwrite(res, file_name)	
 } 

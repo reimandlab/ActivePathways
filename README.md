@@ -30,6 +30,9 @@ Open R in the directory where you cloned the package and run `install.packages("
 
 ## Using ActivePathways
 
+* See the vignette for more details. Run `browseVignettes(package='ActivePathways')` in R.
+
+
 ### Examples
 The simplest use of ActivePathways requires only a data table (matrix of p-values) and a list of gene sets in the form of a GMT [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file. The data table must be in the form of numerical matrix and cannot contain any missing values.
 ```R
@@ -205,6 +208,8 @@ To allow better interpretation of the enrichment map, `ActivePathways` generates
 Note that one of the colors corresponds to a subset of enriched pathways with *combined* evidence that were only detected through data fusion and P-value merging and not when any of the input datasets were detected separately. This exemplifies the added value of integrative multi-omics pathway enrichment analysis. 
 
 ## References
+
+* See the vignette for more details: `browseVignettes(package='ActivePathways')`.
 
 * Integrative Pathway Enrichment Analysis of Multivariate Omics Data. Paczkowska M, Barenboim J, Sintupisut N, Fox NS, Zhu H, Abd-Rabbo D, Mee MW, Boutros PC, PCAWG Drivers and Functional Interpretation Working Group; Reimand J, PCAWG Consortium. Nature Communications (2020) <https://pubmed.ncbi.nlm.nih.gov/32024846/> <https://doi.org/10.1038/s41467-019-13983-9>.
 

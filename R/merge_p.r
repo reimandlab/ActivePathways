@@ -24,7 +24,7 @@
 #' @examples
 #'   merge_p_values(c(0.05, 0.09, 0.01))
 #'   merge_p_values(list(a=0.01, b=1, c=0.0015, d=0.025), method='Fisher')
-#'   merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow=2), method='Brown')
+#'   merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow = 2), method='Brown')
 #' 
 #' @export
 merge_p_values <- function(scores, method = "Fisher") {
@@ -87,7 +87,7 @@ fishersMethod <- function(p.values) {
 # Only significant differences are the removal of extra_info and allowing a
 # pre-calculated covariance matrix
 # 
-brownsMethod <- function(p.values, data.matrix=NULL, cov.matrix=NULL) {
+brownsMethod <- function(p.values, data.matrix = NULL, cov.matrix = NULL) {
     if (missing(data.matrix) && missing(cov.matrix)) {
         stop ("Either data.matrix or cov.matrix must be supplied")
     }

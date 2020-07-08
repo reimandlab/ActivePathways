@@ -31,7 +31,7 @@ Perform pathway enrichment analysis on an ordered list of genes
 }
 \examples{
 \dontrun{
-    enrichmentAnalysis(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt, makeBackground(gmt))
+    enrichmentAnalysis(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt_fname, makeBackground(gmt_fname))
 }
 }
 \keyword{internal}

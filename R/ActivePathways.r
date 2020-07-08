@@ -85,9 +85,8 @@
 #'   Lastly, use the file legend.pdf as a reference for colors in the enrichment map.
 #'
 #' @examples
-#' \dontrun{
 #'     fname_scores <- system.file("extdata", "Adenocarcinoma_scores_subset.tsv", 
-#'          package <- "ActivePathways")
+#'          package = "ActivePathways")
 #'     fname_GMT = system.file("extdata", "hsapiens_REAC_subset.gmt",
 #'          package = "ActivePathways")
 #'
@@ -95,15 +94,11 @@
 #'     dat[is.na(dat)] <- 1
 #'
 #'     ActivePathways(dat, fname_GMT)
-#' }
 #'
 #' @import data.table
 #'
 #' @export
 
-# TODO: enter citations for article on merging p-values
-# http://www.jstor.org/stable/2529826
-# TODO: enter citations for Cytoscape, enrichmentMap, and enhancedGraphics
 ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
                             geneset.filter = c(5, 1000), cutoff = 0.1, significant = 0.05,
                             merge.method = c("Brown", "Fisher"),
@@ -246,7 +241,7 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
 #'
 #' @examples
 #' \dontrun{
-#'     enrichmentAnalysis(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt, makeBackground(gmt))
+#'     enrichmentAnalysis(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt_fname, makeBackground(gmt_fname))
 #' }
 enrichmentAnalysis <- function(genelist, gmt, background) {
   dt <- data.table(term.id=names(gmt))
@@ -316,9 +311,8 @@ columnSignificance <- function(scores, gmt, background, cutoff, significant, cor
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #'     fname_scores <- system.file("extdata", "Adenocarcinoma_scores_subset.tsv", 
-#'          package <- "ActivePathways")
+#'          package = "ActivePathways")
 #'     fname_GMT = system.file("extdata", "hsapiens_REAC_subset.gmt",
 #'          package = "ActivePathways")
 #'
@@ -327,26 +321,7 @@ columnSignificance <- function(scores, gmt, background, cutoff, significant, cor
 #'
 #'     res <- ActivePathways(dat, fname_GMT)
 #'     export_as_CSV(res, "results_ActivePathways.csv")
-#' }
 export_as_CSV = function (res, file_name) {
 	data.table::fwrite(res, file_name)	
-#	get_evidence_genes = function(x) {
-#		sapply(x, function(xx) {
-#			if (all(is.na(xx))) return(NA)
-#			paste(xx, collapse = ";")
-#		})
-#	}
-#	
-#	constant_columns = c("term.id", "term.name", "adjusted.p.val", "term.size")
-#	res1 = data.frame(res[, constant_columns, with = FALSE], stringsAsFactors = F)
-#
-#	other_cols = setdiff(colnames(res), constant_columns)
-#	res1_other = do.call(cbind, lapply(other_cols, function(x) get_evidence_genes (res[[x]]) ))
-#	colnames(res1_other) = other_cols
-#
-#	res1 = cbind(res1, res1_other, stringsAsFactors = F)
-#	rownames(res1) = NULL
-#
-#	silence = utils::write.csv(res1, file_name)
 } 
 

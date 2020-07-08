@@ -119,9 +119,8 @@ The four files written are:
 }
 
 \examples{
-\dontrun{
     fname_scores <- system.file("extdata", "Adenocarcinoma_scores_subset.tsv", 
-         package <- "ActivePathways")
+         package = "ActivePathways")
     fname_GMT = system.file("extdata", "hsapiens_REAC_subset.gmt",
          package = "ActivePathways")
 
@@ -129,6 +128,5 @@ The four files written are:
     dat[is.na(dat)] <- 1
 
     ActivePathways(dat, fname_GMT)
-}
 
 }

@@ -15,9 +15,8 @@ export_as_CSV(res, file_name)
 Export the results from ActivePathways as a comma-separated values (CSV) file.
 }
 \examples{
-\dontrun{
     fname_scores <- system.file("extdata", "Adenocarcinoma_scores_subset.tsv", 
-         package <- "ActivePathways")
+         package = "ActivePathways")
     fname_GMT = system.file("extdata", "hsapiens_REAC_subset.gmt",
          package = "ActivePathways")
 
@@ -26,5 +25,4 @@ Export the results from ActivePathways as a comma-separated values (CSV) file.
 
     res <- ActivePathways(dat, fname_GMT)
     export_as_CSV(res, "results_ActivePathways.csv")
-}
 }

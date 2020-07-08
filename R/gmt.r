@@ -28,19 +28,14 @@
 #'
 #'
 #' @examples
-#' \dontrun{
-#'   gmt <- read.GMT('path/to/gmt.gmt')
+#'   fname_GMT <- system.file("extdata", "hsapiens_REAC_subset.gmt", package = "ActivePathways")
+#'   gmt <- read.GMT(fname_GMT)
 #'   gmt[1:10]
 #'   gmt[[1]]
-#'   gmt[1]$id
-#'   gmt[1]$genes
-#'   gmt[1]$name
-#'   gmt$`REAC:3108214`
-#'   write.GMT(gmt, 'filename.gmt')
-#' }
-NULL
-
-#' @rdname GMT
+#'   gmt[[1]]$id
+#'   gmt[[1]]$genes
+#'   gmt[[1]]$name
+#'   gmt$`REAC:1630316`
 #' @export
 read.GMT <- function(filename) {
     gmt <- strsplit(readLines(filename), '\t')
@@ -70,9 +65,9 @@ write.GMT <- function(gmt, filename) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'   makeBackground(gmt)
-#' }
+#'   fname_GMT <- system.file("extdata", "hsapiens_REAC_subset.gmt", package = "ActivePathways")
+#'   gmt <- read.GMT(fname_GMT)
+#'   makeBackground(gmt)[1:10]
 makeBackground <- function(gmt) {
     if (!is.GMT(gmt)) stop('gmt is not a valid GMT object')
     unlist(Reduce(function(x, y) union(x, y$genes), gmt, gmt[[1]]$genes))

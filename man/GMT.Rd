@@ -2,8 +2,8 @@
 % Please edit documentation in R/gmt.r
 \name{GMT}
 \alias{GMT}
-\alias{gmt}
 \alias{read.GMT}
+\alias{gmt}
 \alias{write.GMT}
 \alias{is.GMT}
 \title{Read and Write GMT files}
@@ -44,14 +44,12 @@ tab delimited text files. Each row of a GMT file contains a single term with its
 database ID and a term name, followed all genes annotated to the term.
 }
 \examples{
-\dontrun{
-  gmt <- read.GMT('path/to/gmt.gmt')
+  fname_GMT <- system.file("extdata", "hsapiens_REAC_subset.gmt", package = "ActivePathways")
+  gmt <- read.GMT(fname_GMT)
   gmt[1:10]
   gmt[[1]]
-  gmt[1]$id
-  gmt[1]$genes
-  gmt[1]$name
-  gmt$`REAC:3108214`
-  write.GMT(gmt, 'filename.gmt')
-}
+  gmt[[1]]$id
+  gmt[[1]]$genes
+  gmt[[1]]$name
+  gmt$`REAC:1630316`
 }

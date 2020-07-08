@@ -16,7 +16,7 @@ A character vector containing all genes in GMT.
 Returns A character vector of all genes in a GMT object.
 }
 \examples{
-\dontrun{
-  makeBackground(gmt)
-}
+  fname_GMT <- system.file("extdata", "hsapiens_REAC_subset.gmt", package = "ActivePathways")
+  gmt <- read.GMT(fname_GMT)
+  makeBackground(gmt)[1:10]
 }

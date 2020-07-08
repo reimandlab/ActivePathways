@@ -18,8 +18,3 @@ table with the alternative hypothesis 'greater' . In this application, the test 
 probability that counts[1, 1] or more genes would be found to be annotated to a term (pathway),
 assuming the null hypothesis of genes being distributed randomly to terms.
 }
-\examples{
-\dontrun{
-  hypergeometric(matrix(data=c(1, 8, 14, 836), nrow=2))
-}
-}

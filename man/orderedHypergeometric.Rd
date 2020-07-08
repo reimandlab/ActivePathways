@@ -30,8 +30,6 @@ The lowest p-value of the series is returned as the optimal enriched intersectio
 and the biological term (pathway).
 }
 \examples{
-\dontrun{
    orderedHypergeometric(c('HERC2', 'SP100'), c('PHC2', 'BLM', 'XPC', 'SMC3', 'HERC2', 'SP100'),
                          c('HERC2', 'PHC2', 'BLM'))
-}
 }

@@ -29,9 +29,4 @@ a data.table of terms with the following columns:
 \description{
 Perform pathway enrichment analysis on an ordered list of genes
 }
-\examples{
-\dontrun{
-    enrichmentAnalysis(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt_fname, makeBackground(gmt_fname))
-}
-}
 \keyword{internal}

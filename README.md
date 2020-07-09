@@ -19,7 +19,7 @@ Open R and run `install.packages('ActivePathways')`
 
 #### Using devtools on our GitHub repository
 Using the R package `devtools`, run
-`devtools::install_github('https://github.com/reimandlab/ActivePathways')`
+`devtools::install_github('https://github.com/reimandlab/ActivePathways', build_vignettes = TRUE)`
 
 #### From source on our GitHub repository
 Clone the repository, for example using `git clone https://github.com/reimandlab/ActivePathways.git`. 

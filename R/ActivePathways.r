@@ -238,11 +238,6 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
 #'        term and the query}
 #'   }
 #' @keywords internal
-#'
-#' @examples
-#' \dontrun{
-#'     enrichmentAnalysis(c('HERC2', 'SMC5', 'XPC', 'WRN'), gmt_fname, makeBackground(gmt_fname))
-#' }
 enrichmentAnalysis <- function(genelist, gmt, background) {
   dt <- data.table(term.id=names(gmt))
   

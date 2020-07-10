@@ -1,8 +1,6 @@
 # ActivePathways
 
-**July 8th 2020: ActivePathways is under 2nd review at CRAN and has been updated in terms of usability and documentation. stay tuned.**
-
-**May 2nd 2020: ActivePathways is currently not available from CRAN due to broken dependencies. This GitHub repository provides quick fixes to a number of recently-emerged issues. An updated CRAN package (ActivePathways 1.0.2) will be available shortly. We apologize for the inconvenience and thank you for your patience while we fix the code and documentation.**
+**July 10th 2020: ActivePathways is now available in CRAN: https://cran.r-project.org/web/packages/ActivePathways/index.html.**
 
 ActivePathways is a tool for multivariate pathway enrichment analysis. Pathway enrichment analysis identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. Using this strategy, we can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
 
@@ -14,7 +12,7 @@ https://www.ncbi.nlm.nih.gov/pubmed/32024846
 
 ## Installation
 
-#### From CRAN (not available temporarily)
+#### From CRAN
 Open R and run `install.packages('ActivePathways')`
 
 #### Using devtools on our GitHub repository

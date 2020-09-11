@@ -91,6 +91,16 @@ enriched_pathways[1:3,]
 #2: EFNA1,IQGAP1,COL4A1,SCN2B,RPS6KA3,CALM2,...
 #3:                                          NA
 
+##
+# show enriched genes of the first pathway 'DAP12 signalling' 
+# the column `overlap` displays genes of the integrated dataset
+#   derived from data fusion (p-value merging)
+# genes are ranked by their significance across the input omics datasets
+##
+
+enriched_pathways[["overlap"]][[1]]
+# [1] "TP53"   "PIK3CA" "KRAS"   "PTEN"   "BRAF"   "NRAS"   "B2M"    "CALM2"
+# [9] "CDKN1A" "CDKN1B"
 
 ##
 # Save the resulting pathways as a Comma-Separated Values (CSV) file for spreadsheets 

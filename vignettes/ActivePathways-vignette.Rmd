@@ -181,7 +181,7 @@ res
 ```
 The columns `term.id`, `term.name`, and `term.size` give information about each pathway detected in the enrichment analysis. The `adjusted.p.val` column with the adjusted P-value indicates the confidence that the pathway is enriched after multiple testing correction. 
 
-The `overlap` column provides the set of genes of the input ranked gene list that were found in the given gene set (i.e., molecular pathway or biological process). Note that the genes with the strongest scores across the multiple datasets are listed first. 
+The `overlap` column provides the set of genes from the integrated gene list that occur in the given enriched gene set (i.e., molecular pathway or biological process). These genes were quantified across multiple input omics datasets and prioritized based on their joint significance in the input data. Note that the genes with the strongest scores across the multiple datasets are listed first. 
 
 ```{r}
 res$overlap[1:3]

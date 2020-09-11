@@ -95,7 +95,7 @@ enriched_pathways[1:3,]
 # Show enriched genes of the first pathway 'DAP12 signalling' 
 # the column `overlap` displays genes of the integrated dataset (from 
 # data fusion, i.e., p-value merging) that occur in the given pathway.
-# Genes are ranked by their significance across the input omics datasets
+# Genes are ranked by joint significance across input omics datasets.
 ##
 
 enriched_pathways[["overlap"]][[1]]

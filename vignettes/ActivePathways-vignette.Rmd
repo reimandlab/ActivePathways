@@ -242,8 +242,8 @@ The following sections will discuss how to create a pathway enrichment map using
 ## Required software
 
 1.	Cytoscape, see <https://cytoscape.org/download.html>
-2.	EnrichmentMap app of Cytoscape, see menu Apps>App manager or <http://apps.cytoscape.org/apps/enrichmentmap> 
-3.	EhancedGraphics app of Cytoscape, see menu Apps>App manager or <http://apps.cytoscape.org/apps/enhancedGraphics> 
+2.	EnrichmentMap app of Cytoscape, see menu Apps>App manager or <https://apps.cytoscape.org/apps/enrichmentmap> 
+3.	EhancedGraphics app of Cytoscape, see menu Apps>App manager or <https://apps.cytoscape.org/apps/enhancedGraphics> 
 
 ## Required files
 

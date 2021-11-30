@@ -1,6 +1,6 @@
 # ActivePathways
 
-**July 10th 2020: ActivePathways is now available in CRAN: https://cran.r-project.org/web/packages/ActivePathways/index.html.**
+**Nov 30th 2021: ActivePathways 1.0.3 has been updated and will be uploaded to CRAN shortly: https://cran.r-project.org/web/packages/ActivePathways/index.html.**
 
 ActivePathways is a tool for multivariate pathway enrichment analysis. Pathway enrichment analysis identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. Using this strategy, we can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
 
@@ -173,8 +173,8 @@ Pathway enrichment analysis often leads to complex and redundant results. Enrich
 ## Required software
 
 1.	Cytoscape, see <https://cytoscape.org/download.html>
-2.	EnrichmentMap app of Cytoscape, see menu Apps>App manager or <http://apps.cytoscape.org/apps/enrichmentmap> 
-3.	EhancedGraphics app of Cytoscape, see menu Apps>App manager or <http://apps.cytoscape.org/apps/enhancedGraphics> 
+2.	EnrichmentMap app of Cytoscape, see menu Apps>App manager or <https://apps.cytoscape.org/apps/enrichmentmap> 
+3.	EhancedGraphics app of Cytoscape, see menu Apps>App manager or <https://apps.cytoscape.org/apps/enhancedGraphics> 
 
 ## Creating the enrichment map
 

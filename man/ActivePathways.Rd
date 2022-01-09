@@ -14,7 +14,9 @@ ActivePathways(
   merge.method = c("Brown", "Fisher"),
   correction.method = c("holm", "fdr", "hochberg", "hommel", "bonferroni", "BH", "BY",
     "none"),
-  cytoscape.file.tag = NA
+  cytoscape.file.tag = NA,
+  color_palette = NULL,
+  custom_colors = NULL
 )
 }
 \arguments{
@@ -51,6 +53,13 @@ before testing.}
 
 \item{cytoscape.file.tag}{The directory and/or file prefix to which the output files
 for generating enrichment maps should be written. If NA, files will not be written.}
+
+\item{color_palette}{Color palette from RColorBrewer::brewer.pal
+to color each contribution dataset. The contribution datasets correspond to omics datasets
+from the scores parameter. If NULL grDevices::rainbow is used by default.}
+
+\item{custom_colors}{a character vector of custom colors for each column in the scores matrix
+plus one additional color for the "combined" pathway contribution}
 }
 \value{
 A data.table of terms (enriched pathways) containing the following columns:
@@ -104,7 +113,7 @@ The four files written are:
 			when only p-values in that column were used to select genes.}
     \item{pathways.gmt}{A Shortened version of the supplied GMT
     file, containing only the significantly enriched terms in pathways.txt. }
-    \item{legend.pdf}{A legend with colours matching contributions
+    \item{legend.pdf}{A legend with colors matching contributions
     from columns in \code{scores}.}
   }
 

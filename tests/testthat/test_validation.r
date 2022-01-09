@@ -87,3 +87,15 @@ test_that("geneset.filter is a numeric vector of length 2", {
     expect_error(ActivePathways(dat, gmt, geneset.filter=c(0, NA)), NA)
     expect_error(ActivePathways(dat, gmt, geneset.filter=NULL), NA)
 }) 
+
+test_that("custom colors is a character vector that is one longer than the number of columns in scores",{
+  expect_error(ActivePathways(scores = dat, gmt = gmt, custom_colors = list("red","blue","green")),
+               "colors must be provided as a character vector",fixed = TRUE)  
+  expect_error(ActivePathways(scores = dat, gmt = gmt, custom_colors = c("red","blue")),
+               "incorrect number of colors is provided",fixed = TRUE) 
+})
+
+test_that("color palette is from the RColorBrewer package",{
+  expect_error(ActivePathways(scores = dat, gmt = gmt, color_palette = "flamingo"),
+               "palette must be from the RColorBrewer package",fixed = TRUE)
+})

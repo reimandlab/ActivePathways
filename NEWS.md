@@ -1,7 +1,16 @@
-# ActivePathways 1.0.2
+# ActivePathways 1.0.4
 
 ## Major Changes
 
+### ActivePathways 1.0.4
+* Added two new parameters "color_palette" and "custom_colors" to ActivePathways and prepareCytoscape functions. 
+The "color_palette" parameter allows any color palette from the RColorBrewer package to be used for node coloring.
+ Alternatively with "custom_colors" a vector of colors can be specified. 
+
+### ActivePathways 1.0.3
+* Removed dependency used for testing for CRAN compliancy
+
+### ActivePathways 1.0.2
 * Renamed package to ActivePathways from activePathways for consistency 
 with function and publication
 * Added new function export_as_CSV(res, file_name) to save data in 

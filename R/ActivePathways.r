@@ -25,6 +25,11 @@
 #'   \code{\link[stats]{p.adjust}} for details.
 #' @param cytoscape.file.tag The directory and/or file prefix to which the output files
 #'   for generating enrichment maps should be written. If NA, files will not be written. 
+#' @param color_palette Color palette from RColorBrewer::brewer.pal
+#'   to color each contribution dataset. The contribution datasets correspond to omics datasets
+#'   from the scores parameter. If NULL grDevices::rainbow is used by default.
+#' @param custom_colors a character vector of custom colors for each column in the scores matrix
+#'   plus one additional color for the "combined" pathway contribution 
 #'
 #' @return A data.table of terms (enriched pathways) containing the following columns:
 #'   \describe{
@@ -104,7 +109,7 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
                             merge.method = c("Brown", "Fisher"),
                             correction.method = c("holm", "fdr", "hochberg", "hommel",
                                                   "bonferroni", "BH", "BY", "none"),
-                            cytoscape.file.tag = NA) {
+                            cytoscape.file.tag = NA, color_palette = NULL, custom_colors = NULL) {
   
   merge.method <- match.arg(merge.method)
   correction.method <- match.arg(correction.method)
@@ -141,6 +146,19 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
     if (any(geneset.filter < 0, na.rm=TRUE)) stop("geneset.filter limits must be positive")
   }
   
+  # custom_colors
+  if (!is.null(custom_colors)){
+    if(!(is.character(custom_colors) && is.vector(custom_colors))){
+      stop("colors must be provided as a character vector")   
+    } 
+    if(1+length(colnames(scores)) != length(custom_colors)) stop("incorrect number of colors is provided")
+  }
+  
+  # color_palette
+  if (!is.null(color_palette)){
+    if (!(color_palette %in% rownames(RColorBrewer::brewer.pal.info))) stop("palette must be from the RColorBrewer package")
+  }
+	
   contribution <- TRUE
   # contribution
   if (ncol(scores) == 1) {
@@ -213,7 +231,7 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
     prepareCytoscape(res[significant.indeces, c("term.id", "term.name", "adjusted.p.val")],
                      gmt[significant.indeces], 
                      cytoscape.file.tag,
-                     sig.cols[significant.indeces,])
+                     sig.cols[significant.indeces,], color_palette, custom_colors)
   }
   
   res[significant.indeces]

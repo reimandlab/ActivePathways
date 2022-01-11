@@ -153,7 +153,7 @@ More thorough documentation of the ActivePathways function can be found in R wit
 The Cytoscape software and the EnrichmentMap app provide powerful tools to visualise the enriched pathways from `ActivePathways` as a network (i.e., an Enrichment Map). To facilitate this visualisation step, `ActivePathways` provides the files needed for building enrichment maps. To create these files, a file prefix must be supplied to `ActivePathways` using the argument `cytoscape.file.tag`. The prefix can be a path to an existing writable directory.
  
 ```{r}
-res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__")
+res <- ActivePathways(scores, fname_GMT, cytoscape.file.tag = "enrichmentMap__")
 ```
 Four files are written using the prefix:
 
@@ -220,7 +220,7 @@ Note that one of the colors corresponds to a subset of enriched pathways with *c
 For a more diverse range of colors, ActivePathways supports any color palette from RColorBrewer. The color_palette parameter must be provided.
 
 ```{r}
-res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__", color_palette = "Pastel1")
+res <- ActivePathways(scores, fname_GMT, cytoscape.file.tag = "enrichmentMap__", color_palette = "Pastel1")
 ```
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView_RColorBrewer.png)
 
@@ -228,7 +228,7 @@ Instead, to manually input the color of each dataset the custom_colors parameter
 in the scores matrix plus one for the *combined* evidence, which is mentioned last. These colors should be ordered according to the column order in the scores matrix.
 
 ```{r}
-res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__", custom_colors = c("violet","green","orange","red","cyan"))
+res <- ActivePathways(scores, fname_GMT, cytoscape.file.tag = "enrichmentMap__", custom_colors = c("violet","green","orange","red","cyan"))
 ```
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView_Custom.png)
 

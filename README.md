@@ -235,7 +235,7 @@ res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__", 
 No enriched pathways were identified with the X5UTR dataset and thus the green color does not appear in the legend. Note the contribution order does not reflect the column order
 in the scores matrix. 
 
-If colors did not work in cytoscape, check that enhancedGraphics is installed.
+Tip: if the coloring of nodes did not work in Cytoscape after setting the options in the Style panel, check that the EnhancedGraphics Cytoscape app is installed.
 
 ## References
 

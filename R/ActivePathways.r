@@ -29,7 +29,7 @@
 #'   to color each contribution dataset. The contribution datasets correspond to omics datasets
 #'   from the scores parameter. If NULL grDevices::rainbow is used by default.
 #' @param custom_colors a character vector of custom colors for each column in the scores matrix
-#'   plus one additional color for the "combined" pathway contribution 
+#'   plus one additional color for the "combined" pathway contribution. 
 #'
 #' @return A data.table of terms (enriched pathways) containing the following columns:
 #'   \describe{

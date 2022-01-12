@@ -25,11 +25,11 @@
 #'   \code{\link[stats]{p.adjust}} for details.
 #' @param cytoscape.file.tag The directory and/or file prefix to which the output files
 #'   for generating enrichment maps should be written. If NA, files will not be written. 
-#' @param color_palette Color palette from RColorBrewer::brewer.pal
-#'   to color each contribution dataset. The contribution datasets correspond to omics datasets
-#'   from the scores parameter. If NULL grDevices::rainbow is used by default.
-#' @param custom_colors a character vector of custom colors for each column in the scores matrix
-#'   plus one additional color for the "combined" pathway contribution. 
+#' @param color_palette Color palette from RColorBrewer::brewer.pal to color each
+#'   column in the scores matrix. If NULL grDevices::rainbow is used by default.
+#' @param custom_colors A character vector of custom colors for each column in the scores matrix.
+#' @param color_integrated_only A character vector of length 1 specifying the color of the 
+#'   "combined" pathway contribution. 
 #'
 #' @return A data.table of terms (enriched pathways) containing the following columns:
 #'   \describe{
@@ -109,7 +109,7 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
                             merge.method = c("Brown", "Fisher"),
                             correction.method = c("holm", "fdr", "hochberg", "hommel",
                                                   "bonferroni", "BH", "BY", "none"),
-                            cytoscape.file.tag = NA, color_palette = NULL, custom_colors = NULL) {
+                            cytoscape.file.tag = NA, color_palette = NULL, custom_colors = NULL, color_integrated_only = "#FFFFF0") {
   
   merge.method <- match.arg(merge.method)
   correction.method <- match.arg(correction.method)
@@ -151,13 +151,22 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
     if(!(is.character(custom_colors) && is.vector(custom_colors))){
       stop("colors must be provided as a character vector")   
     } 
-    if(1+length(colnames(scores)) != length(custom_colors)) stop("incorrect number of colors is provided")
+    if(length(colnames(scores)) != length(custom_colors)) stop("incorrect number of colors is provided")
+  }
+  if (!is.null(custom_colors) & !is.null(color_palette)){
+    stop("Both custom_colors and color_palette are provided. Specify only one of these parameters for node coloring.")
   }
   
   # color_palette
   if (!is.null(color_palette)){
     if (!(color_palette %in% rownames(RColorBrewer::brewer.pal.info))) stop("palette must be from the RColorBrewer package")
   }
+  
+  # color_integrated_only
+  if(!(is.character(color_integrated_only) && is.vector(color_integrated_only))){
+      stop("color must be provided as a character vector")   
+  } 
+  if(1 != length(color_integrated_only)) stop("only a single color must be specified")
 	
   contribution <- TRUE
   # contribution
@@ -231,7 +240,7 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
     prepareCytoscape(res[significant.indeces, c("term.id", "term.name", "adjusted.p.val")],
                      gmt[significant.indeces], 
                      cytoscape.file.tag,
-                     sig.cols[significant.indeces,], color_palette, custom_colors)
+                     sig.cols[significant.indeces,], color_palette, custom_colors, color_integrated_only)
   }
   
   res[significant.indeces]

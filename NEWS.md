@@ -3,9 +3,7 @@
 ## Major Changes
 
 ### ActivePathways 1.0.4
-* Added two new parameters "color_palette" and "custom_colors" to ActivePathways and prepareCytoscape functions. 
-The "color_palette" parameter allows any color palette from the RColorBrewer package to be used for node coloring.
- Alternatively with "custom_colors" a vector of colors can be specified. 
+* Added three new parameters to ActivePathways and prepareCystoscape functions. These include "color_palette", "custom_colors" and "color_integrated_only" to provide more options for node coloring. 
 
 ### ActivePathways 1.0.3
 * Removed dependency used for testing for CRAN compliancy

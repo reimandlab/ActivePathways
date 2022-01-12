@@ -211,29 +211,26 @@ This step colours the nodes corresponding to the enriched pathways according to 
 
 To allow better interpretation of the enrichment map, `ActivePathways` generates a color legend in the file `enrichmentMap__legend.pdf` that shows which colors correspond to which omics datasets. 
 
-![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView.png)
+![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView.PNG)
 
 Note that one of the colors corresponds to a subset of enriched pathways with *combined* evidence that were only detected through data fusion and P-value merging and not when any of the input datasets were detected separately. This exemplifies the added value of integrative multi-omics pathway enrichment analysis. 
 
 ## Alternative node coloring
 
 For a more diverse range of colors, ActivePathways supports any color palette from RColorBrewer. The color_palette parameter must be provided.
-
 ```{r}
-res <- ActivePathways(scores, fname_GMT, cytoscape.file.tag = "enrichmentMap__", color_palette = "Pastel1")
+res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__", color_palette = "Pastel1")
 ```
-![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView_RColorBrewer.png)
+![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView_RColorBrewer.PNG)
 
-Instead, to manually input the color of each dataset the custom_colors parameter must be specified as a vector. This vector must contain the same number of colors as columns
-in the scores matrix plus one for the *combined* evidence, which is mentioned last. These colors should be ordered according to the column order in the scores matrix.
-
+Instead, to manually input the color of each dataset the custom_colors parameter must be specified as a vector. This vector should contain the same number of colors as columns
+in the scores matrix.
 ```{r}
-res <- ActivePathways(scores, fname_GMT, cytoscape.file.tag = "enrichmentMap__", custom_colors = c("violet","green","orange","red","cyan"))
+res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__", custom_colors = c("violet","green","orange","red"))
 ```
-![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView_Custom.png)
+![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView_Custom.PNG)
 
-No enriched pathways were identified with the X5UTR dataset and thus the green color does not appear in the legend. Note the contribution order does not reflect the column order
-in the scores matrix. 
+To change the color of the *combined* contribution, a color must be provided to the color_integrated_only parameter.
 
 Tip: if the coloring of nodes did not work in Cytoscape after setting the options in the Style panel, check that the EnhancedGraphics Cytoscape app is installed.
 

@@ -88,8 +88,8 @@ test_that("geneset.filter is a numeric vector of length 2", {
     expect_error(ActivePathways(dat, gmt, geneset.filter=NULL), NA)
 }) 
 
-test_that("custom colors is a character vector that is one longer than the number of columns in scores",{
-  expect_error(ActivePathways(scores = dat, gmt = gmt, custom_colors = list("red","blue","green")),
+test_that("custom colors is a character vector that is equal in length to the number of columns in scores",{
+  expect_error(ActivePathways(scores = dat, gmt = gmt, custom_colors = list("red","blue", "green")),
                "colors must be provided as a character vector",fixed = TRUE)  
   expect_error(ActivePathways(scores = dat, gmt = gmt, custom_colors = c("red","blue")),
                "incorrect number of colors is provided",fixed = TRUE) 
@@ -98,4 +98,16 @@ test_that("custom colors is a character vector that is one longer than the numbe
 test_that("color palette is from the RColorBrewer package",{
   expect_error(ActivePathways(scores = dat, gmt = gmt, color_palette = "flamingo"),
                "palette must be from the RColorBrewer package",fixed = TRUE)
+})
+
+test_that("color palette and custom colors parameters are never specified together",{
+  expect_error(ActivePathways(scores = dat, gmt = gmt, color_palette = "Pastel1", custom_colors = c("red","blue", "green")),
+               "Both custom_colors and color_palette are provided. Specify only one of these parameters for node coloring.",fixed = TRUE)
+})
+
+test_that("color_integrated_only is a character vector of length 1",{
+  expect_error(ActivePathways(scores = dat, gmt = gmt, color_integrated_only = list(1,2,3)),
+               "color must be provided as a character vector",fixed = TRUE)
+  expect_error(ActivePathways(scores = dat, gmt = gmt, color_integrated_only = c("red","blue")),
+               "only a single color must be specified",fixed = TRUE)
 })

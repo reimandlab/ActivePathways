@@ -331,27 +331,22 @@ Note that one of the colors corresponds to a subset of enriched pathways with *c
 ## Alternative node coloring
 
 For a more diverse range of colors, ActivePathways supports any color palette from RColorBrewer. The color_palette parameter must be provided.
-
 ```{r}
 res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__", color_palette = "Pastel1")
 ```
 ![](LegendView_RColorBrewer.png)
 
-Instead, to manually input the color of each dataset the custom_colors parameter must be specified as a vector. This vector must contain the same number of colors as columns
-in the scores matrix plus one for the *combined* evidence, which is mentioned last. These colors should be ordered according to the column order in the scores matrix. 
-
+Instead, to manually input the color of each dataset the custom_colors parameter must be specified as a vector. This vector should contain the same number of colors as columns
+in the scores matrix.
 ```{r}
-res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__", custom_colors = c("violet","green","orange","red","cyan"))
-head(scores)
+res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__", custom_colors = c("violet","green","orange","red"))
 ```
-
 ![](LegendView_Custom.png)
 
+To change the color of the *combined* contribution, a color must be provided to the color_integrated_only parameter.
 
-No enriched pathways were identified with the X5UTR dataset and thus the green color does not appear in the legend. Note the contribution order does not reflect the column order
-in the scores matrix. 
+Tip: if the coloring of nodes did not work in Cytoscape after setting the options in the Style panel, check that the EnhancedGraphics Cytoscape app is installed.
 
-If colors did not work in cytoscape, check that enhancedGraphics is installed.
 # References
 
 * Integrative Pathway Enrichment Analysis of Multivariate Omics Data. Paczkowska M, Barenboim J, Sintupisut N, Fox NS, Zhu H, Abd-Rabbo D, Mee MW, Boutros PC, PCAWG Drivers and Functional Interpretation Working Group; Reimand J, PCAWG Consortium. Nature Communications (2020) <https://pubmed.ncbi.nlm.nih.gov/32024846/> <https://doi.org/10.1038/s41467-019-13983-9>.

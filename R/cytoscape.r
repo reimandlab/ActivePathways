@@ -24,11 +24,10 @@
 #' @param col.significance A data.table object with a column 'term.id' and a column
 #' for each type of omics evidence indicating whether a term was also found to be signficiant or not
 #' when considering only the genes and p-values in the corresponding column of the \code{scores} matrix. If term was not found, NA's are shown in columns, otherwise the relevant lists of genes are shown.
-#' @param color_palette Color palette from RColorBrewer::brewer.pal
-#'   to color each contribution dataset. The contribution datasets correspond to omics datasets
-#'   from the scores parameter. If NULL grDevices::rainbow is used by default.
-#' @param custom_colors a character vector of custom colors for each column in the scores matrix
-#'   plus one additional color for the "combined" pathway contribution 
+#' @param color_palette Color palette from RColorBrewer::brewer.pal to color each
+#' column in the scores matrix. If NULL grDevices::rainbow is used by default.
+#' @param custom_colors A character vector of custom colors for each column in the scores matrix.
+#' @param color_integrated_only A character vector of length 1 specifying the color of the "combined" pathway contribution. 
 #' @import ggplot2
 #'
 #' @return None
@@ -36,16 +35,13 @@
 prepareCytoscape <- function(terms, 
                              gmt, 
                              cytoscape.file.tag, 
-                             col.significance, color_palette = NULL, custom_colors = NULL) {
+                             col.significance, color_palette = NULL, custom_colors = NULL, color_integrated_only = "#FFFFF0") {
   if (!is.null(col.significance)) {
-    tests <- unique(unlist(col.significance$evidence))
-    rows <- 1:nrow(col.significance)
+    tests <- colnames(col.significance)[3:length(colnames(col.significance))]
+    tests <- substr(tests, 7, 100)
+    tests <- append(tests, "combined")
     
-    #Map each significantly identified omics dataset (evidence) to an index
-    all_cols <- colnames(col.significance)[3:length(colnames(col.significance))]
-    subset_all_cols <- substr(all_cols, 7, 100)
-    subset_all_cols <- append(subset_all_cols, "combined",after = length(subset_all_cols))
-    columns.indices <- match(tests, subset_all_cols)
+    rows <- 1:nrow(col.significance)
     
     evidence.columns = do.call(rbind, lapply(col.significance$evidence,
                                              function(x) 0+(tests %in% x)))
@@ -53,17 +49,16 @@ prepareCytoscape <- function(terms,
     
     col.significance = cbind(col.significance[,"term.id"], evidence.columns)
     
-    #Convert the index of each significant omics dataset to a unique color
     if(is.null(color_palette) & is.null(custom_colors)) {
-      col.colors <- grDevices::rainbow(length(subset_all_cols))
-      col.colors <- col.colors[columns.indices]
+      col.colors <- grDevices::rainbow(length(tests))
     } else if (!is.null(custom_colors)){
-      col.colors <- custom_colors[columns.indices]
-      
+      custom_colors <- append(custom_colors, color_integrated_only, after = match("combined",tests))
+      col.colors <- custom_colors
     } else {
-      col.colors <- RColorBrewer::brewer.pal(length(subset_all_cols),color_palette)
-      col.colors <- col.colors[columns.indices]
+      col.colors <- RColorBrewer::brewer.pal(length(tests),color_palette)
     }
+    col.colors <- replace(col.colors, match("combined",tests),color_integrated_only)
+                                             
     instruct.str <- paste('piechart:',
                           ' attributelist="', 
                           paste(tests, collapse=','),

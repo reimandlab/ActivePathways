@@ -10,7 +10,8 @@ prepareCytoscape(
   cytoscape.file.tag,
   col.significance,
   color_palette = NULL,
-  custom_colors = NULL
+  custom_colors = NULL,
+  color_integrated_only = "#FFFFF0"
 )
 }
 \arguments{
@@ -25,12 +26,12 @@ found to be significant in the ActivePathways analysis.}
 for each type of omics evidence indicating whether a term was also found to be signficiant or not
 when considering only the genes and p-values in the corresponding column of the \code{scores} matrix. If term was not found, NA's are shown in columns, otherwise the relevant lists of genes are shown.}
 
-\item{color_palette}{Color palette from RColorBrewer::brewer.pal
-to color each contribution dataset. The contribution datasets correspond to omics datasets
-from the scores parameter. If NULL grDevices::rainbow is used by default.}
+\item{color_palette}{Color palette from RColorBrewer::brewer.pal to color each
+column in the scores matrix. If NULL grDevices::rainbow is used by default.}
 
-\item{custom_colors}{a character vector of custom colors for each column in the scores matrix
-plus one additional color for the "combined" pathway contribution}
+\item{custom_colors}{A character vector of custom colors for each column in the scores matrix.}
+
+\item{color_integrated_only}{A character vector of length 1 specifying the color of the "combined" pathway contribution.}
 }
 \value{
 None
@@ -49,7 +50,7 @@ Cytoscape and the EnrichmentMap app. The files are prefixed with \code{cytoscape
     column to test for enrichment analysis}
     \item{pathways.gmt}{A shortened version of the supplied GMT
     file, containing only the terms in pathways.txt.}
-    \item{legend.pdf}{A legend with colors matching contributions
+    \item{legend.pdf}{A legend with colours matching contributions
     from columns in \code{scores}}
   }
 }

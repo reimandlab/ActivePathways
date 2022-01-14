@@ -3,10 +3,10 @@
 ## Major Changes
 
 ### ActivePathways 1.0.4
-* Added three new parameters to ActivePathways and prepareCystoscape functions. These include "color_palette", "custom_colors" and "color_integrated_only" to provide more options for node coloring. 
+* Added three new parameters to ActivePathways and prepareCystoscape functions. These include "color_palette", "custom_colors" and "color_integrated_only" to provide more options for node coloring in Cytoscape. 
 
 ### ActivePathways 1.0.3
-* Removed dependency used for testing for CRAN compliancy
+* Removed dependency used for testing for CRAN compliance.
 
 ### ActivePathways 1.0.2
 * Renamed package to ActivePathways from activePathways for consistency 

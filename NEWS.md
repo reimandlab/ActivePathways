@@ -1,6 +1,10 @@
-# ActivePathways 1.0.4
+# ActivePathways 1.1
 
 ## Major Changes
+
+### ActivePathways 1.1
+* Updated the gmt filtering step in ActivePathways.R. If a custom gene background vector is provided, then gmt gene sets share zero overlap
+with the background are removed. This step also reduces the genes in the retained gmt gene sets to those present in the background.
 
 ### ActivePathways 1.0.4
 * Added three new parameters to ActivePathways and prepareCystoscape functions. These include "color_palette", "custom_colors" and "color_integrated_only" to provide more options for node coloring in Cytoscape. 

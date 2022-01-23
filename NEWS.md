@@ -1,8 +1,8 @@
-# ActivePathways 1.1
+# ActivePathways 1.1.0
 
 ## Major Changes
 
-### ActivePathways 1.1
+### ActivePathways 1.1.0
 * Updated the gmt filtering step in ActivePathways.R. If a custom gene background vector is provided, then gmt gene sets share zero overlap
 with the background are removed. This step also reduces the genes in the retained gmt gene sets to those present in the background.
 

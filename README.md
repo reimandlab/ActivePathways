@@ -1,5 +1,7 @@
 # ActivePathways
 
+Version 1.0.4 is unstable and will be updated to 1.1.0 on CRAN.
+
 **January 2022: ActivePathways has been updated to version 1.0.4. The package now includes new options to select colors for enrichment maps. The updated package has been uploaded to CRAN: https://cran.r-project.org/web/packages/ActivePathways/index.html.**
 
 ActivePathways is a tool for multivariate pathway enrichment analysis. Pathway enrichment analysis identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. Using this strategy, we can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 

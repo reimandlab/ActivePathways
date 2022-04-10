@@ -280,7 +280,7 @@ enrichmentAnalysis <- function(genelist, gmt, background) {
     tmp <- orderedHypergeometric(genelist, background, term$genes)
     overlap <- genelist[1:tmp$ind]
     overlap <- overlap[overlap %in% term$genes]
-    if (length(overlap) == 0) overlap <- NA
+    if (length(overlap) == 0) overlap <- c()
     set(dt, i, 'term.name', term$name)
     set(dt, i, 'adjusted.p.val', tmp$p.val)
     set(dt, i, 'term.size', length(term$genes))

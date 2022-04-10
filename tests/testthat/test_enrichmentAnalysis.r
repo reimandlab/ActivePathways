@@ -8,5 +8,5 @@ test_that('Overlap Found by enrichmentAnalysis is correct', {
     expect_true(setequal(res[[1, 'overlap']], c('BLM')))
     expect_true(setequal(res[[2, 'overlap']], c('HERC2', 'SP100', 'BLM')))
     expect_true(setequal(res2[[3, 'overlap']], c('HERC2')))
-    expect_true(setequal(res[[4, 'overlap']], NA))
+    expect_true(setequal(res[[4, 'overlap']], NULL))
 })

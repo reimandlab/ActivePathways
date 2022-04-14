@@ -1,6 +1,6 @@
 # ActivePathways
 
-Version 1.0.4 is unstable and will be updated to 1.1.0 on CRAN.
+The development version 1.0.4 on GitHub is currently unstable and will be updated to 1.1.0 on CRAN.
 
 **January 2022: ActivePathways has been updated to version 1.0.4. The package now includes new options to select colors for enrichment maps. The updated package has been uploaded to CRAN: https://cran.r-project.org/web/packages/ActivePathways/index.html.**
 

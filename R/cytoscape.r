@@ -52,12 +52,16 @@ prepareCytoscape <- function(terms,
     if(is.null(color_palette) & is.null(custom_colors)) {
       col.colors <- grDevices::rainbow(length(tests))
     } else if (!is.null(custom_colors)){
+        if (!is.null(names(custom_colors))){
+        custom_colors <- custom_colors[order(match(names(custom_colors),tests))]
+      }
       custom_colors <- append(custom_colors, color_integrated_only, after = match("combined",tests))
       col.colors <- custom_colors
     } else {
       col.colors <- RColorBrewer::brewer.pal(length(tests),color_palette)
     }
     col.colors <- replace(col.colors, match("combined",tests),color_integrated_only)
+    names(col.colors)[length(col.colors)] <- "combined"
                                              
     instruct.str <- paste('piechart:',
                           ' attributelist="', 

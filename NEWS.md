@@ -1,9 +1,13 @@
-# ActivePathways 1.1.0
+# ActivePathways 1.1.1
 
 ## Major Changes
 
+### ActivePathways 1.1.1
+* Added an option for the parameter "custom_colors" with vector "names()" to be specific in any order, as long as they match the column names of the "scores" matrix. 
+* Fixed an error where the combined contribution label was absent from the legend.pdf ActivePathways output file. 
+
 ### ActivePathways 1.1.0
-* Updated the filtering procedure of gene sets in the GMT file in cases where a custom gene background set is provided. Given a custom background gene set, the GMT gene sets are first modified to only include the genes of the background set, and second, the gene sets are filtered by gene set size. Gene sets including no genes of the background set are removed. This update will result in a more lenient multiple testing correction in analyses with custom background gene sets may cause different gene sets to be tested due to set size filters being applied after background filtering of gene sets. 
+* Updated the filtering procedure of gene sets in the GMT file when a custom gene background is provided. Given a background gene list, the GMT gene sets are first modified to only include the genes of the background list, and second, the gene sets are filtered by gene set size. Gene sets lacking any genes from the background list are removed. This update will result in a more lenient multiple testing correction in analyses with a custom background gene list.
 
 ### ActivePathways 1.0.4
 * Added three new parameters to ActivePathways and prepareCystoscape functions. These include "color_palette", "custom_colors" and "color_integrated_only" to provide more options for node coloring in Cytoscape. 

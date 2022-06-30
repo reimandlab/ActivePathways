@@ -61,7 +61,9 @@ prepareCytoscape <- function(terms,
       col.colors <- RColorBrewer::brewer.pal(length(tests),color_palette)
     }
     col.colors <- replace(col.colors, match("combined",tests),color_integrated_only)
-    names(col.colors)[length(col.colors)] <- "combined"
+    if (!is.null(names(col.colors))){
+      names(col.colors)[length(col.colors)] <- "combined"
+    }
                                              
     instruct.str <- paste('piechart:',
                           ' attributelist="', 

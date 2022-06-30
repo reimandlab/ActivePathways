@@ -3,8 +3,8 @@
 ## Major Changes
 
 ### ActivePathways 1.1.1
-* Added an option for the parameter "custom_colors" with vector "names()" to be specific in any order, as long as they match the column names of the "scores" matrix. 
-* Fixed an error where the combined contribution label was absent from the legend.pdf ActivePathways output file. 
+* Added an option for the colours specified in the "custom_colors" parameter to be provided in any order, as long as the vector "names()" match the column names of the "scores" matrix. 
+* Fixed an error where the "combined" contribution label was absent from the legend.pdf ActivePathways output file. 
 
 ### ActivePathways 1.1.0
 * Updated the filtering procedure of gene sets in the GMT file when a custom gene background is provided. Given a background gene list, the GMT gene sets are first modified to only include the genes of the background list, and second, the gene sets are filtered by gene set size. Gene sets lacking any genes from the background list are removed. This update will result in a more lenient multiple testing correction in analyses with a custom background gene list.

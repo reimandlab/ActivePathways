@@ -156,6 +156,11 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   if (!is.null(custom_colors) & !is.null(color_palette)){
     stop("Both custom_colors and color_palette are provided. Specify only one of these parameters for node coloring.")
   }
+  if (!is.null(names(custom_colors))){
+       if (!all(names(custom_colors) %in% colnames(scores))){
+             stop("names() of the custom colors vector should match the scores column names")
+       }
+  } 
   
   # color_palette
   if (!is.null(color_palette)){

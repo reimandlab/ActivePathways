@@ -93,6 +93,11 @@ test_that("custom colors is a character vector that is equal in length to the nu
                "colors must be provided as a character vector",fixed = TRUE)  
   expect_error(ActivePathways(scores = dat, gmt = gmt, custom_colors = c("red","blue")),
                "incorrect number of colors is provided",fixed = TRUE) 
+  
+  incorrect_color_names <- c("red","blue", "green")
+  names(incorrect_color_names) <- c("promoter","lds",	"enhancer")
+  expect_error(ActivePathways(scores = dat, gmt = gmt, custom_colors = incorrect_color_names),
+               "names() of the custom colors vector should match the scores column names",fixed = TRUE)
 })
 
 test_that("color palette is from the RColorBrewer package",{

@@ -2,6 +2,9 @@
 #'
 #' @param scores Either a list of p-values or a matrix where each column is a test.
 #' @param method Method to merge p-values. See 'methods' section below.
+#' @param scores_direction Either a list of fold-change direction values or a matrix where each column is a test. 
+#' @param expected_direction  A numerical vector of +1 or -1 values corresponding to the expected
+#'   directional relationship between columns in scores_direction
 #'
 #' @return If \code{scores} is a vector or list, returns a number. If \code{scores} is a
 #'   matrix, returns a named list of p-values merged by row.
@@ -19,6 +22,13 @@
 #'  necessarily independent. Note that the "Brown" method cannot be used with a 
 #'  single list of p-values. However, in this case Brown's method is identical 
 #'  to Fisher's method and should be used instead.}
+#'  \item{Stouffer}{Stouffer's method assumes p-values are uniformly distributed
+#'  and transforms p-values into a Z-score using the cumulative distribution function of a
+#'  standard normal distribution. This method is appropriate when the columns in \code{scores}
+#'   are independent.}
+#'  \item{Strube}{Strube's method extends Stouffer's method by accounting for the 
+#'  covariance in the columns of \code{scores}.}
+#'   
 #' }
 #'
 #' @examples
@@ -27,45 +37,107 @@
 #'   merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow = 2), method='Brown')
 #' 
 #' @export
-merge_p_values <- function(scores, method = "Fisher") {
+merge_p_values <- function(scores, method = "Fisher",scores_direction = scores/scores, 
+                           expected_direction = NULL) {
     # Validation on scores
     if (is.list(scores)) scores <- unlist(scores, recursive=FALSE)
     if (!(is.vector(scores) || is.matrix(scores))) stop("scores must be a matrix or list.")
     if (any(is.na(scores))) stop("scores may not contain missing values.")
     if (!is.numeric(scores)) stop("scores must be numeric.")
     if (any(scores < 0 | scores > 1)) stop("All values in scores must be in [0,1].")
-	if (!method %in% c("Fisher", "Brown")) stop("Only Fisher's and Brown's methods are currently supported.")
-
-    if (is.vector(scores)) {
-
-        if (method == "Brown") {
-        	stop("Brown's method cannot be used with a single list of p-values")
+	if (!method %in% c("Fisher", "Brown", "Stouffer","Strube")){
+	    stop("Only Fisher's, Brown's, Stouffer's and Strube's methods are currently supported.")
+	} 
+     
+    # if expected_direction is missing, assign a vector of ones
+    if (is.vector(scores) && is.null(expected_direction)) {
+        expected_direction <- rep(1, times = length(scores))
+    } else if (is.matrix(scores) && is.null(expected_direction)){
+        expected_direction <- rep(1, times = length(scores[1,]))
+    }
+    
+    #methods to merge p-values from a scores vector
+    if (is.vector(scores)){
+        if (method == "Brown" || method == "Strube") {
+            stop("Brown's or Strube's method cannot be used with a single list of p-values")
         }
-        
+            
         # convert zeroes to smallest available doubles
         scores <- sapply(scores, function(x) ifelse (x == 0, 1e-300, x))
-        
-        # if not brown, then fisher
-        return(fishersMethod(scores))
+        if (method == "Fisher") return(fishersMethod(scores,scores_direction,expected_direction))
+        if (method == "Stouffer") return(stouffersMethod(scores,scores_direction,expected_direction))
     }
     
-    # scores is a matrix with one column, then no transformatino needed
+    # scores is a matrix with one column, then no transformation needed
     if (ncol(scores) == 1) return (scores[, 1, drop=TRUE])
     
+    # scores is a matrix with multiple columns, apply the following methods
+    scores <- apply(scores, c(1,2), function(x) ifelse (x == 0, 1e-300, x))
     if (method == "Brown") {
-        cov.matrix <- calculateCovariances(t(scores))
-        return(apply(scores, 1, brownsMethod, cov.matrix=cov.matrix))
+        cov_matrix <- calculateCovariances(t(scores))
+        brown_merged <- brownsMethod(scores, cov_matrix = cov_matrix, scores_direction = scores_direction,
+                                     expected_direction = expected_direction)
+        return(brown_merged)
     }
     
-    scores <- apply(scores, c(1,2), function(x) ifelse (x == 0, 1e-300, x))
-
-    return (apply(scores, 1, fishersMethod))
+    if (method == "Fisher"){
+        fisher_merged <- c()
+        for(i in 1:length(scores[,1])) {
+            fisher_merged <- c(fisher_merged,fishersMethod(scores[i,], scores_direction[i,],expected_direction))
+        }
+        names(fisher_merged) <- rownames(scores)
+        return(fisher_merged)
+    }
+    if (method == "Stouffer"){
+        stouffer_merged <- c()
+        for(i in 1:length(scores[,1])) {
+            stouffer_merged <- c(stouffer_merged,stouffersMethod(scores[i,], scores_direction[i,],expected_direction))
+        }
+        names(stouffer_merged) <- rownames(scores)
+        return(stouffer_merged)
+    }
+    if (method == "Strube"){
+        strube_merged <- strubesMethod(scores,scores_direction,expected_direction)
+        return(strube_merged)
+    }
+    
 }
 
+stouffersMethod <- function (p_values, scores_direction,expected_direction){
+    directionality <- expected_direction * scores_direction/abs(scores_direction)
+    k = length(p_values)
+    z <- stats::qnorm(p_values/2)*directionality
+    z <- sum(z)/sqrt(k)
+    pval_stouffer <- 2*stats::pnorm(-1*abs(z))
+    return (pval_stouffer)
+}
 
-fishersMethod <- function(p.values) {
-    lnp <- log(p.values)
-    chisq <- (-2) * sum(lnp)
+strubesMethod <- function (p_values, scores_direction, expected_direction){
+    #acquiring the unadjusted p-value from stouffers method
+    k = length(expected_direction)
+    stouffer_merged <- c()
+    for(i in 1:length(p_values[,1])) {
+        directionality <- expected_direction * scores_direction[i,]/abs(scores_direction[i,])
+        z <- stats::qnorm(p_values[i,]/2)*directionality
+        stouffer_merged <- c(stouffer_merged,sum(z)/sqrt(k))
+    }
+    
+    #correlation matrix
+    cor_mtx <- stats::cor(p_values, use = "complete.obs")
+    cor_mtx[is.na(cor_mtx)] <- 0
+    cor_mtx <- abs(cor_mtx)
+    
+    #adjusted p-value
+    adjusted_z <- stouffer_merged * sqrt(k) / sqrt(sum(cor_mtx))
+    adj_pval <- 2*stats::pnorm(-1*abs(adjusted_z))
+    names(adj_pval) <- rownames(p_values)
+    return(adj_pval)
+}
+
+fishersMethod <- function(p_values, scores_direction, expected_direction) {
+    directionality <- expected_direction * scores_direction/abs(scores_direction)
+    lnp <- log(p_values)
+    chisq <- abs(-2 * sum(lnp * directionality))
     df <- 2 * length(lnp)
     stats::pchisq(chisq, df, lower.tail = FALSE)
 }
@@ -73,13 +145,16 @@ fishersMethod <- function(p.values) {
 
 #' Merge p-values using the Brown's method. 
 #'
-#' @param p.values A vector of m p-values.
-#' @param data.matrix An m x n matrix representing m tests and n samples. NA's are not allowed.
-#' @param cov.matrix A pre-calculated covariance matrix of \code{data.matrix}. This is more
-#'   efficient when making many calls with the same data.matrix.
-#'   Only one of \code{data.matrix} and \code{cov.matrix} must be given. If both are supplied,
-#'   \code{data.matrix} is ignored.
-#' @return A single p-value representing the merged significance of multiple p-values.
+#' @param p_values A matrix of m x n p-values.
+#' @param data_matrix An m x n matrix representing m tests and n samples. NA's are not allowed.
+#' @param cov_matrix A pre-calculated covariance matrix of \code{data_matrix}. This is more
+#'   efficient when making many calls with the same data_matrix.
+#'   Only one of \code{data_matrix} and \code{cov_matrix} must be given. If both are supplied,
+#'   \code{data_matrix} is ignored.
+#' @param scores_direction A matrix of m x n log2 fold-change values. 
+#' @param expected_direction  A numerical vector of +1 or -1 values corresponding to the expected
+#'   directional relationship between columns in scores_direction.
+#' @return A p-value vector representing the merged significance of multiple p-values.
 #' @export
 
 # Based on the R package EmpiricalBrownsMethod
@@ -87,19 +162,20 @@ fishersMethod <- function(p.values) {
 # Only significant differences are the removal of extra_info and allowing a
 # pre-calculated covariance matrix
 # 
-brownsMethod <- function(p.values, data.matrix = NULL, cov.matrix = NULL) {
-    if (missing(data.matrix) && missing(cov.matrix)) {
-        stop ("Either data.matrix or cov.matrix must be supplied")
+brownsMethod <- function(p_values, data_matrix = NULL, cov_matrix = NULL, scores_direction = scores_direction,
+                         expected_direction = expected_direction) {
+    if (missing(data_matrix) && missing(cov_matrix)) {
+        stop ("Either data_matrix or cov_matrix must be supplied")
     }
-    if (!(missing(data.matrix) || missing(cov.matrix))) {
-        message("Both data.matrix and cov.matrix were supplied. Ignoring data.matrix")
+    if (!(missing(data_matrix) || missing(cov_matrix))) {
+        message("Both data_matrix and cov_matrix were supplied. Ignoring data_matrix")
     }
-    if (missing(cov.matrix)) cov.matrix <- calculateCovariances(data.matrix)
+    if (missing(cov_matrix)) cov_matrix <- calculateCovariances(data_matrix)
 
-    N <- ncol(cov.matrix)
+    N <- ncol(cov_matrix)
     expected <- 2 * N
-    cov.sum <- 2 * sum(cov.matrix[lower.tri(cov.matrix, diag=FALSE)])
-    var <- (4 * N) + cov.sum
+    cov_sum <- 2 * sum(cov_matrix[lower.tri(cov_matrix, diag=FALSE)])
+    var <- (4 * N) + cov_sum
     sf <- var / (2 * expected)
 
     df <- (2 * expected^2) / var
@@ -107,10 +183,17 @@ brownsMethod <- function(p.values, data.matrix = NULL, cov.matrix = NULL) {
         df <- 2 * N
         sf <- 1
     }
-
-    x <- 2 * sum(-log(p.values), na.rm=TRUE)
-    p.brown <- stats::pchisq(df=df, q=x/sf, lower.tail=FALSE)
-    p.brown
+    
+    fisher_merged <- c()
+    for(i in 1:length(p_values[,1])) {
+        directionality <- expected_direction * scores_direction[i,]/abs(scores_direction[i,])
+        lnp <- log(p_values[i,])
+        chisq <- abs(-2 * sum(lnp * directionality))
+        fisher_merged <- c(fisher_merged, chisq)
+    }
+    p_brown <- stats::pchisq(df=df, q=fisher_merged/sf, lower.tail=FALSE)
+    names(p_brown) <- rownames(p_values)
+    p_brown
 }
 
 transformData <- function(dat) {
@@ -127,9 +210,9 @@ transformData <- function(dat) {
 }
 
 
-calculateCovariances <- function(data.matrix) {
-    transformed.data.matrix <- apply(data.matrix, 1, transformData)
-    stats::cov(transformed.data.matrix)
+calculateCovariances <- function(data_matrix) {
+    transformed_data_matrix <- apply(data_matrix, 1, transformData)
+    stats::cov(transformed_data_matrix)
 }
 
 pop.var <- function(x) stats::var(x, na.rm=TRUE) * (length(x) - 1) / length(x)

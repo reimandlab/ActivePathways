@@ -57,23 +57,23 @@ scores[is.na(scores)] <- 1
 The basic use of `ActivePathways` requires only two input parameters, the matrix of P-values with genes in rows and datasets in columns, as prepared above, and the path to the GMT file in the file system. Here we use a GMT file provided with the package. Importantly, the gene IDs (symbols, accession numbers, etc) in the P-value matrix need to match those in the GMT file. 
 ```{r}
 library(ActivePathways)
-gmt.file <- system.file('extdata', 'hsapiens_REAC_subset.gmt', package = 'ActivePathways')
-ActivePathways(scores, gmt.file)
+gmt_file <- system.file('extdata', 'hsapiens_REAC_subset.gmt', package = 'ActivePathways')
+ActivePathways(scores, gmt_file)
 ```
 
 
 ## Significance threshold and returning all results
-A pathway is considered to be significantly enriched if it has `adjusted.p.val <= significant`. The parameter `significant` represents the maximum adjusted P-value for a resulting pathway to be considered statistically significant. Only the significant pathways are returned. P-values from pathway enrichment analysis are adjusted for multiple testing correction to provide a more conservative analysis (see below). 
+A pathway is considered to be significantly enriched if it has `adjusted_p_val <= significant`. The parameter `significant` represents the maximum adjusted P-value for a resulting pathway to be considered statistically significant. Only the significant pathways are returned. P-values from pathway enrichment analysis are adjusted for multiple testing correction to provide a more conservative analysis (see below). 
 ```{r}
-nrow(ActivePathways(scores, gmt.file, significant = 0.05))
-nrow(ActivePathways(scores, gmt.file, significant = 0.1))
+nrow(ActivePathways(scores, gmt_file, significant = 0.05))
+nrow(ActivePathways(scores, gmt_file, significant = 0.1))
 ```
 
 
 ## GMT objects
 In the most common use case, a GMT file is downloaded from a database and provided directly to `ActivePathways` as a location in the file system. In some cases, it may be useful to load a GMT file separately for preprocessing. The ActivePathways package includes an interface for working with GMT objects. The GMT object can be read from a file using the `read.GMT` function. The GMT is structured as a list of terms (e.g., molecular pathways, biological processes, etc.). In the GMT object, each term is a list containing an id, a name, and the list of genes associated with this term. 
 ```{r}
-gmt <- read.GMT(gmt.file)
+gmt <- read.GMT(gmt_file)
 names(gmt[[1]])
 
 # Pretty-print the GMT
@@ -97,11 +97,11 @@ The new GMT object can now be used for analysis with `ActivePathways`
 ActivePathways(scores, gmt)
 ```
 
-This filtering can also be done automatically using the `geneset.filter` option to the `ActivePathways` function. By default, `ActivePathways` removes gene sets with less than five or more than a thousand genes from the GMT prior to analysis. In general, gene sets that are too large are likely not specific and less useful in interpreting the data and may also cause statistical inflation of enrichment scores in the analysis. Gene sets that are too small are likely too specific for most analyses and also make the multiple testing corrections more stringent, potentially causing deflation of results. 
-A stricter filter can be applied by running `ActivePathways` with the parameter `geneset.filter = c(10, 500)`.
+This filtering can also be done automatically using the `geneset_filter` option to the `ActivePathways` function. By default, `ActivePathways` removes gene sets with less than five or more than a thousand genes from the GMT prior to analysis. In general, gene sets that are too large are likely not specific and less useful in interpreting the data and may also cause statistical inflation of enrichment scores in the analysis. Gene sets that are too small are likely too specific for most analyses and also make the multiple testing corrections more stringent, potentially causing deflation of results. 
+A stricter filter can be applied by running `ActivePathways` with the parameter `geneset_filter = c(10, 500)`.
 
 ```{r}
-ActivePathways(scores, gmt.file, geneset.filter = c(10, 500))
+ActivePathways(scores, gmt_file, geneset_filter = c(10, 500))
 ```
 
 This GMT object can be saved to a file
@@ -120,30 +120,61 @@ To alter the background gene set in `ActivePathways`, one can provide a characte
 ```{r}
 background <- makeBackground(gmt)
 background <- background[background != 'TP53']
-ActivePathways(scores, gmt.file, background = background)
+ActivePathways(scores, gmt_file, background = background)
 ```
 
 Note that only the genes found in the background set are used for testing enrichment. Any genes in the input data that are not in the background set will be automatically removed by `ActivePathways`.
 
 
 ## Merging p-values
-A key feature of `ActivePathways` is the integration of multiple complementary omics datasets to prioritise genes for the pathway analysis. In this approach, genes with significant scores in multiple datasets will get the highest priority, and certain genes with weak scores in multiple datasets may be ranked higher, highlighting functions that would be missed when only single datasets were analysed. `ActivePathways` accomplishes this by merging the series of p-values in the columns of the scores matrix for each gene into a single combined P-value. The two main methods to merge P-values are Brown's method (the default) and Fisher's method. The Brown’s method is more accurate and/or conservative in the case when the input datasets show some large-scale similarities (i.e., covariation), since the Brown’s method will take that into account when prioritising genes across similar datasets. The Brown’s method is recommended for most cases since omics datasets are often not statistically independent of each other and genes with high scores in one dataset are more likely to have high scores in another dataset just by chance. 
+A key feature of `ActivePathways` is the integration of multiple complementary omics datasets to prioritise genes for the pathway analysis. In this approach, genes with significant scores in multiple datasets will get the highest priority, and certain genes with weak scores in multiple datasets may be ranked higher, highlighting functions that would be missed when only single datasets were analysed. `ActivePathways` accomplishes this by merging the series of p-values in the columns of the scores matrix for each gene into a single combined P-value. The four methods to merge P-values are Fisher's method (the default), Brown's method (extension of Fisher's), Stouffer's method and Strube's method (extension of Stouffer's). The Brownâs and Strube's methods are more conservative in the case when the input datasets show some large-scale similarities (i.e., covariation), since they will take that into account when prioritising genes across similar datasets. The Brownâs or Strube's method is recommended for most cases since omics datasets are often not statistically independent of each other and genes with high scores in one dataset are more likely to have high scores in another dataset just by chance. 
 
-The following example compares the merged P-values of the first few genes between the two methods. The genes with the top scores are the same while the P-values of the second method are somewhat more conservative. 
+The following example compares the merged P-values of the first few genes between the four methods. Fisher's and Stouffer's method are two alternative strategies to merge p-values and as a result the top scoring genes and p-values may differ. The genes with the top scores for Brown's method are the same as Fisher's, but their P-values are somewhat more conservative. This is the case for Strube's method as well, in which the top scoring genes are the same as Stouffer's method, but the P-values are more conservative. Fisher's method is more sensitive to a single small p-value than Stouffer's method, which is why the merged P-values are much more conservative with Stouffer's method in this example. 
 ```{r}
 sort(merge_p_values(scores, 'Fisher'))[1:5]
 sort(merge_p_values(scores, 'Brown'))[1:5]
+
+sort(merge_p_values(scores, 'Stouffer'))[1:5]
+sort(merge_p_values(scores, 'Strube'))[1:5]
 ```
 
-This function can be used to combine some of the data before the analysis for any follow-up analysis or visualisation. For example, we can merge the columns `X5UTR`, `X3UTR`, and `promCore` into a single `non_coding` column (these correspond to predictions of driver mutations in 5’UTRs, 3’UTRs and core promoters of genes, respectively). This will consider the three non-coding regions as a single column, rather than giving them all equal weight to the `CDS` column.
+This function can be used to combine some of the data before the analysis for any follow-up analysis or visualisation. For example, we can merge the columns `X5UTR`, `X3UTR`, and `promCore` into a single `non_coding` column (these correspond to predictions of driver mutations in 5âUTRs, 3âUTRs and core promoters of genes, respectively). This will consider the three non-coding regions as a single column, rather than giving them all equal weight to the `CDS` column.
 ```{r}
 scores2 <- cbind(scores[, 'CDS'], merge_p_values(scores[, c('X3UTR', 'X5UTR', 'promCore')], 'Brown'))
 colnames(scores2) <- c('CDS', 'non_coding')
 scores[c(2179, 1760),]
 scores2[c(2179, 1760),]
 
-ActivePathways(scores, gmt.file)
-ActivePathways(scores2, gmt.file)
+ActivePathways(scores, gmt_file)
+ActivePathways(scores2, gmt_file)
+```
+
+The scores_direction and expected_direction parameters have recently been introduced to merge_p_values() and ActivePathways() functions, which can incorporate directional logic into the p-value merging methods. For example, fold-change in protein expression would be expected to associate positively with mRNA change of the corresponding gene, while DNA methylation change of the gene promoter would be expected to associate negatively. We penalize genes where such directional interaction assumptions are violated. Using the expected_direction parameter we can encode our expected relationship between different datasets, and scores_direction would reflect the log2 fold-change values of each gene. The magnitude of the input log2 fold-change values in scores_direction is discarded and only the directional information is used for pathway enrichment analysis and merging p-values. 
+
+As an example, the human glioma cell transcriptome was profiled from wild-type, overexpression and knockdown long noncoding RNA (lncRNA) HOXA10-AS conditions. The differentially expressed genes in HOXA10-AS overexpression and knockdown experiments in brain cancer cells provided two datasets that are expected to have opposite fold-change directionality.
+```{r}
+df_oe_kd <- read.table(system.file('extdata', 'Differential_expression_hoxa10as.tsv', package = 'ActivePathways'), 
+header = TRUE, sep = '\t')
+df_oe_kd
+```
+
+
+The top 5 scoring genes differ if we penalize genes where this directional logic is violated. Using Stouffer's method the genes, COL25A1, ARHGEF17,B4GALT6 and NEGR1 are penalized, whilst CPED1 retains its significance and improves in rank. 
+
+```{r}
+scores3 <- data.frame(row.names = df_oe_kd[,1], overexpression = df_oe_kd[,3], knockdown = df_oe_kd[,5])
+scores3 <- as.matrix(scores3)
+scores3[is.na(scores3)] <- 1
+
+scores_direction <- data.frame(row.names = df_oe_kd[,1], overexpression = df_oe_kd[,2], knockdown = df_oe_kd[,4])
+scores_direction <- as.matrix(scores_direction)
+scores_direction[is.na(scores_direction)] <- 1
+
+expected_direction <- c(-1,1)
+
+sort(merge_p_values(scores3, 'Stouffer'))[1:5]
+sort(merge_p_values(scores3, 'Stouffer',scores_direction, expected_direction))[1:5]
+df_oe_kd[df_oe_kd$gene_name %in% c('COL25A1','CPED1','ARHGEF17','B4GALT6','NEGR1'),]
 ```
 
 
@@ -152,8 +183,8 @@ To perform pathway enrichment of the ranked gene list of merged P-values, `Activ
 
 ```{r}
 
-nrow(ActivePathways(scores, gmt.file))
-nrow(ActivePathways(scores, gmt.file, cutoff = 0.01))
+nrow(ActivePathways(scores, gmt_file))
+nrow(ActivePathways(scores, gmt_file, cutoff = 0.01))
 
 ```
 
@@ -161,12 +192,12 @@ nrow(ActivePathways(scores, gmt.file, cutoff = 0.01))
 ## Adjusting P-values using multiple testing correction
 Multiple testing correction is essential in the analysis of omics data since each analysis routinely considers thousands of hypotheses and apparently significant P-values will occur by chance alone. `ActivePathways` uses multiple testing correction at the level of pathways as P-values from the ranked hypergeometric test are adjusted for multiple testing (note that the ranked gene list provided to the ranked hypergeometric test remain unadjusted for multiple testing by design).
  
-The package uses the `p.adjust` function of base R to run multiple testing corrections and all methods in this function are available. By default, 'holm' correction is used. The option `correction.method = 'none'` can be used to override P-value adjustment (not recommended in most cases). 
+The package uses the `p.adjust` function of base R to run multiple testing corrections and all methods in this function are available. By default, 'holm' correction is used. The option `correction_method = 'none'` can be used to override P-value adjustment (not recommended in most cases). 
 
 ```{r}
 
-nrow(ActivePathways(scores, gmt.file))
-nrow(ActivePathways(scores, gmt.file, correction.method = 'none'))
+nrow(ActivePathways(scores, gmt_file))
+nrow(ActivePathways(scores, gmt_file, correction_method = 'none'))
 
 ```
 
@@ -176,10 +207,10 @@ nrow(ActivePathways(scores, gmt.file, correction.method = 'none'))
 
 Consider the results object from the basic use case of `ActivePathways`
 ```{r}
-res <- ActivePathways(scores, gmt.file)
+res <- ActivePathways(scores, gmt_file)
 res
 ```
-The columns `term.id`, `term.name`, and `term.size` give information about each pathway detected in the enrichment analysis. The `adjusted.p.val` column with the adjusted P-value indicates the confidence that the pathway is enriched after multiple testing correction. 
+The columns `term_id`, `term_name`, and `term_size` give information about each pathway detected in the enrichment analysis. The `adjusted_p_val` column with the adjusted P-value indicates the confidence that the pathway is enriched after multiple testing correction. 
 
 The `overlap` column provides the set of genes from the integrated gene list that occur in the given enriched gene set (i.e., molecular pathway or biological process). These genes were quantified across multiple input omics datasets and prioritized based on their joint significance in the input data. Note that the genes with the strongest scores across the multiple datasets are listed first. 
 
@@ -193,7 +224,7 @@ This column is useful in the further analysis on the data, allowing the research
 The `evidence` column provides insights to which of the input omics datasets (i.e., columns in the scores matrix) contributed to the discovery of this pathway or process in the integrated enrichment analysis. To achieve this level of detail, `ActivePathways` also analyses the gene lists ranked by the individual columns of the input matrix to detect enriched pathways. The `evidence` column lists the name of a given column of the input matrix if the given pathway is detected both in the integrated analysis and the analysis of the individual column. For example, in this analysis the majority of the detected pathways have only 'CDS' as their evidence, since these pathways were found to be enriched in data fusion through P-value merging and also by analysing the gene scores in the column `CDS` (for reference, CDS corresponds to protein-coding sequence where the majority of known driver mutations have been found). As a counter-example, the record for the pathway `REAC:422475` in our results lists as evidence `list('X3UTR', 'promCore')`, meaning that the pathway was found to be enriched when considering either the `X3UTR` column, the `promCore` column, or the combined omics datasets. 
 
 ```{r}
-res[res$term.id == "REAC:422475","evidence"]
+res[res$term_id == "REAC:422475","evidence"]
 ```
 
 Finally, if a pathway is found to be enriched only with the combined data and not in any individual column, 'combined' will be listed as the evidence. This subset of results may be particularly interesting since it highlights complementary aspects of the analysis that would remain hidden in the analysis of any input omics dataset separately. 
@@ -205,29 +236,29 @@ The following  columns named as `Genes_{column}` help interpret how each pathway
 The results are returned as a `data.table` object due to some additional data structures needed to store lists of gene IDs and supporting evidence. The usual R functions `write.table` and `write.csv` will struggle with exporting the data unless the gene and evidence lists are manually transformed as strings. Fortunately, the `fwrite` function of `data.table` can be used to write the file directly and the ActivePathways package includes the function `export_as_CSV` as a shortcut that uses the vertical bar symbol to concatenate gene lists. 
 
 ```{r, eval = FALSE}
-result.file <- paste('ActivePathways_results.csv', sep = '/')
-export_as_CSV (res, result.file) # remove comment to run
-read.csv(result.file, stringsAsFactors = F)[1:3,]
+result_file <- paste('ActivePathways_results.csv', sep = '/')
+export_as_CSV (res, result_file) # remove comment to run
+read.csv(result_file, stringsAsFactors = F)[1:3,]
 ```
 
 The `fwrite` can be called directly for customised output. 
 
 ```{r, eval=FALSE}
-result.file <- paste('ActivePathways_results2.txt', sep = '/')
-data.table::fwrite(res, result.file, sep = '\t', sep2 = c('', ',', ''))
-cat(paste(readLines(result.file)[1:2], collapse = '\n'))
+result_file <- paste('ActivePathways_results2.txt', sep = '/')
+data.table::fwrite(res, result_file, sep = '\t', sep2 = c('', ',', ''))
+cat(paste(readLines(result_file)[1:2], collapse = '\n'))
 ```
 
 # Visualising pathway enrichment results using enrichment maps in Cytoscape
 
-The Cytoscape software and the EnrichmentMap app provide powerful tools to visualise the enriched pathways from `ActivePathways` as a network (i.e., an Enrichment Map). To facilitate this visualisation step, `ActivePathways` provides the files needed for building enrichment maps. To create these files, a file prefix must be supplied to `ActivePathways` using the argument `cytoscape.file.tag`. The prefix can be a path to an existing writable directory.
+The Cytoscape software and the EnrichmentMap app provide powerful tools to visualise the enriched pathways from `ActivePathways` as a network (i.e., an Enrichment Map). To facilitate this visualisation step, `ActivePathways` provides the files needed for building enrichment maps. To create these files, a file prefix must be supplied to `ActivePathways` using the argument `cytoscape_file_tag`. The prefix can be a path to an existing writable directory.
  
 ```{r, eval=FALSE}
-res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__")
+res <- ActivePathways(scores, gmt_file, cytoscape_file_tag = "enrichmentMap__")
 ```
 Four files are written using the prefix:
 
-* `enrichmentMap__pathways.txt` contains the table of significant terms (i.e. molecular pathways, biological processes, other gene sets) and the associated adjusted P-values. Note that only terms with `adjusted.p.val <= significant` are written.
+* `enrichmentMap__pathways.txt` contains the table of significant terms (i.e. molecular pathways, biological processes, other gene sets) and the associated adjusted P-values. Note that only terms with `adjusted_p_val <= significant` are written.
 
 * `enrichmentMap__subgroups.txt` contains a matrix indicating the columns of the input matrix of P-values that contributed to the discovery of the corresponding pathways. These values correspond to the `evidence` evaluation of input omics datasets discussed above, where a value of one indicates that the pathway was also detectable using a specific input omics dataset. A value of zero indicates otherwise. This file will be not generated if a single-column matrix of scores corresponding to just one omics dataset is provided to `ActivePathways`.
 
@@ -258,14 +289,14 @@ files <- c(system.file('extdata', 'enrichmentMap__pathways.txt', package='Active
 The following commands will perform the basic analysis again and write output files required for generating enrichment maps into the current working directory of the R session. All file names use the prefix ` enrichmentMap__`. The generated files are also available in the `ActivePathways` R package as shown above. 
 
 ```{r, eval=FALSE}
-gmt.file <- system.file('extdata', 'hsapiens_REAC_subset.gmt', package = 'ActivePathways')
-scores.file <- system.file('extdata', 'Adenocarcinoma_scores_subset.tsv', package = 'ActivePathways')
+gmt_file <- system.file('extdata', 'hsapiens_REAC_subset.gmt', package = 'ActivePathways')
+scores_file <- system.file('extdata', 'Adenocarcinoma_scores_subset.tsv', package = 'ActivePathways')
 
-scores <- read.table(scores.file, header = TRUE, sep = '\t', row.names = 'Gene')
+scores <- read.table(scores_file, header = TRUE, sep = '\t', row.names = 'Gene')
 scores <- as.matrix(scores)
 scores[is.na(scores)] <- 1
 
-res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__")
+res <- ActivePathways(scores, gmt_file, cytoscape_file_tag = "enrichmentMap__")
 ```
 
 The four files written are:
@@ -332,14 +363,14 @@ Note that one of the colors corresponds to a subset of enriched pathways with *c
 
 For a more diverse range of colors, ActivePathways supports any color palette from RColorBrewer. The color_palette parameter must be provided.
 ```{r}
-res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__", color_palette = "Pastel1")
+res <- ActivePathways(scores, gmt_file, cytoscape_file_tag = "enrichmentMap__", color_palette = "Pastel1")
 ```
 ![](LegendView_RColorBrewer.png)
 
 Instead, to manually input the color of each dataset the custom_colors parameter must be specified as a vector. This vector should contain the same number of colors as columns
 in the scores matrix.
 ```{r}
-res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__", custom_colors = c("violet","green","orange","red"))
+res <- ActivePathways(scores, gmt_file, cytoscape_file_tag = "enrichmentMap__", custom_colors = c("violet","green","orange","red"))
 ```
 ![](LegendView_Custom.png)
 

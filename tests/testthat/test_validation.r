@@ -23,6 +23,39 @@ test_that("scores is a numeric matrix with valid p-values", {
   expect_error(run_ap_short(dat2), NA)
 })
 
+test_that("scores_direction and expected_direction have valid input",{
+  hox_test <- hox_direction
+  hox_test[1,1] <- 'a'
+  expect_error(run_ap(hox_score,hox_test,hox_expected_direction), 'Scores direction must be a numeric matrix')
+  
+  #hox_test <- hox_direction
+  #hox_test[1,1] <- NA
+  #expect_error(run_ap(hox_score,hox_test,hox_expected_direction), 'Scores direction matrix may not contain missing values')
+  
+  hox_test <- hox_direction
+  rownames(hox_test) <- 1:length(hox_direction[,1])
+  expect_error(run_ap(hox_score,hox_test,hox_expected_direction), 'Scores direction gene names must match scores genes')
+  
+  hox_test <- hox_direction
+  hox_test <- hox_test[1:10,]
+  expect_error(run_ap(hox_score,hox_test,hox_expected_direction), 
+               'Scores direction matrix should have the same numbers of rows as the scores matrix')
+
+  hox_expected <- c('a','b')
+  expect_error(run_ap(hox_score,hox_direction,hox_expected), 'expected_direction must be a numeric vector')
+  
+  hox_expected <- c(1,1,-1)
+  expect_error(run_ap(hox_score,hox_direction,hox_expected), 
+               'expected_direction should have the same number of entries as columns in scores_direction')
+  
+  hox_expected <- c(1,-1)
+  names(hox_expected) <- c("knockdown","overexpression")
+  expect_error(run_ap(hox_score,hox_direction,hox_expected), 
+               'the expected_direction entries should match the order of scores_direction columns')
+  
+  
+})
+
 test_that("significant is valid", {
     expect_error(ActivePathways(dat, gmt, significant=-0.1),
                  "significant must be a value in [0,1]", fixed=TRUE)
@@ -71,33 +104,33 @@ test_that("genes not found in background are removed", {
                  "scores does not contain any genes in the background")
 })
 
-test_that("geneset.filter is a numeric vector of length 2", {
-    expect_error(ActivePathways(dat, gmt, geneset.filter=1), 
-                 "geneset.filter must be length 2")
-    expect_error(ActivePathways(dat, gmt, geneset.filter=list(1,2)),
-                 "geneset.filter must be a numeric vector")
-    expect_error(ActivePathways(dat, gmt, geneset.filter=c('q', 2)),
-                 "geneset.filter must be a numeric vector")
-    expect_error(ActivePathways(dat, gmt, geneset.filter=c(1, -2)),
-                 "geneset.filter limits must be positive")
-    expect_error(ActivePathways(dat, gmt, geneset.filter=c(0, 0)), 
-                 "No pathways in gmt made the geneset.filter", fixed=TRUE)
-    expect_message(ActivePathways(dat, gmt, geneset.filter=c(NA, 10)),
-                   "[0-9]+ terms were removed from gmt because they did not make the geneset.filter")
-    expect_error(ActivePathways(dat, gmt, geneset.filter=c(0, NA)), NA)
-    expect_error(ActivePathways(dat, gmt, geneset.filter=NULL), NA)
+test_that("geneset_filter is a numeric vector of length 2", {
+    expect_error(ActivePathways(dat, gmt, geneset_filter=1), 
+                 "geneset_filter must be length 2")
+    expect_error(ActivePathways(dat, gmt, geneset_filter=list(1,2)),
+                 "geneset_filter must be a numeric vector")
+    expect_error(ActivePathways(dat, gmt, geneset_filter=c('q', 2)),
+                 "geneset_filter must be a numeric vector")
+    expect_error(ActivePathways(dat, gmt, geneset_filter=c(1, -2)),
+                 "geneset_filter limits must be positive")
+    expect_error(ActivePathways(dat, gmt, geneset_filter=c(0, 0)), 
+                 "No pathways in gmt made the geneset_filter", fixed=TRUE)
+    expect_message(ActivePathways(dat, gmt, geneset_filter=c(NA, 10)),
+                   "[0-9]+ terms were removed from gmt because they did not make the geneset_filter")
+    expect_error(ActivePathways(dat, gmt, geneset_filter=c(0, NA)), NA)
+    expect_error(ActivePathways(dat, gmt, geneset_filter=NULL), NA)
 }) 
 
 test_that("custom colors is a character vector that is equal in length to the number of columns in scores",{
   expect_error(ActivePathways(scores = dat, gmt = gmt, custom_colors = list("red","blue", "green")),
                "colors must be provided as a character vector",fixed = TRUE)  
   expect_error(ActivePathways(scores = dat, gmt = gmt, custom_colors = c("red","blue")),
-               "incorrect number of colors is provided",fixed = TRUE) 
+               "incorrect number of colors is provided",fixed = TRUE)
   
   incorrect_color_names <- c("red","blue", "green")
   names(incorrect_color_names) <- c("promoter","lds",	"enhancer")
   expect_error(ActivePathways(scores = dat, gmt = gmt, custom_colors = incorrect_color_names),
-               "names() of the custom colors vector should match the scores column names",fixed = TRUE)
+               "names() of the custom colors vector should match the scores column names",fixed = TRUE) 
 })
 
 test_that("color palette is from the RColorBrewer package",{

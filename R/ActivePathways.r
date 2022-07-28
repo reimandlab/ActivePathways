@@ -9,34 +9,41 @@
 #' @param background A character vector of gene names to be used as a
 #'   statistical background. By default, the background is all genes that appear
 #'   in \code{gmt}.
-#' @param geneset.filter A numeric vector of length two giving the lower and 
+#' @param geneset_filter A numeric vector of length two giving the lower and 
 #'   upper limits for the size of the annotated geneset to pathways in gmt.
-#'   Pathways with a geneset shorter than \code{geneset.filter[1]} or longer
-#'   than \code{geneset.filter[2]} will be removed. Set either value to NA to
-#'   to not enforce a minimum or maximum value, or set \code{geneset.filter} to 
+#'   Pathways with a geneset shorter than \code{geneset_filter[1]} or longer
+#'   than \code{geneset_filter[2]} will be removed. Set either value to NA to
+#'   to not enforce a minimum or maximum value, or set \code{geneset_filter} to 
 #'   \code{NULL} to skip filtering.
 #' @param cutoff A maximum merged p-value for a gene to be used for analysis.
 #'   Any genes with merged, unadjusted \code{p > significant} will be discarded 
 #'   before testing.
 #' @param significant Significance cutoff for selecting enriched pathways. Pathways with
-#'   \code{adjusted.p.val < significant} will be selected as results.
-#' @param merge.method Statistical method to merge p-values. See section on Merging P-Values
-#' @param correction.method Statistical method to correct p-values. See
+#'   \code{adjusted_p_val < significant} will be selected as results.
+#' @param merge_method Statistical method to merge p-values. See section on Merging P-Values
+#' @param correction_method Statistical method to correct p-values. See
 #'   \code{\link[stats]{p.adjust}} for details.
-#' @param cytoscape.file.tag The directory and/or file prefix to which the output files
+#' @param cytoscape_file_tag The directory and/or file prefix to which the output files
 #'   for generating enrichment maps should be written. If NA, files will not be written. 
 #' @param color_palette Color palette from RColorBrewer::brewer.pal to color each
 #'   column in the scores matrix. If NULL grDevices::rainbow is used by default.
 #' @param custom_colors A character vector of custom colors for each column in the scores matrix.
 #' @param color_integrated_only A character vector of length 1 specifying the color of the 
-#'   "combined" pathway contribution. 
+#'   "combined" pathway contribution.
+#' @param scores_direction A numerical matrix of fold-change values where each row is a
+#'   gene and each column represents a dataset (evidence). Rownames correspond to the genes
+#'   and colnames to the datasets. We recommend converting missing values to ones. 
+#'   Only datasets with fold-change information should be included in this matrix. 
+#' @param expected_direction A numerical vector of +1 or -1 values corresponding to the expected
+#'   directional relationship between columns in scores_direction. The length of this vector 
+#'   should match the number of columns in scores_direction.
 #'
 #' @return A data.table of terms (enriched pathways) containing the following columns:
 #'   \describe{
-#'     \item{term.id}{The database ID of the term}
-#'     \item{term.name}{The full name of the term}
-#'     \item{adjusted.p.val}{The associated p-value, adjusted for multiple testing}
-#'     \item{term.size}{The number of genes annotated to the term}
+#'     \item{term_id}{The database ID of the term}
+#'     \item{term_name}{The full name of the term}
+#'     \item{adjusted_p_val}{The associated p-value, adjusted for multiple testing}
+#'     \item{term_size}{The number of genes annotated to the term}
 #'     \item{overlap}{A character vector of the genes enriched in the term}
 #'     \item{evidence}{Columns of \code{scores} (i.e., omics datasets) that contributed 
 #'          individually to the enrichment of the term. Each input column is evaluated 
@@ -57,18 +64,24 @@
 #'  tests of significance used to create the columns in \code{scores} are not
 #'  necessarily independent. The Brown's method is therefore recommended for 
 #'  many omics integration approaches.}
+#'  \item{Stouffer}{Stouffer's method assumes p-values are uniformly distributed
+#'  and transforms p-values into a Z-score using the cumulative distribution function of a
+#'  standard normal distribution. This method is appropriate when the columns in \code{scores}
+#'   are independent.}
+#'  \item{Strube}{Strube's method extends Stouffer's method by accounting for the 
+#'  covariance in the columns of \code{scores}.}
 #' }
 #'
 #' @section Cytoscape:
 #'   To visualize and interpret enriched pathways, ActivePathways provides an option
 #'   to further analyse results as enrichment maps in the Cytoscape software. 
-#'   If \code{!is.na(cytoscape.file.tag)}, four files will be written that can be used 
+#'   If \code{!is.na(cytoscape_file_tag)}, four files will be written that can be used 
 #'   to build enrichment maps. This requires the EnrichmentMap and enhancedGraphics apps.
 #'
 #' The four files written are:
 #'   \describe{
 #'     \item{pathways.txt}{A list of significant terms and the
-#'     associated p-value. Only terms with \code{adjusted.p.val <= significant} are
+#'     associated p-value. Only terms with \code{adjusted_p_val <= significant} are
 #'     written to this file.}
 #'     \item{subgroups.txt}{A matrix indicating whether the significant terms (pathways)
 #'     were also found to be significant when considering only one column from
@@ -105,14 +118,16 @@
 #' @export
 
 ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
-                            geneset.filter = c(5, 1000), cutoff = 0.1, significant = 0.05,
-                            merge.method = c("Brown", "Fisher"),
-                            correction.method = c("holm", "fdr", "hochberg", "hommel",
+                            geneset_filter = c(5, 1000), cutoff = 0.1, significant = 0.05,
+                            merge_method = c("Brown", "Fisher", "Stouffer","Strube"),
+                            correction_method = c("holm", "fdr", "hochberg", "hommel",
                                                   "bonferroni", "BH", "BY", "none"),
-                            cytoscape.file.tag = NA, color_palette = NULL, custom_colors = NULL, color_integrated_only = "#FFFFF0") {
+                            cytoscape_file_tag = NA, color_palette = NULL, custom_colors = NULL, 
+                            color_integrated_only = "#FFFFF0", scores_direction = scores/scores, 
+                            expected_direction = rep(1, times = length(scores[1,]))) {
   
-  merge.method <- match.arg(merge.method)
-  correction.method <- match.arg(correction.method)
+  merge_method <- match.arg(merge_method)
+  correction_method <- match.arg(correction_method)
   
   ##### Validation #####
   # scores
@@ -120,6 +135,19 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   if (any(is.na(scores))) stop("scores may not contain missing values")
   if (any(scores < 0) || any(scores > 1)) stop("All values in scores must be in [0,1]")
   if (any(duplicated(rownames(scores)))) stop("Scores matrix contains duplicated genes - rownames must be unique.")
+  
+  #scores_direction and expected_direction
+  if(!(is.matrix(scores_direction) && is.numeric(scores_direction))) stop("Scores direction must be a numeric matrix")
+  #if (any(is.na(scores_direction))) stop("Scores direction matrix may not contain missing values")
+  if (any(!rownames(scores_direction) %in% rownames(scores))) stop ("Scores direction gene names must match scores genes")
+  if(length(scores_direction[,1]) != (length(scores[,1]))) stop("Scores direction matrix should have the same numbers of rows as the scores matrix")
+  if (!(is.numeric(expected_direction) && is.vector(expected_direction))) stop("expected_direction must be a numeric vector")
+  if (length(expected_direction) != length(colnames(scores_direction))) stop("expected_direction should have the same number of entries as columns in scores_direction")
+  if (!is.null(names(expected_direction))){
+        if (!all.equal(names(expected_direction), colnames(scores_direction)) == TRUE){
+              stop("the expected_direction entries should match the order of scores_direction columns")
+        }
+  } 
   
   # cutoff and significant
   stopifnot(length(cutoff) == 1)
@@ -131,19 +159,19 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   
   # gmt
   if (!is.GMT(gmt)) gmt <- read.GMT(gmt)
-  if (length(gmt) == 0) stop("No pathways in gmt made the geneset.filter")
+  if (length(gmt) == 0) stop("No pathways in gmt made the geneset_filter")
   if (!(is.character(background) && is.vector(background))) {
     stop("background must be a character vector")
   } 
   
-  # geneset.filter
-  if (!is.null(geneset.filter)) {
-    if (!(is.numeric(geneset.filter) && is.vector(geneset.filter))) {
-      stop("geneset.filter must be a numeric vector")
+  # geneset_filter
+  if (!is.null(geneset_filter)) {
+    if (!(is.numeric(geneset_filter) && is.vector(geneset_filter))) {
+      stop("geneset_filter must be a numeric vector")
     }
-    if (length(geneset.filter) != 2) stop("geneset.filter must be length 2")
-    if (!is.numeric(geneset.filter)) stop("geneset.filter must be numeric")
-    if (any(geneset.filter < 0, na.rm=TRUE)) stop("geneset.filter limits must be positive")
+    if (length(geneset_filter) != 2) stop("geneset_filter must be length 2")
+    if (!is.numeric(geneset_filter)) stop("geneset_filter must be numeric")
+    if (any(geneset_filter < 0, na.rm=TRUE)) stop("geneset_filter limits must be positive")
   }
   
   # custom_colors
@@ -156,11 +184,12 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   if (!is.null(custom_colors) & !is.null(color_palette)){
     stop("Both custom_colors and color_palette are provided. Specify only one of these parameters for node coloring.")
   }
+  
   if (!is.null(names(custom_colors))){
-       if (!all(names(custom_colors) %in% colnames(scores))){
-             stop("names() of the custom colors vector should match the scores column names")
-       }
-  } 
+        if (!all(names(custom_colors) %in% colnames(scores))){
+              stop("names() of the custom colors vector should match the scores column names")
+        }
+  }
   
   # color_palette
   if (!is.null(color_palette)){
@@ -183,15 +212,17 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   ##### filtering and sorting ####
     
   # Remove any genes not found in the background
-  orig.length <- nrow(scores)
+  orig_length <- nrow(scores)
   scores <- scores[rownames(scores) %in% background, , drop=FALSE]
+  scores_direction <- scores_direction[rownames(scores_direction) %in% background, , drop=FALSE]
   if (nrow(scores) == 0) {
     stop("scores does not contain any genes in the background")
   }
-  if (nrow(scores) < orig.length) {
-    message(paste(orig.length - nrow(scores), "rows were removed from scores",
+  if (nrow(scores) < orig_length) {
+    message(paste(orig_length - nrow(scores), "rows were removed from scores",
                   "because they are not found in the background"))
   }
+  
 	
   # Filter the GMT
   background_genes <- lapply(sapply(gmt, "[", c(3)), intersect, background)
@@ -201,61 +232,61 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
     gmt[[i]]$genes <- background_genes[[i]]
   }
 	
-  if(!is.null(geneset.filter)) {
-    orig.length <- length(gmt)
-    if (!is.na(geneset.filter[1])) {
-      gmt <- Filter(function(x) length(x$genes) >= geneset.filter[1], gmt)
+  if(!is.null(geneset_filter)) {
+    orig_length <- length(gmt)
+    if (!is.na(geneset_filter[1])) {
+      gmt <- Filter(function(x) length(x$genes) >= geneset_filter[1], gmt)
     }
-    if (!is.na(geneset.filter[2])) {
-      gmt <- Filter(function(x) length(x$genes) <= geneset.filter[2], gmt)
+    if (!is.na(geneset_filter[2])) {
+      gmt <- Filter(function(x) length(x$genes) <= geneset_filter[2], gmt)
     }
-    if (length(gmt) == 0) stop("No pathways in gmt made the geneset.filter")
-    if (length(gmt) < orig.length) {
-      message(paste(orig.length - length(gmt), "terms were removed from gmt", 
-                    "because they did not make the geneset.filter"))
+    if (length(gmt) == 0) stop("No pathways in gmt made the geneset_filter")
+    if (length(gmt) < orig_length) {
+      message(paste(orig_length - length(gmt), "terms were removed from gmt", 
+                    "because they did not make the geneset_filter"))
     }
   }
   
   # merge p-values to get a single score for each gene and remove any genes
   # that don't make the cutoff
-  merged.scores <- merge_p_values(scores, merge.method)
-  merged.scores <- merged.scores[merged.scores <= cutoff]
+  merged_scores <- merge_p_values(scores, merge_method,scores_direction,expected_direction)
+  merged_scores <- merged_scores[merged_scores <= cutoff]
   
-  if (length(merged.scores) == 0) stop("No genes made the cutoff")
+  if (length(merged_scores) == 0) stop("No genes made the cutoff")
   
   # Sort genes by p-value
-  ordered.scores <- names(merged.scores)[order(merged.scores)]
+  ordered_scores <- names(merged_scores)[order(merged_scores)]
   
   ##### enrichmentAnalysis and column contribution #####
   
-  res <- enrichmentAnalysis(ordered.scores, gmt, background)
-  adjusted_p <- stats::p.adjust(res$adjusted.p.val, method = correction.method)
-  res[, "adjusted.p.val" := adjusted_p]
+  res <- enrichmentAnalysis(ordered_scores, gmt, background)
+  adjusted_p <- stats::p.adjust(res$adjusted_p_val, method = correction_method)
+  res[, "adjusted_p_val" := adjusted_p]
   
-  significant.indeces <- which(res$adjusted.p.val <= significant)
-  if (length(significant.indeces) == 0) {
+  significant_indeces <- which(res$adjusted_p_val <= significant)
+  if (length(significant_indeces) == 0) {
     warning("No significant terms were found.")
     return()
   }
   
   if (contribution) {
-    sig.cols <- columnSignificance(scores, gmt, background, cutoff,
-                                   significant, correction.method, res$adjusted.p.val)
-    res <- cbind(res, sig.cols[, -1])
+    sig_cols <- columnSignificance(scores, gmt, background, cutoff,
+                                   significant, correction_method, res$adjusted_p_val)
+    res <- cbind(res, sig_cols[, -1])
   } else {
-    sig.cols <- NULL
+    sig_cols <- NULL
   }
   
   # if significant result were found and cytoscape file tag exists
   # proceed with writing files in the working directory
-  if (length(significant.indeces) > 0 & !is.na(cytoscape.file.tag)) {
-    prepareCytoscape(res[significant.indeces, c("term.id", "term.name", "adjusted.p.val")],
-                     gmt[significant.indeces], 
-                     cytoscape.file.tag,
-                     sig.cols[significant.indeces,], color_palette, custom_colors, color_integrated_only)
+  if (length(significant_indeces) > 0 & !is.na(cytoscape_file_tag)) {
+    prepareCytoscape(res[significant_indeces, c("term_id", "term_name", "adjusted_p_val")],
+                     gmt[significant_indeces], 
+                     cytoscape_file_tag,
+                     sig_cols[significant_indeces,], color_palette, custom_colors, color_integrated_only)
   }
   
-  res[significant.indeces]
+  res[significant_indeces]
 }
 
 
@@ -269,16 +300,16 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
 #'
 #' @return a data.table of terms with the following columns:
 #'   \describe{
-#'     \item{term.id}{The id of the term}
-#'     \item{term.name}{The full name of the term}
-#'     \item{adjusted.p.val}{The associated p-value adjusted for multiple testing}
-#'     \item{term.size}{The number of genes annotated to the term}
+#'     \item{term_id}{The id of the term}
+#'     \item{term_name}{The full name of the term}
+#'     \item{adjusted_p_val}{The associated p-value adjusted for multiple testing}
+#'     \item{term_size}{The number of genes annotated to the term}
 #'     \item{overlap}{A character vector of the genes that overlap between the
 #'        term and the query}
 #'   }
 #' @keywords internal
 enrichmentAnalysis <- function(genelist, gmt, background) {
-  dt <- data.table(term.id=names(gmt))
+  dt <- data.table(term_id=names(gmt))
   
   for (i in 1:length(gmt)) {
     term <- gmt[[i]]
@@ -286,9 +317,9 @@ enrichmentAnalysis <- function(genelist, gmt, background) {
     overlap <- genelist[1:tmp$ind]
     overlap <- overlap[overlap %in% term$genes]
     if (length(overlap) == 0) overlap <- c()
-    set(dt, i, 'term.name', term$name)
-    set(dt, i, 'adjusted.p.val', tmp$p.val)
-    set(dt, i, 'term.size', length(term$genes))
+    set(dt, i, 'term_name', term$name)
+    set(dt, i, 'adjusted_p_val', tmp$p_val)
+    set(dt, i, 'term_size', length(term$genes))
     set(dt, i, 'overlap', list(list(overlap)))
   }
   dt
@@ -300,21 +331,21 @@ enrichmentAnalysis <- function(genelist, gmt, background) {
 #' @inheritParams ActivePathways
 #' @param pvals p-value for the pathways calculated by ActivePathways
 #'
-#' @return a data.table with columns 'term.id' and a column for each column
+#' @return a data.table with columns 'term_id' and a column for each column
 #' in \code{scores}, indicating whether each term (pathway) was found to be
 #' significant or not when considering only that column. For each term, 
 #' either report the list of related genes if that term was significant, or NA if not. 
 
-columnSignificance <- function(scores, gmt, background, cutoff, significant, correction.method, pvals) {
-  dt <- data.table(term.id=names(gmt), evidence=NA)
+columnSignificance <- function(scores, gmt, background, cutoff, significant, correction_method, pvals) {
+  dt <- data.table(term_id=names(gmt), evidence=NA)
   for (col in colnames(scores)) {
-    col.scores <- scores[, col, drop=TRUE]
-    col.scores <- col.scores[col.scores <= cutoff]
-    col.scores <- names(col.scores)[order(col.scores)]
+    col_scores <- scores[, col, drop=TRUE]
+    col_scores <- col_scores[col_scores <= cutoff]
+    col_scores <- names(col_scores)[order(col_scores)]
     
-    res <- enrichmentAnalysis(col.scores, gmt, background)
-    set(res, i = NULL, "adjusted.p.val", stats::p.adjust(res$adjusted.p.val, correction.method))
-    set(res, i = which(res$adjusted.p.val > significant), "overlap", list(list(NA)))
+    res <- enrichmentAnalysis(col_scores, gmt, background)
+    set(res, i = NULL, "adjusted_p_val", stats::p.adjust(res$adjusted_p_val, correction_method))
+    set(res, i = which(res$adjusted_p_val > significant), "overlap", list(list(NA)))
     set(dt, i=NULL, col, res$overlap)
   }
   

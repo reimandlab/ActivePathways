@@ -1,6 +1,7 @@
 # ActivePathways
 
-**June 30 2022: ActivePathways has been updated to version 1.1.1. This update provides improved functionality to the "custom_colors" parameter. The updated package has been uploaded to CRAN: https://cran.r-project.org/web/packages/ActivePathways/index.html.**
+**July 28 2022: ActivePathways will soon be updated to version 2.0.0. This update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
+
 
 ActivePathways is a tool for multivariate pathway enrichment analysis. Pathway enrichment analysis identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. Using this strategy, we can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
 
@@ -22,7 +23,7 @@ Using the R package `devtools`, run
 #### From source on our GitHub repository
 Clone the repository, for example using `git clone https://github.com/reimandlab/ActivePathways.git`. 
 
-Open R in the directory where you cloned the package and run `install.packages("ActivePathways", repos = NULL, type "source")`
+Open R in the directory where you cloned the package and run `install.packages("ActivePathways", repos = NULL, type = "source")`
 
 
 
@@ -145,19 +146,59 @@ readLines(fname_GMT)[11:13]
 
 ```
 
+### Examples - Incorporating directionality
+Fold-change in protein expression would be expected to associate positively with mRNA change of the corresponding gene, while DNA methylation change of the gene promoter would be expected to associate negatively. We penalize genes where such directional interaction assumptions are violated. The scores_direction and expected_direction parameters are provided in the merge_p_values() and ActivePathways() functions to incorporate this directional penalty into the data fusion and pathway enrichment analyses. 
+
+```R 
+ 
+df <- read.table(system.file('extdata', 'Differential_expression_hoxa10as.tsv', package = 'ActivePathways'), 
+header = TRUE, sep = '\t')
+
+head(df,3)
+#gene_name  OE_logFC  OE_adj.P.Val  KD_logFC  KD_adj.P.Val
+#TSPAN6  -0.0957155415 9.999954e-01	 0.4346923436 0.2560983801
+#DPM1 0.0340970905 9.999954e-01      0.4253006261 0.1161994806
+#SCYL3 0.1887001732 9.999954e-01	 0.0180449641 0.9999998702
+
+scores <- data.frame(row.names = df[,1], overexpression = df[,3], knockdown = df[,5])
+scores <- as.matrix(scores)
+scores[is.na(scores)] <- 1
+
+
+# A numerical matrix of log2 fold-changes values is required as input along 
+# with a vector that provides the expected relationship between different datasets
+
+scores_direction <- data.frame(row.names = df[,1], overexpression = df[,2], knockdown = df[,4])
+scores_direction <- as.matrix(scores_direction)
+scores_direction[is.na(scores_direction)] <- 1
+
+expected_direction <- c(-1,1)
+
+sort(merge_p_values(scores, 'Stouffer'))[1:3]
+
+# COL25A1        CPED1     ARHGEF17      
+# 2.245169e-05 8.799371e-05 9.033745e-05
+
+sort(merge_p_values(scores, 'Stouffer',scores_direction, expected_direction))[1:3]
+
+# CPED1        IFI44       IFI44L         
+# 8.799371e-05 2.057385e-04 4.010490e-04 
+
+```
+
 More thorough documentation of the ActivePathways function can be found in R with `?ActivePathways`, and complete tutorials can be found with `browseVignettes(package='ActivePathways')`.
 
 
 # Visualising pathway enrichment results using enrichment maps in Cytoscape
 
-The Cytoscape software and the EnrichmentMap app provide powerful tools to visualise the enriched pathways from `ActivePathways` as a network (i.e., an Enrichment Map). To facilitate this visualisation step, `ActivePathways` provides the files needed for building enrichment maps. To create these files, a file prefix must be supplied to `ActivePathways` using the argument `cytoscape.file.tag`. The prefix can be a path to an existing writable directory.
+The Cytoscape software and the EnrichmentMap app provide powerful tools to visualise the enriched pathways from `ActivePathways` as a network (i.e., an Enrichment Map). To facilitate this visualisation step, `ActivePathways` provides the files needed for building enrichment maps. To create these files, a file prefix must be supplied to `ActivePathways` using the argument `cytoscape_file_tag`. The prefix can be a path to an existing writable directory.
  
 ```{r}
-res <- ActivePathways(scores, fname_GMT, cytoscape.file.tag = "enrichmentMap__")
+res <- ActivePathways(scores, fname_GMT, cytoscape_file_tag = "enrichmentMap__")
 ```
 Four files are written using the prefix:
 
-* `enrichmentMap__pathways.txt` contains the table of significant terms (i.e. molecular pathways, biological processes, other gene sets) and the associated adjusted P-values. Note that only terms with `adjusted.p.val <= significant` are written.
+* `enrichmentMap__pathways.txt` contains the table of significant terms (i.e. molecular pathways, biological processes, other gene sets) and the associated adjusted P-values. Note that only terms with `adjusted_p_val <= significant` are written.
 
 * `enrichmentMap__subgroups.txt` contains a matrix indicating the columns of the input matrix of P-values that contributed to the discovery of the corresponding pathways. These values correspond to the `evidence` evaluation of input omics datasets discussed above, where a value of one indicates that the pathway was also detectable using a specific input omics dataset. A value of zero indicates otherwise. This file will be not generated if a single-column matrix of scores corresponding to just one omics dataset is provided to `ActivePathways`.
 
@@ -219,14 +260,14 @@ Note that one of the colors corresponds to a subset of enriched pathways with *c
 
 For a more diverse range of colors, ActivePathways supports any color palette from RColorBrewer. The color_palette parameter must be provided.
 ```{r}
-res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__", color_palette = "Pastel1")
+res <- ActivePathways(scores, gmt_file, cytoscape_file_tag = "enrichmentMap__", color_palette = "Pastel1")
 ```
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView_RColorBrewer.png)
 
 Instead, to manually input the color of each dataset the custom_colors parameter must be specified as a vector. This vector should contain the same number of colors as columns
 in the scores matrix.
 ```{r}
-res <- ActivePathways(scores, gmt.file, cytoscape.file.tag = "enrichmentMap__", custom_colors = c("violet","green","orange","red"))
+res <- ActivePathways(scores, gmt_file, cytoscape_file_tag = "enrichmentMap__", custom_colors = c("violet","green","orange","red"))
 ```
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView_Custom.png)
 

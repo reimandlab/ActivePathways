@@ -11,7 +11,7 @@ test_that("CSV file structure is expected for single evidence", {
     suppressWarnings(file.remove(CSV_fname))
     
     expect_equal(colnames(res_from_CSV), colnames(res))
-    expect_equal(res_from_CSV$term.id, res$term.id)
+    expect_equal(res_from_CSV$term_id, res$term_id)
 
 })
 
@@ -27,6 +27,6 @@ test_that("CSV file structure is expected for multiple evidence", {
     suppressWarnings(file.remove(CSV_fname))
     
     expect_equal(colnames(res_from_CSV), colnames(res))
-    expect_equal(res_from_CSV$term.id, res$term.id)
+    expect_equal(res_from_CSV$term_id, res$term_id)
 
 })

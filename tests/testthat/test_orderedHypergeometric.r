@@ -27,11 +27,11 @@ test_that('orderedHypergeometric returns the lowest p-value and correct index', 
         counts <- matrix(c(genelist1, genelist0, complement1, complement0), 2)
         hypergeometric(counts)
     }
-    p.values <- sapply(1:length(genelist), function(i) get_pvalue(genelist[1:i]))
+    p_values <- sapply(1:length(genelist), function(i) get_pvalue(genelist[1:i]))
 
-    smallest.value <- min(p.values)
-    smallest.index <- match(smallest.value, p.values)
-    exp <- list(p.val=smallest.value, ind=smallest.index)
+    smallest_value <- min(p_values)
+    smallest_index <- match(smallest_value, p_values)
+    exp <- list(p_val=smallest_value, ind=smallest_index)
 
     expect_equal(orderedHypergeometric(genelist, background, annotations), exp)
 })

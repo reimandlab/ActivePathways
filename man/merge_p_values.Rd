@@ -4,12 +4,22 @@
 \alias{merge_p_values}
 \title{Merge a list or matrix of p-values}
 \usage{
-merge_p_values(scores, method = "Fisher")
+merge_p_values(
+  scores,
+  method = "Fisher",
+  scores_direction = scores/scores,
+  expected_direction = NULL
+)
 }
 \arguments{
 \item{scores}{Either a list of p-values or a matrix where each column is a test.}
 
 \item{method}{Method to merge p-values. See 'methods' section below.}
+
+\item{scores_direction}{Either a list of fold-change direction values or a matrix where each column is a test.}
+
+\item{expected_direction}{A numerical vector of +1 or -1 values corresponding to the expected
+directional relationship between columns in scores_direction}
 }
 \value{
 If \code{scores} is a vector or list, returns a number. If \code{scores} is a
@@ -32,6 +42,13 @@ Two methods are available to merge a list of p-values:
  necessarily independent. Note that the "Brown" method cannot be used with a 
  single list of p-values. However, in this case Brown's method is identical 
  to Fisher's method and should be used instead.}
+ \item{Stouffer}{Stouffer's method assumes p-values are uniformly distributed
+ and transforms p-values into a Z-score using the cumulative distribution function of a
+ standard normal distribution. This method is appropriate when the columns in \code{scores}
+  are independent.}
+ \item{Strube}{Strube's method extends Stouffer's method by accounting for the 
+ covariance in the columns of \code{scores}.}
+  
 }
 }
 

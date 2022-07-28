@@ -17,7 +17,7 @@ For example, the genes could be ranked by decreasing significance of differentia
 \value{
 a list with the items:
   \describe{
-    \item{p.val}{The lowest obtained p-value}
+    \item{p_val}{The lowest obtained p-value}
     \item{ind}{The index of \code{genelist} such that \code{genelist[1:ind]}
       gives the lowest p-value}
  }

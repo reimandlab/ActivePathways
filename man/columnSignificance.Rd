@@ -11,7 +11,7 @@ columnSignificance(
   background,
   cutoff,
   significant,
-  correction.method,
+  correction_method,
   pvals
 )
 }
@@ -33,15 +33,15 @@ Any genes with merged, unadjusted \code{p > significant} will be discarded
 before testing.}
 
 \item{significant}{Significance cutoff for selecting enriched pathways. Pathways with
-\code{adjusted.p.val < significant} will be selected as results.}
+\code{adjusted_p_val < significant} will be selected as results.}
 
-\item{correction.method}{Statistical method to correct p-values. See
+\item{correction_method}{Statistical method to correct p-values. See
 \code{\link[stats]{p.adjust}} for details.}
 
 \item{pvals}{p-value for the pathways calculated by ActivePathways}
 }
 \value{
-a data.table with columns 'term.id' and a column for each column
+a data.table with columns 'term_id' and a column for each column
 in \code{scores}, indicating whether each term (pathway) was found to be
 significant or not when considering only that column. For each term, 
 either report the list of related genes if that term was significant, or NA if not.

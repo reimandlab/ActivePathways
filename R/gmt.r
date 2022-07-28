@@ -100,13 +100,13 @@ is.GMT <- function(x) inherits(x, 'GMT')
 # Print a GMT object
 #' @export
 print.GMT <- function(x, ...) {
-    num.lines <- min(length(x), getOption("max.print", 99999))
-    num.trunc <- length(x) - num.lines
-    cat(sapply(x[1:num.lines], function(a) paste(a$id, "-", a$name, "\n",
+    num_lines <- min(length(x), getOption("max.print", 99999))
+    num_trunc <- length(x) - num_lines
+    cat(sapply(x[1:num_lines], function(a) paste(a$id, "-", a$name, "\n",
                                                  paste(a$genes, collapse=", "), '\n\n')))
-    if (num.trunc == 1) {
+    if (num_trunc == 1) {
         cat('[ reached getOption("max.print") -- omitted 1 term ]')
-    } else if (num.trunc > 1) {
-        cat(paste('[ reached getOption("max.print") -- ommitted', num.trunc, 'terms ]'))
+    } else if (num_trunc > 1) {
+        cat(paste('[ reached getOption("max.print") -- ommitted', num_trunc, 'terms ]'))
     }
 }

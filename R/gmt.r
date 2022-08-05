@@ -51,7 +51,8 @@ write.GMT <- function(gmt, filename) {
     if (!is.GMT(gmt)) stop("gmt is not a valid GMT object")
     sink(filename)
     for (term in gmt) {
-        cat(term$id, term$name, paste(term$genes, collapse="\t"), "\n", sep="\t")
+        cat(term$id, term$name, paste(term$genes, collapse = "\t"), sep = "\t")
+        cat("\n")
     }
     sink()
 }

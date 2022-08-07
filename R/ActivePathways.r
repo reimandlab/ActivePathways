@@ -123,8 +123,8 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
                             correction_method = c("holm", "fdr", "hochberg", "hommel",
                                                   "bonferroni", "BH", "BY", "none"),
                             cytoscape_file_tag = NA, color_palette = NULL, custom_colors = NULL, 
-                            color_integrated_only = "#FFFFF0", scores_direction = scores/scores, 
-                            expected_direction = rep(1, times = length(scores[1,]))) {
+                            color_integrated_only = "#FFFFF0", scores_direction = NULL, 
+                            expected_direction = NULL) {
   
   merge_method <- match.arg(merge_method)
   correction_method <- match.arg(correction_method)
@@ -137,17 +137,24 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   if (any(duplicated(rownames(scores)))) stop("Scores matrix contains duplicated genes - rownames must be unique.")
   
   #scores_direction and expected_direction
-  if(!(is.matrix(scores_direction) && is.numeric(scores_direction))) stop("Scores direction must be a numeric matrix")
-  #if (any(is.na(scores_direction))) stop("Scores direction matrix may not contain missing values")
-  if (any(!rownames(scores_direction) %in% rownames(scores))) stop ("Scores direction gene names must match scores genes")
-  if(length(scores_direction[,1]) != (length(scores[,1]))) stop("Scores direction matrix should have the same numbers of rows as the scores matrix")
-  if (!(is.numeric(expected_direction) && is.vector(expected_direction))) stop("expected_direction must be a numeric vector")
-  if (length(expected_direction) != length(colnames(scores_direction))) stop("expected_direction should have the same number of entries as columns in scores_direction")
-  if (!is.null(names(expected_direction))){
-        if (!all.equal(names(expected_direction), colnames(scores_direction)) == TRUE){
-              stop("the expected_direction entries should match the order of scores_direction columns")
+  if (!is.null(scores_direction) && !is.null(expected_direction)){
+        if (!is.matrix(scores_direction)) stop("scores_direction must be a matrix.")
+        if (any(is.na(scores_direction))) stop("scores_direction may not contain missing values.")
+        if (!is.numeric(scores_direction)) stop("scores_direction must be numeric.")
+        if (!(is.numeric(expected_direction) && is.vector(expected_direction))) stop("expected_direction must be a numeric vector")
+        if (any(!rownames(scores_direction) %in% rownames(scores))) stop ("scores_direction gene names must match scores genes")
+        if(length(scores_direction[,1]) != (length(scores[,1]))) stop("scores_direction matrix should have the same numbers of rows as the scores matrix")
+        if(length(colnames(scores_direction)[colnames(scores_direction) %in% colnames(scores)]) < 2){ 
+              stop("A minimum of two datasets from the scores matrix should have corresponding directionality data in scores_direction. Ensure column names are identical.")
+             }
+        if (length(expected_direction) != length(colnames(scores_direction))) stop("expected_direction should have the same number of entries as columns in scores_direction")
+        if (!is.null(names(expected_direction))){
+              if (!all.equal(names(expected_direction), colnames(scores_direction)) == TRUE){
+                    stop("the expected_direction entries should match the order of scores_direction columns")
+              }
         }
-  } 
+  }
+  
   
   # cutoff and significant
   stopifnot(length(cutoff) == 1)
@@ -214,7 +221,9 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   # Remove any genes not found in the background
   orig_length <- nrow(scores)
   scores <- scores[rownames(scores) %in% background, , drop=FALSE]
-  scores_direction <- scores_direction[rownames(scores_direction) %in% background, , drop=FALSE]
+  if(!is.null(scores_direction)){
+        scores_direction <- scores_direction[rownames(scores_direction) %in% background, , drop=FALSE]
+  }
   if (nrow(scores) == 0) {
     stop("scores does not contain any genes in the background")
   }

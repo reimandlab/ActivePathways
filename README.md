@@ -1,6 +1,6 @@
 # ActivePathways
 
-** August 09 2022: ActivePathways gmt.r file has been updated to ensure the written GMT file format is consistent with MSigDB. This update will be submitted to CRAN as a part of version 2.0.0.**
+**August 09 2022: ActivePathways gmt.r file has been updated to ensure the written GMT file format is consistent with MSigDB. This update will be submitted to CRAN as a part of version 2.0.0.**
 
 ActivePathways is a tool for multivariate pathway enrichment analysis. Pathway enrichment analysis identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. Using this strategy, we can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
 

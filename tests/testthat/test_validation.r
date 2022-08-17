@@ -26,7 +26,7 @@ test_that("scores is a numeric matrix with valid p-values", {
 test_that("scores_direction and expected_direction have valid input",{
   hox_test <- hox_direction
   hox_test[1,1] <- 'a'
-  expect_error(run_ap(hox_score,hox_test,hox_expected_direction), 'Scores direction must be a numeric matrix')
+  expect_error(run_ap(hox_score,hox_test,hox_expected_direction), 'scores_direction must be numeric')
   
   #hox_test <- hox_direction
   #hox_test[1,1] <- NA
@@ -34,12 +34,12 @@ test_that("scores_direction and expected_direction have valid input",{
   
   hox_test <- hox_direction
   rownames(hox_test) <- 1:length(hox_direction[,1])
-  expect_error(run_ap(hox_score,hox_test,hox_expected_direction), 'Scores direction gene names must match scores genes')
+  expect_error(run_ap(hox_score,hox_test,hox_expected_direction), 'scores_direction gene names must match scores genes')
   
   hox_test <- hox_direction
   hox_test <- hox_test[1:10,]
   expect_error(run_ap(hox_score,hox_test,hox_expected_direction), 
-               'Scores direction matrix should have the same numbers of rows as the scores matrix')
+               'scores_direction matrix should have the same numbers of rows as the scores matrix')
 
   hox_expected <- c('a','b')
   expect_error(run_ap(hox_score,hox_direction,hox_expected), 'expected_direction must be a numeric vector')

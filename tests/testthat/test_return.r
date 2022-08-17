@@ -18,6 +18,8 @@ test_that("All results or only significant ones are returned", {
 
 test_that("No significant results are found", {
     expect_warning(res1 <- ActivePathways(dat, gmt, cytoscape_file_tag = NA, significant = 0),
-                   "No significant terms were found.", fixed = TRUE)
+                   "No significant terms were found", fixed = TRUE)
     expect_equal(nrow(res1), NULL)
 })
+
+

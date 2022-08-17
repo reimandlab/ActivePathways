@@ -18,8 +18,8 @@ ActivePathways(
   color_palette = NULL,
   custom_colors = NULL,
   color_integrated_only = "#FFFFF0",
-  scores_direction = scores/scores,
-  expected_direction = rep(1, times = length(scores[1, ]))
+  scores_direction = NULL,
+  expected_direction = NULL
 )
 }
 \arguments{

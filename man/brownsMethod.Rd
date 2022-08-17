@@ -8,8 +8,8 @@ brownsMethod(
   p_values,
   data_matrix = NULL,
   cov_matrix = NULL,
-  scores_direction = scores_direction,
-  expected_direction = expected_direction
+  scores_direction,
+  expected_direction
 )
 }
 \arguments{
@@ -22,7 +22,7 @@ efficient when making many calls with the same data_matrix.
 Only one of \code{data_matrix} and \code{cov_matrix} must be given. If both are supplied,
 \code{data_matrix} is ignored.}
 
-\item{scores_direction}{A matrix of m x n log2 fold-change values.}
+\item{scores_direction}{A matrix of log2 fold-change values.}
 
 \item{expected_direction}{A numerical vector of +1 or -1 values corresponding to the expected
 directional relationship between columns in scores_direction.}

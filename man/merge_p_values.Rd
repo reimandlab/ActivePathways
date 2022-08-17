@@ -7,7 +7,7 @@
 merge_p_values(
   scores,
   method = "Fisher",
-  scores_direction = scores/scores,
+  scores_direction = NULL,
   expected_direction = NULL
 )
 }
@@ -16,7 +16,7 @@ merge_p_values(
 
 \item{method}{Method to merge p-values. See 'methods' section below.}
 
-\item{scores_direction}{Either a list of fold-change direction values or a matrix where each column is a test.}
+\item{scores_direction}{Either a vector of fold-change values or a matrix where each column is a test.}
 
 \item{expected_direction}{A numerical vector of +1 or -1 values corresponding to the expected
 directional relationship between columns in scores_direction}

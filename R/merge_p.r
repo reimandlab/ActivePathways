@@ -41,29 +41,29 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
                            expected_direction = NULL) {
     # Validation on scores
     if (is.list(scores)) scores <- unlist(scores, recursive=FALSE)
-    if (!(is.vector(scores) || is.matrix(scores))) stop("scores must be a matrix or list.")
-    if (any(is.na(scores))) stop("scores may not contain missing values.")
-    if (!is.numeric(scores)) stop("scores must be numeric.")
-    if (any(scores < 0 | scores > 1)) stop("All values in scores must be in [0,1].")
+    if (!(is.vector(scores) || is.matrix(scores))) stop("scores must be a matrix or vector")
+    if (any(is.na(scores))) stop("scores may not contain missing values")
+    if (!is.numeric(scores)) stop("scores must be numeric")
+    if (any(scores < 0 | scores > 1)) stop("All values in scores must be in [0,1]")
 	if (!method %in% c("Fisher", "Brown", "Stouffer","Strube")){
-	    stop("Only Fisher's, Brown's, Stouffer's and Strube's methods are currently supported.")
+	    stop("Only Fisher's, Brown's, Stouffer's and Strube's methods are currently supported")
 	}
     
     
     # Validation on scores_direction and expected_direction
     if (!is.null(scores_direction) && !is.null(expected_direction)){
-        if (is.vector(scores_direction) && is.matrix(scores)) stop ("scores and scores_direction must be the same data type.")
-        if (is.matrix(scores_direction) && is.vector(scores)) stop ("scores and scores_direction must be the same data type.")
-        if (!(is.vector(scores_direction) || is.matrix(scores_direction))) stop("scores_direction must be a matrix or vector.")
-        if (any(is.na(scores_direction))) stop("scores_direction may not contain missing values.")
-        if (!is.numeric(scores_direction)) stop("scores_direction must be numeric.")
+        if (is.vector(scores_direction) && is.matrix(scores)) stop ("scores and scores_direction must be the same data type")
+        if (is.matrix(scores_direction) && is.vector(scores)) stop ("scores and scores_direction must be the same data type")
+        if (!(is.vector(scores_direction) || is.matrix(scores_direction))) stop("scores_direction must be a matrix or vector")
+        if (any(is.na(scores_direction))) stop("scores_direction may not contain missing values")
+        if (!is.numeric(scores_direction)) stop("scores_direction must be numeric")
         if (!(is.numeric(expected_direction) && is.vector(expected_direction))) stop("expected_direction must be a numeric vector")
         
         if (is.matrix(scores_direction) && is.matrix(scores)){
             if (any(!rownames(scores_direction) %in% rownames(scores))) stop ("scores_direction gene names must match scores genes")
             if(length(scores_direction[,1]) != (length(scores[,1]))) stop("scores_direction matrix should have the same numbers of rows as the scores matrix")
             if(length(colnames(scores_direction)[colnames(scores_direction) %in% colnames(scores)]) < 2){ 
-                stop("A minimum of two datasets from the scores matrix should have corresponding directionality data in scores_direction. Ensure column names are identical.")
+                stop("A minimum of two datasets from the scores matrix should have corresponding directionality data in scores_direction. Ensure column names are identical")
             }
             if (length(expected_direction) != length(colnames(scores_direction))) stop("expected_direction should have the same number of entries as columns in scores_direction")
             if (!is.null(names(expected_direction))){
@@ -80,7 +80,7 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
                 }
             } 
             if(length(names(scores_direction)[names(scores_direction) %in% names(scores)]) < 2){ 
-                stop("A minimum of two entries from the scores vector should have corresponding directionality data in scores_direction. Ensure entry names() are identical.")
+                stop("A minimum of two entries from the scores vector should have corresponding directionality data in scores_direction. Ensure entry names() are identical")
             }
         }
     }

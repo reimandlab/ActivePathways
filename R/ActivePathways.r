@@ -134,18 +134,18 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   if (!(is.matrix(scores) && is.numeric(scores))) stop("scores must be a numeric matrix")
   if (any(is.na(scores))) stop("scores may not contain missing values")
   if (any(scores < 0) || any(scores > 1)) stop("All values in scores must be in [0,1]")
-  if (any(duplicated(rownames(scores)))) stop("Scores matrix contains duplicated genes - rownames must be unique.")
+  if (any(duplicated(rownames(scores)))) stop("scores matrix contains duplicated genes - rownames must be unique")
   
   #scores_direction and expected_direction
   if (!is.null(scores_direction) && !is.null(expected_direction)){
-        if (!is.matrix(scores_direction)) stop("scores_direction must be a matrix.")
-        if (any(is.na(scores_direction))) stop("scores_direction may not contain missing values.")
-        if (!is.numeric(scores_direction)) stop("scores_direction must be numeric.")
+        if (!is.matrix(scores_direction)) stop("scores_direction must be a matrix")
+        if (any(is.na(scores_direction))) stop("scores_direction may not contain missing values")
+        if (!is.numeric(scores_direction)) stop("scores_direction must be numeric")
         if (!(is.numeric(expected_direction) && is.vector(expected_direction))) stop("expected_direction must be a numeric vector")
         if (any(!rownames(scores_direction) %in% rownames(scores))) stop ("scores_direction gene names must match scores genes")
         if(length(scores_direction[,1]) != (length(scores[,1]))) stop("scores_direction matrix should have the same numbers of rows as the scores matrix")
         if(length(colnames(scores_direction)[colnames(scores_direction) %in% colnames(scores)]) < 2){ 
-              stop("A minimum of two datasets from the scores matrix should have corresponding directionality data in scores_direction. Ensure column names are identical.")
+              stop("A minimum of two datasets from the scores matrix should have corresponding directionality data in scores_direction. Ensure column names are identical")
              }
         if (length(expected_direction) != length(colnames(scores_direction))) stop("expected_direction should have the same number of entries as columns in scores_direction")
         if (!is.null(names(expected_direction))){
@@ -213,7 +213,7 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   # contribution
   if (ncol(scores) == 1) {
     contribution <- FALSE
-    message("Scores matrix contains only one column. Column contributions will not be calculated.")
+    message("scores matrix contains only one column. Column contributions will not be calculated")
   }
   
   ##### filtering and sorting ####
@@ -274,7 +274,7 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   
   significant_indeces <- which(res$adjusted_p_val <= significant)
   if (length(significant_indeces) == 0) {
-    warning("No significant terms were found.")
+    warning("No significant terms were found")
     return()
   }
   

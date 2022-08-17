@@ -5,7 +5,7 @@ test_that("cytoscape_filenames specified", {
 
     expect_error(ActivePathways(dat, gmt, cytoscape_file_tag = CStag, significant = 1), NA)
     expect_message(ActivePathways(dat[,1, drop = F], gmt, cytoscape_file_tag = CStag, significant = 1),
-			"Scores matrix contains only one column. Column contributions will not be calculated.", 
+			"scores matrix contains only one column. Column contributions will not be calculated", 
 			fixed = TRUE)
 })
 

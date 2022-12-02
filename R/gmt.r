@@ -5,7 +5,7 @@
 #'
 #' A GMT file describes gene sets, such as biological terms and pathways. GMT files are 
 #' tab delimited text files. Each row of a GMT file contains a single term with its 
-#' database ID and a term name, followed all genes annotated to the term.
+#' database ID and a term name, followed by all the genes annotated to the term.
 #'
 #' @format
 #' A GMT object is a named list of terms, where each term is a list with the items:
@@ -51,7 +51,8 @@ write.GMT <- function(gmt, filename) {
     if (!is.GMT(gmt)) stop("gmt is not a valid GMT object")
     sink(filename)
     for (term in gmt) {
-        cat(term$id, term$name, paste(term$genes, collapse="\t"), "\n", sep="\t")
+        cat(term$id, term$name, paste(term$genes, collapse="\t"), sep = "\t")
+        cat("\n")
     }
     sink()
 }

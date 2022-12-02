@@ -12,14 +12,14 @@
 #' @param geneset_filter A numeric vector of length two giving the lower and 
 #'   upper limits for the size of the annotated geneset to pathways in gmt.
 #'   Pathways with a geneset shorter than \code{geneset_filter[1]} or longer
-#'   than \code{geneset_filter[2]} will be removed. Set either value to NA to
+#'   than \code{geneset_filter[2]} will be removed. Set either value to NA
 #'   to not enforce a minimum or maximum value, or set \code{geneset_filter} to 
 #'   \code{NULL} to skip filtering.
 #' @param cutoff A maximum merged p-value for a gene to be used for analysis.
 #'   Any genes with merged, unadjusted \code{p > significant} will be discarded 
 #'   before testing.
 #' @param significant Significance cutoff for selecting enriched pathways. Pathways with
-#'   \code{adjusted_p_val < significant} will be selected as results.
+#'   \code{adjusted_p_val <= significant} will be selected as results.
 #' @param merge_method Statistical method to merge p-values. See section on Merging P-Values
 #' @param correction_method Statistical method to correct p-values. See
 #'   \code{\link[stats]{p.adjust}} for details.
@@ -30,7 +30,7 @@
 #' @param custom_colors A character vector of custom colors for each column in the scores matrix.
 #' @param color_integrated_only A character vector of length 1 specifying the color of the 
 #'   "combined" pathway contribution.
-#' @param scores_direction A numerical matrix of fold-change values where each row is a
+#' @param scores_direction A numerical matrix of log2 transformed fold-change values where each row is a
 #'   gene and each column represents a dataset (evidence). Rownames correspond to the genes
 #'   and colnames to the datasets. We recommend converting missing values to ones. 
 #'   Only datasets with fold-change information should be included in this matrix. 
@@ -53,7 +53,7 @@
 #' @section Merging P-values:
 #' To obtain a single p-value for each gene across the multiple omics datasets considered, 
 #' the p-values in \code{scores} #' are merged row-wise using a data fusion approach of p-value merging. 
-#' The two available methods are:
+#' The four available methods are:
 #' \describe{
 #'  \item{Fisher}{Fisher's method assumes p-values are uniformly
 #'  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
@@ -85,7 +85,7 @@
 #'     written to this file.}
 #'     \item{subgroups.txt}{A matrix indicating whether the significant terms (pathways)
 #'     were also found to be significant when considering only one column from
-#'     \code{scores}. A one indicates that that term was found to be significant 
+#'     \code{scores}. A one indicates that term was found to be significant 
 #' 			when only p-values in that column were used to select genes.}
 #'     \item{pathways.gmt}{A Shortened version of the supplied GMT
 #'     file, containing only the significantly enriched terms in pathways.txt. }
@@ -209,8 +209,8 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   } 
   if(1 != length(color_integrated_only)) stop("only a single color must be specified")
 	
+  #contribution
   contribution <- TRUE
-  # contribution
   if (ncol(scores) == 1) {
     contribution <- FALSE
     message("scores matrix contains only one column. Column contributions will not be calculated")
@@ -234,11 +234,13 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   
 	
   # Filter the GMT
-  background_genes <- lapply(sapply(gmt, "[", c(3)), intersect, background)
-  background_genes <- background_genes[lapply(background_genes,length) > 0]
-  gmt <- gmt[names(sapply(gmt,"[",c(3))) %in% names(background_genes)]
-  for (i in 1:length(gmt)) {
-    gmt[[i]]$genes <- background_genes[[i]]
+  if (!all(background %in% unique(unlist(sapply(gmt, "[", c(3)))))){
+        background_genes <- lapply(sapply(gmt, "[", c(3)), intersect, background)
+        background_genes <- background_genes[lapply(background_genes,length) > 0]
+        gmt <- gmt[names(sapply(gmt,"[",c(3))) %in% names(background_genes)]
+        for (i in 1:length(gmt)) {
+          gmt[[i]]$genes <- background_genes[[i]]
+        }
   }
 	
   if(!is.null(geneset_filter)) {

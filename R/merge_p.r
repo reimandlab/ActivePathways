@@ -2,15 +2,15 @@
 #'
 #' @param scores Either a list of p-values or a matrix where each column is a test.
 #' @param method Method to merge p-values. See 'methods' section below.
-#' @param scores_direction Either a vector of fold-change values or a matrix where each column is a test. 
+#' @param scores_direction Either a vector of log2 transformed fold-change values or a matrix where each column is a test. 
 #' @param expected_direction  A numerical vector of +1 or -1 values corresponding to the expected
-#'   directional relationship between columns in scores_direction
+#'   directional relationship between columns in scores_direction.
 #'
 #' @return If \code{scores} is a vector or list, returns a number. If \code{scores} is a
 #'   matrix, returns a named list of p-values merged by row.
 #'
 #' @section Methods:
-#' Two methods are available to merge a list of p-values:
+#' Four methods are available to merge a list of p-values:
 #' \describe{
 #'  \item{Fisher}{Fisher's method (default) assumes that p-values are uniformly
 #'  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
@@ -164,7 +164,7 @@ stouffersMethod <- function (p_values, scores_direction,expected_direction){
 }
 
 strubesMethod <- function (p_values, scores_direction, expected_direction){
-    #acquiring the unadjusted z-value from stouffers method.
+    #acquiring the unadjusted z-value from Stouffer's method.
     stouffer_z <- c()
     for(i in 1:length(p_values[,1])){
         stouffer_z <- c(stouffer_z,stouffersMethod(p_values[i,], scores_direction[i,],expected_direction))
@@ -246,7 +246,7 @@ brownsMethod <- function(p_values, data_matrix = NULL, cov_matrix = NULL, scores
         sf <- 1
     }
     
-    #acquiring the unadjusted chi-squared value from fishers method.
+    #acquiring the unadjusted chi-squared value from Fisher's method.
     fisher_chisq <- c()
     for(i in 1:length(p_values[,1])) {
         fisher_chisq <- c(fisher_chisq, fishersMethod(p_values[i,], scores_direction[i,],expected_direction))
@@ -262,7 +262,7 @@ brownsMethod <- function(p_values, data_matrix = NULL, cov_matrix = NULL, scores
 transformData <- function(dat) {
     # If all values in dat are the same (equal to y), return dat. The covariance
     # matrix will be the zero matrix, and brown's method gives the p-value as y
-    # Otherwise (dat - dmv) / dvsd is NaN and ecdf throws and error
+    # Otherwise (dat - dmv) / dvsd is NaN and ecdf throws an error
     if (isTRUE(all.equal(min(dat), max(dat)))) return(dat)
 
     dvm <- mean(dat, na.rm=TRUE)

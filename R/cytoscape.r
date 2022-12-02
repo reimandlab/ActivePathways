@@ -22,7 +22,7 @@
 #' found to be significant in the ActivePathways analysis.
 #' @param cytoscape_file_tag The user-defined file prefix and/or directory defining the location of the files.
 #' @param col_significance A data.table object with a column 'term_id' and a column
-#' for each type of omics evidence indicating whether a term was also found to be signficiant or not
+#' for each type of omics evidence indicating whether a term was also found to be significant or not
 #' when considering only the genes and p-values in the corresponding column of the \code{scores} matrix.
 #' If term was not found, NA's are shown in columns, otherwise the relevant lists of genes are shown.
 #' @param color_palette Color palette from RColorBrewer::brewer.pal to color each
@@ -38,19 +38,21 @@ prepareCytoscape <- function(terms,
                              cytoscape_file_tag, 
                              col_significance, color_palette = NULL, custom_colors = NULL, color_integrated_only = "#FFFFF0") {
   if (!is.null(col_significance)) {
+    
+    # Obtain the name of each omics dataset and incorporate a 'combined' contribution
     tests <- colnames(col_significance)[3:length(colnames(col_significance))]
     tests <- substr(tests, 7, 100)
     tests <- append(tests, "combined")
     
+    # Create a matrix of ones and zeros, where columns are omics datasets + 'combined'
+    # and rows are enriched pathways
     rows <- 1:nrow(col_significance)
-    
     evidence_columns = do.call(rbind, lapply(col_significance$evidence,
                                              function(x) 0+(tests %in% x)))
     colnames(evidence_columns) = tests
-    
     col_significance = cbind(col_significance[,"term_id"], evidence_columns)
     
-  
+    # Acquire colours from grDevices::rainbow or RColorBrewer::brewer.pal if custom colors are not provided  
     if(is.null(color_palette) & is.null(custom_colors)) {
       col_colors <- grDevices::rainbow(length(tests))
     } else if (!is.null(custom_colors)){

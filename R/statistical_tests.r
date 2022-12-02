@@ -1,7 +1,7 @@
-#' Hypergemoetric test
+#' Hypergeometric test
 #'
 #' Perform a hypergeometric test, also known as the Fisher's exact test, on a 2x2 contingency
-#' table with the alternative hypothesis 'greater' . In this application, the test finds the
+#' table with the alternative hypothesis set to 'greater'. In this application, the test finds the
 #' probability that counts[1, 1] or more genes would be found to be annotated to a term (pathway),
 #' assuming the null hypothesis of genes being distributed randomly to terms. 
 #'
@@ -28,7 +28,7 @@ hypergeometric <- function(counts) {
 #'
 #' @param genelist Character vector of gene names, assumed to be ordered by decreasing importance. 
 #' For example, the genes could be ranked by decreasing significance of differential expression. 
-#' @param background Character vector of gene names. List of all genes used as a statistical background (i.e., the universe)
+#' @param background Character vector of gene names. List of all genes used as a statistical background (i.e., the universe).
 #' @param annotations Character vector of gene names. A gene set representing a functional term, process or biological pathway. 
 #'
 #' @return a list with the items:

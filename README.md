@@ -208,7 +208,7 @@ Four files are written using the prefix:
 
 ## Creating enrichment maps using results of ActivePathways 
 
-Pathway enrichment analysis often leads to complex and redundant results. Enrichment maps are network-based visualisations of pathway enrichment analyses. Enrichment maps can be generated in the Cytoscape software using the EnrichmentMap app. ** The enhancedGraphics app is also required **. See the vignette for details: `browseVignettes(package='ActivePathways')`.
+Pathway enrichment analysis often leads to complex and redundant results. Enrichment maps are network-based visualisations of pathway enrichment analyses. Enrichment maps can be generated in the Cytoscape software using the EnrichmentMap app. **The enhancedGraphics app is also required**. See the vignette for details: `browseVignettes(package='ActivePathways')`.
 
 
 ## Required software

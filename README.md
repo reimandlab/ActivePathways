@@ -147,7 +147,7 @@ readLines(fname_GMT)[11:13]
 ```
 
 ### Examples - Incorporating directionality
-Fold-change in protein expression would be expected to associate positively with mRNA change of the corresponding gene, while DNA methylation change of the gene promoter would be expected to associate negatively. We penalize genes where such directional interaction assumptions are violated. The scores_direction and expected_direction parameters are provided in the merge_p_values() and ActivePathways() functions to incorporate this directional penalty into the data fusion and pathway enrichment analyses. 
+Transcripts significantly up-regulated in an experiment would be expected to have the same proteins significantly up-regulated (i.e., a match in directionality). In contrast, significantly up-regulated transcripts coinciding with down-regulated proteins would have mismatches in directionality and undergo statistical penalties. The scores_direction and expected_direction parameters are provided in the merge_p_values() and ActivePathways() functions to incorporate this directional penalty into the data fusion and pathway enrichment analyses. 
 
 ```R 
  

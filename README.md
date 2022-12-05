@@ -1,6 +1,6 @@
 # ActivePathways
 
-**July 28 2022: ActivePathways will soon be updated to version 2.0.0. This update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
+**December 05 2022: ActivePathways will soon be updated to version 2.0.0. This update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
 
 
 ActivePathways is a tool for multivariate pathway enrichment analysis. Pathway enrichment analysis identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. Using this strategy, we can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
@@ -61,7 +61,7 @@ scores[is.na(scores)] <- 1
 
 enriched_pathways <- ActivePathways(scores, fname_GMT) 
 
-#35 terms were removed from gmt because they did not make the geneset.filter
+#35 terms were removed from gmt because they did not make the geneset_filter
 #91 rows were removed from scores because they are not found in the background
 
 
@@ -71,7 +71,7 @@ enriched_pathways <- ActivePathways(scores, fname_GMT)
 
 enriched_pathways[1:3,]
 
-#        term.id         term.name adjusted.p.val term.size
+#        term_id         term_name adjusted_p_val term_size
 #1: REAC:2424491   DAP12 signaling   4.491268e-05       358
 #2:  REAC:422475     Axon guidance   2.028966e-02       555
 #3:  REAC:177929 Signaling by EGFR   6.245734e-04       366
@@ -155,7 +155,7 @@ df <- read.table(system.file('extdata', 'Differential_expression_hoxa10as.tsv', 
 header = TRUE, sep = '\t')
 
 head(df,3)
-#gene_name  OE_logFC  OE_adj.P.Val  KD_logFC  KD_adj.P.Val
+#gene_name  OE_logFC  OE_P.Val  KD_logFC  KD_P.Val
 #TSPAN6  -0.0957155415 9.999954e-01	 0.4346923436 0.2560983801
 #DPM1 0.0340970905 9.999954e-01      0.4253006261 0.1161994806
 #SCYL3 0.1887001732 9.999954e-01	 0.0180449641 0.9999998702
@@ -208,7 +208,7 @@ Four files are written using the prefix:
 
 ## Creating enrichment maps using results of ActivePathways 
 
-Pathway enrichment analysis often leads to complex and redundant results. Enrichment maps are network-based visualisations of pathway enrichment analyses. Enrichment maps can be generated in the Cytoscape software using the EnrichmentMap app. The enhancedGraphics app is also required. See the vignette for details: `browseVignettes(package='ActivePathways')`.
+Pathway enrichment analysis often leads to complex and redundant results. Enrichment maps are network-based visualisations of pathway enrichment analyses. Enrichment maps can be generated in the Cytoscape software using the EnrichmentMap app. ** The enhancedGraphics app is also required **. See the vignette for details: `browseVignettes(package='ActivePathways')`.
 
 
 ## Required software
@@ -234,7 +234,7 @@ Pathway enrichment analysis often leads to complex and redundant results. Enrich
 
 ## Colour the nodes of the network to visualise supporting omics datasets
 
-To color nodes in the network (i.e., molecular pathways, biological processes) according to the omics datasets supporting the enrichments, the third file `enrichmentMap__subgroups.txt` needs to be imported to Cytoscape directly. To import the file, activate the menu option *File -> Import -> Table from File* and select the file `enrichmentMap__subgroups.txt`. In the following dialogue, select *To a Network Collection* in the dropdown menu *Where to Import Table data*. Click OK to proceed. 
+To color nodes in the network (i.e., molecular pathways, biological processes) according to the omics datasets supporting the enrichments, the third file `enrichmentMap__subgroups.txt` needs to be imported to Cytoscape directly. To import the file, activate the menu option *File -> Import -> Table from File* and select the file `enrichmentMap__subgroups.txt`. In the following dialogue, select *To a Network Collection* in the dropdown menu *Where to Import Table Data*. Click OK to proceed. 
 
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/ImportStep_V2.png)
 
@@ -242,11 +242,11 @@ Next, Cytoscape needs to use the imported information to color nodes using a pie
 
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/PropertiesDropDown2_V2.png)
 
-The *image/Chart 1* property now appears in the Style control panel. Click the triangle on the right, then set the *Column* to *instruct* and the *Mapping type* to *Passthrough*. 
+The *image/Chart 1* property now appears in the Style control panel. Click the triangle on the right, then set the *Column* to *instruct* and the *Mapping Type* to *Passthrough Mapping*. 
 
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/StylePanel_V2.png)
 
-This step colours the nodes corresponding to the enriched pathways according to the supporting omics datasets, based on in the scores matrix initially analysed in `ActivePathways`. 
+This step colours the nodes corresponding to the enriched pathways according to the supporting omics datasets, based on the scores matrix initially analysed in `ActivePathways`. 
 
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/NetworkStep2_V2.png)
 

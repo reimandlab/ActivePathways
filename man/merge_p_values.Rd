@@ -16,10 +16,10 @@ merge_p_values(
 
 \item{method}{Method to merge p-values. See 'methods' section below.}
 
-\item{scores_direction}{Either a vector of fold-change values or a matrix where each column is a test.}
+\item{scores_direction}{Either a vector of log2 transformed fold-change values or a matrix where each column is a test.}
 
 \item{expected_direction}{A numerical vector of +1 or -1 values corresponding to the expected
-directional relationship between columns in scores_direction}
+directional relationship between columns in scores_direction.}
 }
 \value{
 If \code{scores} is a vector or list, returns a number. If \code{scores} is a
@@ -30,7 +30,7 @@ Merge a list or matrix of p-values
 }
 \section{Methods}{
 
-Two methods are available to merge a list of p-values:
+Four methods are available to merge a list of p-values:
 \describe{
  \item{Fisher}{Fisher's method (default) assumes that p-values are uniformly
  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).

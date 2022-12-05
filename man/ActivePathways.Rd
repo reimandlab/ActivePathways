@@ -38,7 +38,7 @@ in \code{gmt}.}
 \item{geneset_filter}{A numeric vector of length two giving the lower and 
 upper limits for the size of the annotated geneset to pathways in gmt.
 Pathways with a geneset shorter than \code{geneset_filter[1]} or longer
-than \code{geneset_filter[2]} will be removed. Set either value to NA to
+than \code{geneset_filter[2]} will be removed. Set either value to NA
 to not enforce a minimum or maximum value, or set \code{geneset_filter} to 
 \code{NULL} to skip filtering.}
 
@@ -47,7 +47,7 @@ Any genes with merged, unadjusted \code{p > significant} will be discarded
 before testing.}
 
 \item{significant}{Significance cutoff for selecting enriched pathways. Pathways with
-\code{adjusted_p_val < significant} will be selected as results.}
+\code{adjusted_p_val <= significant} will be selected as results.}
 
 \item{merge_method}{Statistical method to merge p-values. See section on Merging P-Values}
 
@@ -65,7 +65,7 @@ column in the scores matrix. If NULL grDevices::rainbow is used by default.}
 \item{color_integrated_only}{A character vector of length 1 specifying the color of the 
 "combined" pathway contribution.}
 
-\item{scores_direction}{A numerical matrix of fold-change values where each row is a
+\item{scores_direction}{A numerical matrix of log2 transformed fold-change values where each row is a
 gene and each column represents a dataset (evidence). Rownames correspond to the genes
 and colnames to the datasets. We recommend converting missing values to ones. 
 Only datasets with fold-change information should be included in this matrix.}
@@ -94,7 +94,7 @@ ActivePathways
 
 To obtain a single p-value for each gene across the multiple omics datasets considered, 
 the p-values in \code{scores} #' are merged row-wise using a data fusion approach of p-value merging. 
-The two available methods are:
+The four available methods are:
 \describe{
  \item{Fisher}{Fisher's method assumes p-values are uniformly
  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
@@ -128,7 +128,7 @@ The four files written are:
     written to this file.}
     \item{subgroups.txt}{A matrix indicating whether the significant terms (pathways)
     were also found to be significant when considering only one column from
-    \code{scores}. A one indicates that that term was found to be significant 
+    \code{scores}. A one indicates that term was found to be significant 
 			when only p-values in that column were used to select genes.}
     \item{pathways.gmt}{A Shortened version of the supplied GMT
     file, containing only the significantly enriched terms in pathways.txt. }

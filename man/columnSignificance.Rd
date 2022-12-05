@@ -33,7 +33,7 @@ Any genes with merged, unadjusted \code{p > significant} will be discarded
 before testing.}
 
 \item{significant}{Significance cutoff for selecting enriched pathways. Pathways with
-\code{adjusted_p_val < significant} will be selected as results.}
+\code{adjusted_p_val <= significant} will be selected as results.}
 
 \item{correction_method}{Statistical method to correct p-values. See
 \code{\link[stats]{p.adjust}} for details.}

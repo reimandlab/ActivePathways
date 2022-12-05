@@ -23,7 +23,7 @@ found to be significant in the ActivePathways analysis.}
 \item{cytoscape_file_tag}{The user-defined file prefix and/or directory defining the location of the files.}
 
 \item{col_significance}{A data.table object with a column 'term_id' and a column
-for each type of omics evidence indicating whether a term was also found to be signficiant or not
+for each type of omics evidence indicating whether a term was also found to be significant or not
 when considering only the genes and p-values in the corresponding column of the \code{scores} matrix.
 If term was not found, NA's are shown in columns, otherwise the relevant lists of genes are shown.}
 

@@ -152,9 +152,10 @@ Transcripts significantly up-regulated in an experiment would be expected to hav
 The scores_direction and expected_direction parameters are provided in the merge_p_values() and ActivePathways() functions to incorporate this directional penalty into the data fusion and pathway enrichment analyses. Using the expected_direction parameter we can encode our expected relationship between different datasets, and scores_direction would reflect the log2 fold-change values of each gene.
 
 ```R 
-# As an example, the human glioma cell transcriptome was profiled from wild-type, overexpression and knockdown 
-# long noncoding RNA (lncRNA) HOXA10-AS conditions. The differentially expressed genes in HOXA10-AS overexpression
-# and knockdown experiments in brain cancer cells provided two datasets that are expected to have opposite fold-change directionality. 
+# As an example, the human glioma cell transcriptome was profiled from wild-type, overexpression
+# and knockdown long noncoding RNA (lncRNA) HOXA10-AS conditions. The differentially expressed
+# genes in HOXA10-AS overexpression and knockdown experiments in brain cancer cells provided
+# two datasets that are expected to have opposite fold-change directionality. 
 
 df <- read.table(system.file('extdata', 'Differential_expression_hoxa10as.tsv', package = 'ActivePathways'), 
 header = TRUE, sep = '\t')

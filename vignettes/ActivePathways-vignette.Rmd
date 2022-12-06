@@ -151,28 +151,28 @@ ActivePathways(scores2, gmt_file)
 
 The scores_direction and expected_direction parameters have recently been introduced to merge_p_values() and ActivePathways() functions, which can incorporate directional logic into the p-value merging methods. For example, fold-change in protein expression would be expected to associate positively with mRNA change of the corresponding gene, while DNA methylation change of the gene promoter would be expected to associate negatively. We penalize genes where such directional interaction assumptions are violated. Using the expected_direction parameter we can encode our expected relationship between different datasets, and scores_direction would reflect the log2 fold-change values of each gene. The magnitude of the input log2 fold-change values in scores_direction is discarded and only the directional information is used for pathway enrichment analysis and merging p-values. 
 
-As an example, the human glioma cell transcriptome was profiled from wild-type, overexpression and knockdown long noncoding RNA (lncRNA) HOXA10-AS conditions. The differentially expressed genes in HOXA10-AS overexpression and knockdown experiments in brain cancer cells provided two datasets that are expected to have opposite fold-change directionality.
+
 ```{r}
-df_oe_kd <- read.table(system.file('extdata', 'Differential_expression_hoxa10as.tsv', package = 'ActivePathways'), 
-header = TRUE, sep = '\t')
-df_oe_kd
+df <- read.table(system.file('extdata', 'Differential_expression_rna_protein.tsv', package = 'ActivePathways'), 
+header = TRUE,row.names = "gene", sep = '\t')
+df
 ```
 
 
-The top 5 scoring genes differ if we penalize genes where this directional logic is violated. Using Stouffer's method the genes, COL25A1, ARHGEF17,B4GALT6 and NEGR1 are penalized, whilst CPED1 retains its significance and improves in rank. 
+The top 5 scoring genes differ if we penalize genes where this directional logic is violated. Using Stouffer's method the genes, KHNYN and PLA2G7 are penalized, whilst TPRG1 retains its significance. Interestingly, as a consequence of penalizing these two genes, other genes move up in rank (DCLK1, RALGAPA1, NOP9 and SCRN1 for example). Incorporating directional information into ActivePathways influences both gene and pathway level findings. 
 
 ```{r}
-scores3 <- data.frame(row.names = df_oe_kd[,1], overexpression = df_oe_kd[,3], knockdown = df_oe_kd[,5])
+scores3 <- data.frame(row.names = rownames(df), rna = df[,1], protein = df[,3])
 scores3 <- as.matrix(scores3)
 scores3[is.na(scores3)] <- 1
 
-scores_direction <- data.frame(row.names = df_oe_kd[,1], overexpression = df_oe_kd[,2], knockdown = df_oe_kd[,4])
+scores_direction <- data.frame(row.names = rownames(df), rna = df[,2], protein = df[,4])
 scores_direction <- as.matrix(scores_direction)
 scores_direction[is.na(scores_direction)] <- 1
 
-expected_direction <- c(-1,1)
+expected_direction <- c(1,1)
 
-df_oe_kd[df_oe_kd$gene_name %in% c('COL25A1','CPED1','ARHGEF17','B4GALT6','NEGR1'),]
+df[c('TPRG1','KHNYN','PLA2G7','DCLK1','RALGAPA1'),]
 sort(merge_p_values(scores3, 'Stouffer'))[1:5]
 sort(merge_p_values(scores3, 'Stouffer',scores_direction, expected_direction))[1:5]
 ```

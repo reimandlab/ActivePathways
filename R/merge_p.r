@@ -61,7 +61,6 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
         
         if (is.matrix(scores_direction) && is.matrix(scores)){
             if (any(!rownames(scores_direction) %in% rownames(scores))) stop ("scores_direction gene names must match scores genes")
-            if(length(scores_direction[,1]) != (length(scores[,1]))) stop("scores_direction matrix should have the same numbers of rows as the scores matrix")
             if(length(colnames(scores_direction)[colnames(scores_direction) %in% colnames(scores)]) < 2){ 
                 stop("A minimum of two datasets from the scores matrix should have corresponding directionality data in scores_direction. Ensure column names are identical")
             }

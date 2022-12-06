@@ -136,14 +136,13 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   if (any(scores < 0) || any(scores > 1)) stop("All values in scores must be in [0,1]")
   if (any(duplicated(rownames(scores)))) stop("scores matrix contains duplicated genes - rownames must be unique")
   
-  #scores_direction and expected_direction
+  # scores_direction and expected_direction
   if (!is.null(scores_direction) && !is.null(expected_direction)){
         if (!is.matrix(scores_direction)) stop("scores_direction must be a matrix")
         if (any(is.na(scores_direction))) stop("scores_direction may not contain missing values")
         if (!is.numeric(scores_direction)) stop("scores_direction must be numeric")
         if (!(is.numeric(expected_direction) && is.vector(expected_direction))) stop("expected_direction must be a numeric vector")
         if (any(!rownames(scores_direction) %in% rownames(scores))) stop ("scores_direction gene names must match scores genes")
-        if(length(scores_direction[,1]) != (length(scores[,1]))) stop("scores_direction matrix should have the same numbers of rows as the scores matrix")
         if(length(colnames(scores_direction)[colnames(scores_direction) %in% colnames(scores)]) < 2){ 
               stop("A minimum of two datasets from the scores matrix should have corresponding directionality data in scores_direction. Ensure column names are identical")
              }
@@ -209,7 +208,7 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   } 
   if(1 != length(color_integrated_only)) stop("only a single color must be specified")
 	
-  #contribution
+  # contribution
   contribution <- TRUE
   if (ncol(scores) == 1) {
     contribution <- FALSE

@@ -22,7 +22,7 @@ Using the R package `devtools`, run
 #### From source on our GitHub repository
 Clone the repository, for example using `git clone https://github.com/reimandlab/ActivePathways.git`. 
 
-Open R in the directory where you cloned the package and run `install.packages("ActivePathways", repos = NULL, type "source")`
+Open R in the directory where you cloned the package and run `install.packages("ActivePathways", repos = NULL, type = "source")`
 
 
 

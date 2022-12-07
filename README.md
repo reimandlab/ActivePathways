@@ -152,43 +152,40 @@ Transcripts significantly up-regulated in an experiment would be expected to hav
 The scores_direction and expected_direction parameters are provided in the merge_p_values() and ActivePathways() functions to incorporate this directional penalty into the data fusion and pathway enrichment analyses. Using the expected_direction parameter we can encode our expected relationship between different datasets, and scores_direction would reflect the log2 fold-change values of each gene.
 
 ```R 
-# As an example, the human glioma cell transcriptome was profiled from wild-type, overexpression
-# and knockdown long noncoding RNA (lncRNA) HOXA10-AS conditions. The differentially expressed
-# genes in HOXA10-AS overexpression and knockdown experiments in brain cancer cells provided
-# two datasets that are expected to have opposite fold-change directionality. 
 
-df <- read.table(system.file('extdata', 'Differential_expression_hoxa10as.tsv', package = 'ActivePathways'), 
-header = TRUE, sep = '\t')
+df <- read.table(system.file('extdata', 'Differential_expression_rna_protein.tsv', package = 'ActivePathways'), 
+header = TRUE,row.names = "gene", sep = '\t')
 
-head(df,3)
-#gene_name  OE_logFC  OE_P.Val  KD_logFC  KD_P.Val
-#TSPAN6  -0.0957155415 9.999954e-01	 0.4346923436 0.2560983801
-#DPM1 0.0340970905 9.999954e-01      0.4253006261 0.1161994806
-#SCYL3 0.1887001732 9.999954e-01	 0.0180449641 0.9999998702
-
-scores <- data.frame(row.names = df[,1], overexpression = df[,3], knockdown = df[,5])
+scores <- data.frame(row.names = rownames(df), rna = df[,1], protein = df[,3])
 scores <- as.matrix(scores)
 scores[is.na(scores)] <- 1
 
-
-# A numerical matrix of log2 fold-changes values is required as input along 
-# with a vector that provides the expected relationship between different datasets
-
-scores_direction <- data.frame(row.names = df[,1], overexpression = df[,2], knockdown = df[,4])
+# A numerical matrix of log2 fold-changes values is required as input
+scores_direction <- data.frame(row.names = rownames(df), rna = df[,2], protein = df[,4])
 scores_direction <- as.matrix(scores_direction)
 scores_direction[is.na(scores_direction)] <- 1
 
-expected_direction <- c(-1,1)
+# This matrix has to be accompanied by a vector that provides the expected relationship between different datasets
+expected_direction <- c(1,1)
 
-sort(merge_p_values(scores, 'Stouffer'))[1:3]
+df[c('TPRG1','KHNYN','PLA2G7','DCLK1','RALGAPA1'),]
 
-# COL25A1        CPED1     ARHGEF17      
-# 2.245169e-05 8.799371e-05 9.033745e-05
+#         rna_pval     rna_log2fc protein_pval  protein_log2fc
+#TPRG1    0.000450743	 1.6928244	 0.015971771	  0.6052608
+#KHNYN    0.002995212	 1.1425171	 0.005479684	 -1.0174321
+#PLA2G7   0.025666212	-1.1803979	 0.000980713	  1.4458352
+#DCLK1    0.002421783	-1.0383075	 0.015971771  -1.1279115
+#RALGAPA1 0.015971771	 0.3079624	 0.002995212	  1.1382782
 
-sort(merge_p_values(scores, 'Stouffer',scores_direction, expected_direction))[1:3]
+sort(merge_p_values(scores, 'Stouffer'))[1:5]
 
-# CPED1        IFI44       IFI44L         
-# 8.799371e-05 2.057385e-04 4.010490e-04 
+# TPRG1        KHNYN        PLA2G7       DCLK1        RALGAPA1 
+# 2.855959e-05 4.849415e-05 9.293250e-05 1.188756e-04 1.431444e-04 
+
+sort(merge_p_values(scores, 'Stouffer',scores_direction, expected_direction))[1:5]
+
+# TPRG1        DCLK1        RALGAPA1     NOP9         SCRN1 
+# 2.855959e-05 1.188756e-04 1.431444e-04 1.472363e-04 1.671520e-04 
 
 ```
 

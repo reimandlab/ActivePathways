@@ -148,7 +148,7 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
                     stop("A minimum of two datasets from the scores matrix should have corresponding directionality data in scores_direction. Ensure column names are identical")
               }
         }
-        if (length(expected_direction) != length(colnames(scores_direction))) stop("expected_direction should have the same number of entries as columns in scores_direction")
+        if (length(expected_direction) != length((scores_direction[1,]))) stop("expected_direction should have the same number of entries as columns in scores_direction")
         if (!is.null(names(expected_direction))){
               if (!all.equal(names(expected_direction), colnames(scores_direction)) == TRUE){
                     stop("the expected_direction entries should match the order of scores_direction columns")

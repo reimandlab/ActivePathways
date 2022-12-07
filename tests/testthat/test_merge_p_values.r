@@ -84,6 +84,10 @@ test_that("scores_direction and expected_direction are valid", {
       test_dir[1,1] <- 'a'
       expect_error(merge_p_values(test_matrix, "Fisher", test_dir, c(1,1)), 'scores_direction must be numeric')
       
+      test_dir <- test_direction_matrix
+      colnames(test_dir) <- NULL
+      expect_error(merge_p_values(test_matrix, "Fisher", test_dir, c(1,1)), 'column names must be provided to scores and scores_direction')
+      
       expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, c(1,"b")), 'expected_direction must be a numeric vector')
       
       test_m <- test_matrix

@@ -24,33 +24,31 @@ test_that("scores is a numeric matrix with valid p-values", {
 })
 
 test_that("scores_direction and expected_direction have valid input",{
-  hox_test <- hox_direction
-  hox_test[1,1] <- 'a'
-  expect_error(run_ap(hox_score,hox_test,hox_expected_direction), 'scores_direction must be numeric')
   
-  #hox_test <- hox_direction
-  #hox_test[1,1] <- NA
-  #expect_error(run_ap(hox_score,hox_test,hox_expected_direction), 'Scores direction matrix may not contain missing values')
+  dir_test <- direction_test
+  dir_test[1,1] <- NA
+  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'scores_direction may not contain missing values')
   
-  hox_test <- hox_direction
-  rownames(hox_test) <- 1:length(hox_direction[,1])
-  expect_error(run_ap(hox_score,hox_test,hox_expected_direction), 'scores_direction gene names must match scores genes')
   
-  hox_test <- hox_direction
-  hox_test <- hox_test[1:10,]
-  expect_error(run_ap(hox_score,hox_test,hox_expected_direction), 
-               'scores_direction matrix should have the same numbers of rows as the scores matrix')
+  dir_test <- direction_test
+  dir_test[1,1] <- 'a'
+  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'scores_direction must be numeric')
+  
+  
+  dir_test <- direction_test
+  rownames(dir_test) <- 1:length(direction_test[,1])
+  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'scores_direction gene names must match scores genes')
 
-  hox_expected <- c('a','b')
-  expect_error(run_ap(hox_score,hox_direction,hox_expected), 'expected_direction must be a numeric vector')
+  expected_dir <- c('a','b')
+  expect_error(run_ap(scores_test,direction_test,expected_dir), 'expected_direction must be a numeric vector')
   
-  hox_expected <- c(1,1,-1)
-  expect_error(run_ap(hox_score,hox_direction,hox_expected), 
+  expected_dir <- c(1,1,-1)
+  expect_error(run_ap(scores_test,direction_test,expected_dir), 
                'expected_direction should have the same number of entries as columns in scores_direction')
   
-  hox_expected <- c(1,-1)
-  names(hox_expected) <- c("knockdown","overexpression")
-  expect_error(run_ap(hox_score,hox_direction,hox_expected), 
+  expected_dir <- c(1,-1)
+  names(expected_dir) <- c("protein","rna")
+  expect_error(run_ap(scores_test,direction_test,expected_dir), 
                'the expected_direction entries should match the order of scores_direction columns')
   
   

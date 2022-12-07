@@ -153,20 +153,8 @@ The scores_direction and expected_direction parameters are provided in the merge
 
 ```R 
 
-df <- read.table(system.file('extdata', 'Differential_expression_rna_protein.tsv', package = 'ActivePathways'), 
-header = TRUE,row.names = "gene", sep = '\t')
-
-scores <- data.frame(row.names = rownames(df), rna = df[,1], protein = df[,3])
-scores <- as.matrix(scores)
-scores[is.na(scores)] <- 1
-
-# A numerical matrix of log2 fold-changes values is required as input
-scores_direction <- data.frame(row.names = rownames(df), rna = df[,2], protein = df[,4])
-scores_direction <- as.matrix(scores_direction)
-scores_direction[is.na(scores_direction)] <- 1
-
-# This matrix has to be accompanied by a vector that provides the expected relationship between different datasets
-expected_direction <- c(1,1)
+df <- read.table(system.file('extdata', 'Differential_expression_rna_protein.tsv',
+                 package = 'ActivePathways'), header = TRUE,row.names = "gene", sep = '\t')
 
 df[c('TPRG1','KHNYN','PLA2G7','DCLK1','RALGAPA1'),]
 
@@ -177,9 +165,23 @@ df[c('TPRG1','KHNYN','PLA2G7','DCLK1','RALGAPA1'),]
 #DCLK1    0.002421783	-1.0383075	 0.015971771     -1.1279115
 #RALGAPA1 0.015971771	 0.3079624	 0.002995212	  1.1382782
 
-# The top 5 scoring genes differ if we penalize genes where this directional logic is violated. Using Stouffer's method
-# the genes, KHNYN and PLA2G7 are penalized, whilst TPRG1 retains its significance. Interestingly, as a consequence of
-# penalizing these two genes, other genes move up in rank (DCLK1, RALGAPA1, NOP9 and SCRN1 for example).  
+scores <- data.frame(row.names = rownames(df), rna = df[,1], protein = df[,3])
+scores <- as.matrix(scores)
+scores[is.na(scores)] <- 1
+
+# A numerical matrix of log2 fold-changes values is required as input
+scores_direction <- data.frame(row.names = rownames(df), rna = df[,2], protein = df[,4])
+scores_direction <- as.matrix(scores_direction)
+scores_direction[is.na(scores_direction)] <- 1
+
+# This matrix has to be accompanied by a vector that provides the expected relationship between
+# different datasets
+expected_direction <- c(1,1)
+
+# The top 5 scoring genes differ if we penalize genes where this directional logic is violated.
+# Using Stouffer's method the genes, KHNYN and PLA2G7 are penalized, whilst TPRG1 retains its
+# significance. Interestingly, as a consequence of penalizing these two genes, other genes
+# move up in rank (DCLK1, RALGAPA1, NOP9 and SCRN1 for example).  
 
 sort(merge_p_values(scores, 'Stouffer'))[1:5]
 

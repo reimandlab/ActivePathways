@@ -39,6 +39,10 @@ test_that("scores_direction and expected_direction have valid input",{
   rownames(dir_test) <- 1:length(direction_test[,1])
   expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'scores_direction gene names must match scores genes')
 
+  dir_test <- direction_test
+  colnames(dir_test) <- NULL
+  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'column names must be provided to scores and scores_direction')
+  
   expected_dir <- c('a','b')
   expect_error(run_ap(scores_test,direction_test,expected_dir), 'expected_direction must be a numeric vector')
   

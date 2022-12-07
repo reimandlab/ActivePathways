@@ -170,12 +170,16 @@ expected_direction <- c(1,1)
 
 df[c('TPRG1','KHNYN','PLA2G7','DCLK1','RALGAPA1'),]
 
-#         rna_pval     rna_log2fc protein_pval  protein_log2fc
+#         rna_pval       rna_log2fc      protein_pval     protein_log2fc
 #TPRG1    0.000450743	 1.6928244	 0.015971771	  0.6052608
 #KHNYN    0.002995212	 1.1425171	 0.005479684	 -1.0174321
 #PLA2G7   0.025666212	-1.1803979	 0.000980713	  1.4458352
-#DCLK1    0.002421783	-1.0383075	 0.015971771  -1.1279115
+#DCLK1    0.002421783	-1.0383075	 0.015971771     -1.1279115
 #RALGAPA1 0.015971771	 0.3079624	 0.002995212	  1.1382782
+
+# The top 5 scoring genes differ if we penalize genes where this directional logic is violated. Using Stouffer's method
+# the genes, KHNYN and PLA2G7 are penalized, whilst TPRG1 retains its significance. Interestingly, as a consequence of
+# penalizing these two genes, other genes move up in rank (DCLK1, RALGAPA1, NOP9 and SCRN1 for example).  
 
 sort(merge_p_values(scores, 'Stouffer'))[1:5]
 

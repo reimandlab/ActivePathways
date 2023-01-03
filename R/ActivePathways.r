@@ -37,6 +37,8 @@
 #' @param expected_direction A numerical vector of +1 or -1 values corresponding to the expected
 #'   directional relationship between columns in scores_direction. The length of this vector 
 #'   should match the number of columns in scores_direction.
+#' @param scores_columns A character vector of column names for scores. Must be provided for directional p-value merging.
+#' @param scores_direction_columns A character vector of column names for scores_direction. Must be provided for directional p-value merging. 
 #'
 #' @return A data.table of terms (enriched pathways) containing the following columns:
 #'   \describe{
@@ -124,10 +126,19 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
                                                   "bonferroni", "BH", "BY", "none"),
                             cytoscape_file_tag = NA, color_palette = NULL, custom_colors = NULL, 
                             color_integrated_only = "#FFFFF0", scores_direction = NULL, 
-                            expected_direction = NULL) {
+                            expected_direction = NULL, scores_columns = NULL, scores_direction_columns = NULL) {
   
   merge_method <- match.arg(merge_method)
   correction_method <- match.arg(correction_method)
+  
+  # Convert the dataframe input into a matrix (specific to python users)
+  if (is.data.frame(scores)){
+        scores <- as.matrix(scores)
+  }
+  if (is.data.frame(scores_direction)){
+        scores_direction <- as.matrix(scores_direction)
+  }
+  
   
   ##### Validation #####
   # scores
@@ -135,6 +146,16 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   if (any(is.na(scores))) stop("scores may not contain missing values")
   if (any(scores < 0) || any(scores > 1)) stop("All values in scores must be in [0,1]")
   if (any(duplicated(rownames(scores)))) stop("scores matrix contains duplicated genes - rownames must be unique")
+  
+  # scores_columns and scores_direction_columns
+  if (!is.null(scores_columns)){
+        if (!(is.character(scores_columns) && is.vector(scores_columns))) stop("scores_columns must be a character vector")
+        colnames(scores) <- scores_columns 
+  }
+  if (!is.null(scores_direction_columns)){
+        if (!(is.character(scores_direction_columns) && is.vector(scores_direction_columns))) stop("scores_direction_columns must be a character vector")
+        colnames(scores_direction) <- scores_direction_columns
+  }
   
   # scores_direction and expected_direction
   if (!is.null(scores_direction) && !is.null(expected_direction)){

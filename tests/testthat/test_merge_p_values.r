@@ -12,21 +12,17 @@ comparison_matrix = matrix(unlist(comparison_list), ncol = 2)
 test_that("scores is a numeric matrix or list with valid p-values", {
 
     expect_error(merge_p_values(unlist(test_list), "Fisher"), NA)
-    expect_error(merge_p_values(test_list, "Brown"), 
-                 "Brown's or Strube's method cannot be used with a single list of p-values")
     expect_error(merge_p_values(unlist(test_list), "Brown"), 
                  "Brown's or Strube's method cannot be used with a single list of p-values")
     
-    
-    
     test_list[[1]] <- -0.1
-    expect_error(merge_p_values(test_list), 'All values in scores must be in [0,1]', fixed=TRUE)
+    expect_error(merge_p_values(unlist(test_list)), 'All values in scores must be in [0,1]', fixed=TRUE)
     test_list[[1]] <- 1.1
-    expect_error(merge_p_values(test_list), 'All values in scores must be in [0,1]', fixed=TRUE)
+    expect_error(merge_p_values(unlist(test_list)), 'All values in scores must be in [0,1]', fixed=TRUE)
     test_list[[1]] <- NA
-    expect_error(merge_p_values(test_list), 'scores may not contain missing values')
+    expect_error(merge_p_values(unlist(test_list)), 'scores may not contain missing values')
     test_list[[1]] <- 'c'
-    expect_error(merge_p_values(test_list), 'scores must be numeric')
+    expect_error(merge_p_values(unlist(test_list)), 'scores must be numeric')
     
     
     test_matrix[1, 1] <- NA
@@ -57,7 +53,7 @@ test_that("Merged p-values are correct", {
     expect_equal(merge_p_values(test_matrix[, 1, drop=FALSE], "Fisher"), test_matrix[, 1, drop=TRUE])
     expect_equal(merge_p_values(test_matrix[, 1, drop=FALSE], "Brown"), test_matrix[, 1, drop=TRUE])
 
-    expect_equal(merge_p_values(test_list, "Fisher"), answer3, tolerance = this_tolerance)
+    expect_equal(merge_p_values(unlist(test_list), "Fisher"), answer3, tolerance = this_tolerance)
 })
 
 

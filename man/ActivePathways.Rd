@@ -19,7 +19,9 @@ ActivePathways(
   custom_colors = NULL,
   color_integrated_only = "#FFFFF0",
   scores_direction = NULL,
-  expected_direction = NULL
+  expected_direction = NULL,
+  scores_columns = NULL,
+  scores_direction_columns = NULL
 )
 }
 \arguments{
@@ -73,6 +75,10 @@ Only datasets with fold-change information should be included in this matrix.}
 \item{expected_direction}{A numerical vector of +1 or -1 values corresponding to the expected
 directional relationship between columns in scores_direction. The length of this vector 
 should match the number of columns in scores_direction.}
+
+\item{scores_columns}{A character vector of column names for scores. Must be provided for directional p-value merging.}
+
+\item{scores_direction_columns}{A character vector of column names for scores_direction. Must be provided for directional p-value merging.}
 }
 \value{
 A data.table of terms (enriched pathways) containing the following columns:

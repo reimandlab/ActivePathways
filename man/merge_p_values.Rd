@@ -8,7 +8,9 @@ merge_p_values(
   scores,
   method = "Fisher",
   scores_direction = NULL,
-  expected_direction = NULL
+  expected_direction = NULL,
+  scores_columns = NULL,
+  scores_direction_columns = NULL
 )
 }
 \arguments{
@@ -20,6 +22,10 @@ merge_p_values(
 
 \item{expected_direction}{A numerical vector of +1 or -1 values corresponding to the expected
 directional relationship between columns in scores_direction.}
+
+\item{scores_columns}{A character vector of column names for scores. Must be provided for directional p-value merging.}
+
+\item{scores_direction_columns}{A character vector of column names for scores_direction. Must be provided for directional p-value merging.}
 }
 \value{
 If \code{scores} is a vector or list, returns a number. If \code{scores} is a
@@ -54,7 +60,6 @@ Four methods are available to merge a list of p-values:
 
 \examples{
   merge_p_values(c(0.05, 0.09, 0.01))
-  merge_p_values(list(a=0.01, b=1, c=0.0015, d=0.025), method='Fisher')
   merge_p_values(matrix(data=c(0.03, 0.061, 0.48, 0.052), nrow = 2), method='Brown')
 
 }

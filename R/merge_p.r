@@ -5,6 +5,8 @@
 #' @param scores_direction Either a vector of log2 transformed fold-change values or a matrix where each column is a test. 
 #' @param expected_direction  A numerical vector of +1 or -1 values corresponding to the expected
 #'   directional relationship between columns in scores_direction.
+#' @param scores_columns A character vector of column names for scores. Must be provided for directional p-value merging.
+#' @param scores_direction_columns A character vector of column names for scores_direction. Must be provided for directional p-value merging. 
 #'
 #' @return If \code{scores} is a vector or list, returns a number. If \code{scores} is a
 #'   matrix, returns a named list of p-values merged by row.
@@ -38,9 +40,17 @@
 #' 
 #' @export
 merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL, 
-                           expected_direction = NULL) {
+                           expected_direction = NULL, scores_columns = NULL, scores_direction_columns = NULL) {
+    
+    # Convert the dataframe input into a matrix (specific to python users)
+    if (is.data.frame(scores)){
+        scores <- as.matrix(scores)
+    }
+    if (is.data.frame(scores_direction)){
+        scores_direction <- as.matrix(scores_direction)
+    }
+    
     # Validation on scores
-    if (is.list(scores)) scores <- unlist(scores, recursive=FALSE)
     if (!(is.vector(scores) || is.matrix(scores))) stop("scores must be a matrix or vector")
     if (any(is.na(scores))) stop("scores may not contain missing values")
     if (!is.numeric(scores)) stop("scores must be numeric")
@@ -49,10 +59,29 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
 	    stop("Only Fisher's, Brown's, Stouffer's and Strube's methods are currently supported")
 	}
     
+    # Validation on scores_columns and scores_direction_columns
+    if (!is.null(scores_columns)){
+        if (!(is.character(scores_columns) && is.vector(scores_columns))) stop("scores_columns must be a character vector")
+        if (is.matrix(scores)){
+            colnames(scores) <- scores_columns 
+        }
+        if (is.vector(scores)){
+            names(scores) <- scores_columns
+        }
+    }
+    if (!is.null(scores_direction_columns)){
+        if (!(is.character(scores_direction_columns) && is.vector(scores_direction_columns))) stop("scores_direction_columns must be a character vector")
+        if (is.matrix(scores_direction)){
+            colnames(scores_direction) <- scores_direction_columns 
+        }
+        if (is.vector(scores_direction)){
+            names(scores_direction) <- scores_direction_columns
+        }
+    }
     
     # Validation on scores_direction and expected_direction
     if (!is.null(scores_direction) && !is.null(expected_direction)){
-        if (is.vector(scores_direction) && is.matrix(scores)) stop ("scores and scores_direction must be the same data type")
+        if (is.vector(scores_direction) && is.matrix(scores))  stop ("scores and scores_direction must be the same data type")
         if (is.matrix(scores_direction) && is.vector(scores)) stop ("scores and scores_direction must be the same data type")
         if (!(is.vector(scores_direction) || is.matrix(scores_direction))) stop("scores_direction must be a matrix or vector")
         if (any(is.na(scores_direction))) stop("scores_direction may not contain missing values")

@@ -73,6 +73,11 @@ rownames(test_direction_matrix) <- rownames(test_matrix)
 
 test_that("scores_direction and expected_direction are valid", {
       
+      expect_error(merge_p_values(test_matrix, "Fisher",test_direction_matrix),'The expected_direction parameter must be provided')
+      expect_error(merge_p_values(test_matrix, "Fisher",expected_direction = expected_dir),'The scores_direction parameter must be provided')
+      expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, c(1,"b")), 'expected_direction must be a numeric vector')
+      expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, c(1,0)), 'expected_direction must contain 1 or -1 values')
+      
       test_dir <- as.vector(test_direction_matrix)
       expect_error(merge_p_values(test_matrix, "Fisher", test_dir, c(1,1)), 'scores and scores_direction must be the same data type')
       
@@ -87,8 +92,6 @@ test_that("scores_direction and expected_direction are valid", {
       test_dir <- test_direction_matrix
       colnames(test_dir) <- NULL
       expect_error(merge_p_values(test_matrix, "Fisher", test_dir, c(1,1)), 'column names must be provided to scores and scores_direction')
-      
-      expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, c(1,"b")), 'expected_direction must be a numeric vector')
       
       test_m <- test_matrix
       rownames(test_m) <- c("TP53", "GENE2", "GENE3")

@@ -33,7 +33,7 @@
 #' @param scores_direction A numerical matrix of log2 transformed fold-change values where each row is a
 #'   gene and each column represents a dataset (evidence). Rownames correspond to the genes
 #'   and colnames to the datasets. We recommend converting missing values to ones. 
-#'   Only datasets with fold-change information should be included in this matrix. 
+#'   Only datasets with fold-change information and a known directional relationship should be included in this matrix.
 #' @param expected_direction A numerical vector of +1 or -1 values corresponding to the expected
 #'   directional relationship between columns in scores_direction. The length of this vector 
 #'   should match the number of columns in scores_direction.
@@ -137,11 +137,14 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
   if (any(duplicated(rownames(scores)))) stop("scores matrix contains duplicated genes - rownames must be unique")
   
   # scores_direction and expected_direction
+  if (!is.null(scores_direction) && is.null(expected_direction)) stop("The expected_direction parameter must be provided")
+  if (is.null(scores_direction) && !is.null(expected_direction)) stop("The scores_direction parameter must be provided")
   if (!is.null(scores_direction) && !is.null(expected_direction)){
+        if (!(is.numeric(expected_direction) && is.vector(expected_direction))) stop("expected_direction must be a numeric vector")
+        if (!is.null(expected_direction) && any(!expected_direction %in% c(1,-1))) stop("expected_direction must contain 1 or -1 values")
         if (!is.matrix(scores_direction)) stop("scores_direction must be a matrix")
         if (any(is.na(scores_direction))) stop("scores_direction may not contain missing values")
         if (!is.numeric(scores_direction)) stop("scores_direction must be numeric")
-        if (!(is.numeric(expected_direction) && is.vector(expected_direction))) stop("expected_direction must be a numeric vector")
         if (any(!rownames(scores_direction) %in% rownames(scores))) stop ("scores_direction gene names must match scores genes")
         if (is.null(colnames(scores)) || is.null(colnames(scores_direction))) stop("column names must be provided to scores and scores_direction")
         if(length(colnames(scores_direction)[colnames(scores_direction) %in% colnames(scores)]) < 2){ 

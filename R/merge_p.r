@@ -3,6 +3,7 @@
 #' @param scores Either a list of p-values or a matrix where each column is a test.
 #' @param method Method to merge p-values. See 'methods' section below.
 #' @param scores_direction Either a vector of log2 transformed fold-change values or a matrix where each column is a test. 
+#' Only datasets with a known directional relationship should be provided.
 #' @param expected_direction  A numerical vector of +1 or -1 values corresponding to the expected
 #'   directional relationship between columns in scores_direction.
 #'
@@ -51,13 +52,16 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
     
     
     # Validation on scores_direction and expected_direction
+    if (!is.null(scores_direction) && is.null(expected_direction)) stop("The expected_direction parameter must be provided")
+    if (is.null(scores_direction) && !is.null(expected_direction)) stop("The scores_direction parameter must be provided")
     if (!is.null(scores_direction) && !is.null(expected_direction)){
+        if (!(is.numeric(expected_direction) && is.vector(expected_direction))) stop("expected_direction must be a numeric vector")
+        if (!is.null(expected_direction) && any(!expected_direction %in% c(1,-1))) stop("expected_direction must contain 1 or -1 values")
         if (is.vector(scores_direction) && is.matrix(scores)) stop ("scores and scores_direction must be the same data type")
         if (is.matrix(scores_direction) && is.vector(scores)) stop ("scores and scores_direction must be the same data type")
         if (!(is.vector(scores_direction) || is.matrix(scores_direction))) stop("scores_direction must be a matrix or vector")
         if (any(is.na(scores_direction))) stop("scores_direction may not contain missing values")
         if (!is.numeric(scores_direction)) stop("scores_direction must be numeric")
-        if (!(is.numeric(expected_direction) && is.vector(expected_direction))) stop("expected_direction must be a numeric vector")
         
         if (is.matrix(scores_direction) && is.matrix(scores)){
             if (any(!rownames(scores_direction) %in% rownames(scores))) stop ("scores_direction gene names must match scores genes")
@@ -110,21 +114,22 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
     
     # If scores is a matrix with multiple columns, apply the following methods
     scores <- apply(scores, c(1,2), function(x) ifelse (x == 0, 1e-300, x))
+    
+    if (method == "Fisher"){
+        fisher_merged <- c()
+        for(i in 1:length(scores[,1])) {
+            p_fisher <- stats::pchisq(fishersMethod(scores[i,], scores_direction[i,],expected_direction),
+                                      2*length(scores[i,]), lower.tail = FALSE)
+            fisher_merged <- c(fisher_merged,p_fisher)
+        }
+        names(fisher_merged) <- rownames(scores)
+        return(fisher_merged)
+    }
     if (method == "Brown") {
         cov_matrix <- calculateCovariances(t(scores))
         brown_merged <- brownsMethod(scores, cov_matrix = cov_matrix, scores_direction = scores_direction,
                                      expected_direction = expected_direction)
         return(brown_merged)
-    }
-    if (method == "Fisher"){
-        fisher_merged <- c()
-        for(i in 1:length(scores[,1])) {
-            p_fisher <- stats::pchisq(fishersMethod(scores[i,], scores_direction[i,],expected_direction),
-                                         2*length(scores[i,]), lower.tail = FALSE)
-            fisher_merged <- c(fisher_merged,p_fisher)
-        }
-        names(fisher_merged) <- rownames(scores)
-        return(fisher_merged)
     }
     if (method == "Stouffer"){
         stouffer_merged <- c()
@@ -139,50 +144,8 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
         strube_merged <- strubesMethod(scores,scores_direction,expected_direction)
         return(strube_merged)
     }
-    
 }
 
-stouffersMethod <- function (p_values, scores_direction,expected_direction){
-    k = length(p_values)
-    if (!is.null(scores_direction) && !is.null(expected_direction)){
-        directionality <- expected_direction * scores_direction/abs(scores_direction)
-        p_values_directional <- p_values[names(p_values) %in% names(scores_direction)]
-        z_directional <- abs(sum(stats::qnorm(p_values_directional/2)*directionality))
-        
-        if (length(p_values_directional) != k){
-            p_values_nondirectional <- p_values[!names(p_values) %in% names(scores_direction)]
-            z_nondirectional <- abs(sum(stats::qnorm(p_values_nondirectional/2)))
-        } else {
-            z_nondirectional <- 0
-        }
-        z_values <- c(z_directional, z_nondirectional)
-    } else {
-        z_values <- stats::qnorm(p_values/2)
-    }
-    z <- sum(z_values)/sqrt(k)
-    z
-}
-
-strubesMethod <- function (p_values, scores_direction, expected_direction){
-    #acquiring the unadjusted z-value from Stouffer's method.
-    stouffer_z <- c()
-    for(i in 1:length(p_values[,1])){
-        stouffer_z <- c(stouffer_z,stouffersMethod(p_values[i,], scores_direction[i,],expected_direction))
-    }
-    names(stouffer_z) <- rownames(p_values)
-    k = length(p_values[1,])
- 
-    #correlation matrix
-    cor_mtx <- stats::cor(p_values, use = "complete.obs")
-    cor_mtx[is.na(cor_mtx)] <- 0
-    cor_mtx <- abs(cor_mtx)
-    
-    #adjusted p-value
-    adjusted_z <- stouffer_z * sqrt(k) / sqrt(sum(cor_mtx))
-    p_strube <- 2*stats::pnorm(-1*abs(adjusted_z))
-    names(p_strube) <- rownames(p_values)
-    p_strube
-}
 
 fishersMethod <- function(p_values, scores_direction, expected_direction) {
     if (!is.null(scores_direction) && !is.null(expected_direction)){
@@ -233,13 +196,13 @@ brownsMethod <- function(p_values, data_matrix = NULL, cov_matrix = NULL, scores
         message("Both data_matrix and cov_matrix were supplied. Ignoring data_matrix")
     }
     if (missing(cov_matrix)) cov_matrix <- calculateCovariances(data_matrix)
-
+    
     N <- ncol(cov_matrix)
     expected <- 2 * N
     cov_sum <- 2 * sum(cov_matrix[lower.tri(cov_matrix, diag=FALSE)])
     var <- (4 * N) + cov_sum
     sf <- var / (2 * expected)
-
+    
     df <- (2 * expected^2) / var
     if (df > 2 * N) {
         df <- 2 * N
@@ -258,6 +221,51 @@ brownsMethod <- function(p_values, data_matrix = NULL, cov_matrix = NULL, scores
     names(p_brown) <- rownames(p_values)
     p_brown
 }
+
+
+stouffersMethod <- function (p_values, scores_direction,expected_direction){
+    k = length(p_values)
+    if (!is.null(scores_direction) && !is.null(expected_direction)){
+        directionality <- expected_direction * scores_direction/abs(scores_direction)
+        p_values_directional <- p_values[names(p_values) %in% names(scores_direction)]
+        z_directional <- abs(sum(stats::qnorm(p_values_directional/2)*directionality))
+        
+        if (length(p_values_directional) != k){
+            p_values_nondirectional <- p_values[!names(p_values) %in% names(scores_direction)]
+            z_nondirectional <- abs(sum(stats::qnorm(p_values_nondirectional/2)))
+        } else {
+            z_nondirectional <- 0
+        }
+        z_values <- c(z_directional, z_nondirectional)
+    } else {
+        z_values <- stats::qnorm(p_values/2)
+    }
+    z <- sum(z_values)/sqrt(k)
+    z
+}
+
+
+strubesMethod <- function (p_values, scores_direction, expected_direction){
+    #acquiring the unadjusted z-value from Stouffer's method.
+    stouffer_z <- c()
+    for(i in 1:length(p_values[,1])){
+        stouffer_z <- c(stouffer_z,stouffersMethod(p_values[i,], scores_direction[i,],expected_direction))
+    }
+    names(stouffer_z) <- rownames(p_values)
+    k = length(p_values[1,])
+ 
+    #correlation matrix
+    cor_mtx <- stats::cor(p_values, use = "complete.obs")
+    cor_mtx[is.na(cor_mtx)] <- 0
+    cor_mtx <- abs(cor_mtx)
+    
+    #adjusted p-value
+    adjusted_z <- stouffer_z * sqrt(k) / sqrt(sum(cor_mtx))
+    p_strube <- 2*stats::pnorm(-1*abs(adjusted_z))
+    names(p_strube) <- rownames(p_values)
+    p_strube
+}
+
 
 transformData <- function(dat) {
     # If all values in dat are the same (equal to y), return dat. The covariance

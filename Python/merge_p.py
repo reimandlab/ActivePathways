@@ -28,6 +28,10 @@ def merge_p_values(scores, method='Fisher', scores_direction = None, expected_di
     if method not in ["Fisher", "Brown", "Stouffer", "Strube"]:
         print("Only Fisher's, Brown's, Stouffer's and Strube's methods are currently supported")
         exit()
+    # if only some p-values are directional, expected_direction must be a pandas dataframe or series
+    if type(scores_direction) != pd.DataFrame:
+        print("scores_direction must be a pandas Dataframe column labels matching the column names of the p-values dataframe or numpy array")
+        exit()
 
     # convert zeroes to smallest available floats
     scores[scores == 0] = 1e-300
@@ -52,7 +56,7 @@ def merge_p_values(scores, method='Fisher', scores_direction = None, expected_di
 
     # if scores is a matrix with multiple columns, apply the following methods
     if method == 'Fisher':
-        p_val = np.array(list(map(lambda x: 1 - stats.chi2.cdf((fishersMethod(scores.loc[x,:], scores_direction, expected_direction), 2*len(scores))), scores.index.to_numpy())))
+        p_val = np.array(list(map(lambda x: 1 - stats.chi2.cdf((fishersMethod(scores.loc[x,:], scores_direction.loc[x,:], expected_direction), 2*len(scores))), scores.index.to_numpy())))
 
         # return dataframe
         return pd.DataFrame(p_val, index = scores.index)
@@ -65,7 +69,7 @@ def merge_p_values(scores, method='Fisher', scores_direction = None, expected_di
 
     if method == 'Stouffer':
         # NOTE subset scores_direction and expected_direction
-        p_val = np.array(list(map(lambda x: 2 * (1 - stats.norm.cdf(abs(stouffersMethod(scores.loc[x,:].to_numpy(), scores_direction, expected_direction)))), scores.index.to_numpy())))
+        p_val = np.array(list(map(lambda x: 2 * (1 - stats.norm.cdf(abs(stouffersMethod(scores.loc[x,:].to_numpy(), scores_direction.loc[x,:], expected_direction)))), scores.index.to_numpy())))
 
         # return dataframe
         return pd.DataFrame(p_val, index = scores.index)
@@ -80,9 +84,6 @@ def merge_p_values(scores, method='Fisher', scores_direction = None, expected_di
 
 def fishersMethod(p_values, scores_direction = None, expected_direction = None):
     if scores_direction != None and expected_direction != None:
-        # if only some p-values are directional, 0's are ignored in expected_direction
-        direction_mask = expected_direction.astype('bool')
-
         # apply directionality penalty where applicable
         directionality = expected_direction[direction_mask] * scores_direction[direction_mask] / np.abs(scores_direction[direction_mask])
         p_values_directional = p_values[direction_mask]

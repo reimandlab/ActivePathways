@@ -25,15 +25,20 @@ test_that("scores is a numeric matrix with valid p-values", {
 
 test_that("scores_direction and expected_direction have valid input",{
   
+  expect_error(run_ap(scores_test, direction_test,NULL),'The expected_direction parameter must be provided')
+  expect_error(run_ap(scores_test, NULL,expected_direction = expected_direction_test),'The scores_direction parameter must be provided')
+  
+  expected_dir <- c('a','b')
+  expect_error(run_ap(scores_test,direction_test,expected_dir), 'expected_direction must be a numeric vector')
+  expect_error(run_ap(scores_test, direction_test, c(1,0)), 'expected_direction must contain 1 or -1 values')
+  
   dir_test <- direction_test
   dir_test[1,1] <- NA
   expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'scores_direction may not contain missing values')
   
-  
   dir_test <- direction_test
   dir_test[1,1] <- 'a'
   expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'scores_direction must be numeric')
-  
   
   dir_test <- direction_test
   rownames(dir_test) <- 1:length(direction_test[,1])
@@ -42,9 +47,6 @@ test_that("scores_direction and expected_direction have valid input",{
   dir_test <- direction_test
   colnames(dir_test) <- NULL
   expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'column names must be provided to scores and scores_direction')
-  
-  expected_dir <- c('a','b')
-  expect_error(run_ap(scores_test,direction_test,expected_dir), 'expected_direction must be a numeric vector')
   
   expected_dir <- c(1,1,-1)
   expect_error(run_ap(scores_test,direction_test,expected_dir), 

@@ -36,7 +36,7 @@ Open R in the directory where you cloned the package and run `install.packages("
 
 * The data table must be in the form of numerical matrix and cannot contain any missing values. One conservative option is to re-assign all missing values as ones, indicating our confidence that the missing values are not indicative of cancer drivers. Alternatively, one may consider removing genes with NA values.
 
-* Gene sets in the form of a GMT file can be acquired from multiple [sources] (https://baderlab.org/GeneSets) such as Gene Ontology, Reactome and others. For better accuracy and statistical power these pathway databases should be combined. Acquiring an [up-to-date GMT file] (http://download.baderlab.org/EM_Genesets/current_release/) is essential to avoid using unreliable outdated annotations. 
+* Gene sets in the form of a GMT file can be acquired from multiple [sources](https://baderlab.org/GeneSets) such as Gene Ontology, Reactome and others. For better accuracy and statistical power these pathway databases should be combined. Acquiring an [up-to-date GMT file](http://download.baderlab.org/EM_Genesets/current_release/) is essential to avoid using unreliable outdated annotations. 
 
 ```R
 

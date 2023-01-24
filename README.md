@@ -32,7 +32,12 @@ Open R in the directory where you cloned the package and run `install.packages("
 
 
 ### Examples
-The simplest use of ActivePathways requires only a data table (matrix of p-values) and a list of gene sets in the form of a GMT [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file. The data table must be in the form of numerical matrix and cannot contain any missing values.
+* The simplest use of ActivePathways requires only a data table (matrix of p-values) and a list of gene sets in the form of a GMT [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file. 
+
+* The data table must be in the form of numerical matrix and cannot contain any missing values. One conservative option is to re-assign all missing values as ones, indicating our confidence that the missing values are not indicative of cancer drivers. Alternatively, one may consider removing genes with NA values.
+
+* Gene sets in the form of a GMT file can be acquired from multiple [sources] (https://baderlab.org/GeneSets) such as Gene Ontology, Reactome and others. For better accuracy and statistical power these pathway databases should be combined. Acquiring an [up-to-date GMT file] (http://download.baderlab.org/EM_Genesets/current_release/) is essential to avoid using unreliable outdated annotations. 
+
 ```R
 
 library(ActivePathways)

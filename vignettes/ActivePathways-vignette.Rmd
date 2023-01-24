@@ -54,7 +54,10 @@ scores[is.na(scores)] <- 1
 ```
 
 ## Basic use
-The basic use of `ActivePathways` requires only two input parameters, the matrix of P-values with genes in rows and datasets in columns, as prepared above, and the path to the GMT file in the file system. Here we use a GMT file provided with the package. Importantly, the gene IDs (symbols, accession numbers, etc) in the P-value matrix need to match those in the GMT file. 
+The basic use of `ActivePathways` requires only two input parameters, the matrix of P-values with genes in rows and datasets in columns, as prepared above, and the path to the GMT file in the file system. Importantly, the gene IDs (symbols, accession numbers, etc) in the P-value matrix need to match those in the GMT file. 
+
+Here we use a GMT file provided with the package. This GMT file is heavily filtered and outdated, thus users must provide their own GMT file when using the package. These GMT files can be acquired from multiple [sources](https://baderlab.org/GeneSets) such as Gene Ontology, Reactome and others. For better accuracy and statistical power these pathway databases should be combined. Acquiring an [up-to-date GMT file](http://download.baderlab.org/EM_Genesets/current_release/) is essential to avoid using unreliable outdated annotations.  
+
 ```{r}
 library(ActivePathways)
 gmt_file <- system.file('extdata', 'hsapiens_REAC_subset.gmt', package = 'ActivePathways')

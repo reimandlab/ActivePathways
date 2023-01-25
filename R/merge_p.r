@@ -1,11 +1,12 @@
 #' Merge a list or matrix of p-values
 #'
-#' @param scores Either a list of p-values or a matrix where each column is a test.
+#' @param scores Either a list/vector of p-values or a matrix where each column is a test.
 #' @param method Method to merge p-values. See 'methods' section below.
 #' @param scores_direction Either a vector of log2 transformed fold-change values or a matrix where each column is a test. 
-#' Only datasets with a known directional relationship should be provided.
+#' Must contain the same dimensions as the scores parameter. Datasets without directional information should be set to 0. 
 #' @param expected_direction  A numerical vector of +1 or -1 values corresponding to the expected
-#'   directional relationship between columns in scores_direction.
+#'   directional relationship between the columns in scores_direction. Datasets without directional information should
+#'   be set to 0. 
 #'
 #' @return If \code{scores} is a vector or list, returns a number. If \code{scores} is a
 #'   matrix, returns a named list of p-values merged by row.
@@ -40,63 +41,61 @@
 #' @export
 merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL, 
                            expected_direction = NULL) {
-    # Validation on scores
+    
+    ##### Validation #####
+    # scores
     if (is.list(scores)) scores <- unlist(scores, recursive=FALSE)
     if (!(is.vector(scores) || is.matrix(scores))) stop("scores must be a matrix or vector")
     if (any(is.na(scores))) stop("scores may not contain missing values")
     if (!is.numeric(scores)) stop("scores must be numeric")
     if (any(scores < 0 | scores > 1)) stop("All values in scores must be in [0,1]")
+    
+    # method
 	if (!method %in% c("Fisher", "Brown", "Stouffer","Strube")){
 	    stop("Only Fisher's, Brown's, Stouffer's and Strube's methods are currently supported")
 	}
     
-    
-    # Validation on scores_direction and expected_direction
-    if (!is.null(scores_direction) && is.null(expected_direction)) stop("The expected_direction parameter must be provided")
-    if (is.null(scores_direction) && !is.null(expected_direction)) stop("The scores_direction parameter must be provided")
+    # scores_direction and expected_direction
+    if (xor(!is.null(scores_direction),!is.null(expected_direction))) stop("Both scores_direction and expected_direction must be provided")
     if (!is.null(scores_direction) && !is.null(expected_direction)){
         if (!(is.numeric(expected_direction) && is.vector(expected_direction))) stop("expected_direction must be a numeric vector")
-        if (!is.null(expected_direction) && any(!expected_direction %in% c(1,-1))) stop("expected_direction must contain 1 or -1 values")
-        if (is.vector(scores_direction) && is.matrix(scores)) stop ("scores and scores_direction must be the same data type")
-        if (is.matrix(scores_direction) && is.vector(scores)) stop ("scores and scores_direction must be the same data type")
+        if (any(!expected_direction %in% c(1,-1,0))) stop("expected_direction must contain the values: 1, -1 or 0")
         if (!(is.vector(scores_direction) || is.matrix(scores_direction))) stop("scores_direction must be a matrix or vector")
+        if (all(class(scores_direction) == class(scores))) stop("scores and scores_direction must be the same data type")
         if (any(is.na(scores_direction))) stop("scores_direction may not contain missing values")
         if (!is.numeric(scores_direction)) stop("scores_direction must be numeric")
         
-        if (is.matrix(scores_direction) && is.matrix(scores)){
+        if (is.matrix(scores_direction)){
             if (any(!rownames(scores_direction) %in% rownames(scores))) stop ("scores_direction gene names must match scores genes")
             if (is.null(colnames(scores)) || is.null(colnames(scores_direction))) stop("column names must be provided to scores and scores_direction")
-            if(length(colnames(scores_direction)[colnames(scores_direction) %in% colnames(scores)]) < 2){ 
-                stop("A minimum of two datasets from the scores matrix should have corresponding directionality data in scores_direction. Ensure column names are identical")
-            }
-            if (length(expected_direction) != length((scores_direction[1,]))) stop("expected_direction should have the same number of entries as columns in scores_direction")
+            if (any(!colnames(scores_direction) %in% colnames(scores))) stop("scores_direction column names must match scores column names")
+            if (length(expected_direction) != length(colnames(scores_direction))) stop("expected_direction should have the same number of entries as columns in scores_direction")
+            if (any(expected_direction %in% 0) &&  !all(scores_direction[,expected_direction %in% 0] == 0)) 
+                stop("scores_direction entries must be set to 0's for columns that do not contain directional information")
             if (!is.null(names(expected_direction))){
-                if (!all.equal(names(expected_direction), colnames(scores_direction)) == TRUE){
-                    stop("the expected_direction entries should match the order of scores_direction columns")
-                }
-            } 
-        }
-        if (is.vector(scores_direction) && is.vector(scores)){
+                if (!all.equal(names(expected_direction), colnames(scores_direction), colnames(scores)) == TRUE){
+                    stop("the expected_direction entries should match the order of scores and scores_direction columns")
+                }}}
+        
+        if (is.vector(scores_direction)){
             if (length(expected_direction) != length(scores_direction)) stop("expected_direction should have the same number of entries as scores_direction")
+            if (length(scores_direction) != length(scores)) stop("scores_direction should have the same number of entries as scores")
+            if (any(expected_direction %in% 0) &&  !all(scores_direction[expected_direction %in% 0] == 0)) 
+                stop("scores_direction entries that do not contain directional information must be set to 0's")
             if (!is.null(names(expected_direction))){
-                if (!all.equal(names(expected_direction), names(scores_direction)) == TRUE){
-                    stop("the expected_direction entries should match the order of scores_direction")
-                }
-            } 
-            if(length(names(scores_direction)[names(scores_direction) %in% names(scores)]) < 2){ 
-                stop("A minimum of two entries from the scores vector should have corresponding directionality data in scores_direction. Ensure entry names() are identical")
-            }
-        }
-    }
+                if (!all.equal(names(expected_direction), names(scores_direction), names(scores)) == TRUE){
+                    stop("the expected_direction entries should match the order of scores and scores_direction")
+                }}}}
     
-   
+    ##### Merge P-values #####
+    
     # Methods to merge p-values from a scores vector
     if (is.vector(scores)){
         if (method == "Brown" || method == "Strube") {
             stop("Brown's or Strube's method cannot be used with a single list of p-values")
         }
             
-        # convert zeroes to smallest available doubles
+        # Convert zeroes to smallest available doubles
         scores <- sapply(scores, function(x) ifelse (x == 0, 1e-300, x))
         if (method == "Fisher"){
             p_fisher <- stats::pchisq(fishersMethod(scores, scores_direction,expected_direction),
@@ -109,7 +108,7 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
         } 
     }
     
-    # If scores is a matrix with one column, then no transformation needed
+    # If scores is a matrix with one column, then no p-value merging can be done 
     if (ncol(scores) == 1) return (scores[, 1, drop=TRUE])
     
     # If scores is a matrix with multiple columns, apply the following methods
@@ -148,23 +147,16 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
 
 
 fishersMethod <- function(p_values, scores_direction, expected_direction) {
-    if (!is.null(scores_direction) && !is.null(expected_direction)){
+    if (!is.null(scores_direction)){
         directionality <- expected_direction * scores_direction/abs(scores_direction)
-        p_values_directional <- p_values[names(p_values) %in% names(scores_direction)]
-        chisq_directional <- abs(-2 * sum(log(p_values_directional)*directionality))
-        
-        if (length(p_values_directional) != length(p_values)){
-            p_values_nondirectional <- p_values[!names(p_values) %in% names(scores_direction)]
-            chisq_nondirectional <- abs(-2 * sum(log(p_values_nondirectional)))
-        } else {
-            chisq_nondirectional <- 0
-        }
+        p_values_directional <- p_values[!is.na(directionality)]
+        chisq_directional <- abs(-2 * sum(log(p_values_directional)*directionality[!is.na(directionality)]))
+        chisq_nondirectional <- abs(-2 * sum(log(p_values[is.na(directionality)])))
         chisq_values <- c(chisq_directional, chisq_nondirectional)
     } else {
         chisq_values <- -2*log(p_values)
     }
-    chisq <- sum(chisq_values)
-    chisq
+    sum(chisq_values)
 }
 
 
@@ -176,9 +168,10 @@ fishersMethod <- function(p_values, scores_direction, expected_direction) {
 #'   efficient when making many calls with the same data_matrix.
 #'   Only one of \code{data_matrix} and \code{cov_matrix} must be given. If both are supplied,
 #'   \code{data_matrix} is ignored.
-#' @param scores_direction A matrix of log2 fold-change values. 
+#' @param scores_direction A matrix of log2 fold-change values. Datasets without directional information should be set to 0. 
 #' @param expected_direction  A numerical vector of +1 or -1 values corresponding to the expected
-#'   directional relationship between columns in scores_direction.
+#'   directional relationship between columns in scores_direction. Datasets without directional information should
+#'   be set to 0.
 #' @return A p-value vector representing the merged significance of multiple p-values.
 #' @export
 
@@ -209,14 +202,13 @@ brownsMethod <- function(p_values, data_matrix = NULL, cov_matrix = NULL, scores
         sf <- 1
     }
     
-    #acquiring the unadjusted chi-squared value from Fisher's method.
+    # Acquiring the unadjusted chi-squared value from Fisher's method
     fisher_chisq <- c()
     for(i in 1:length(p_values[,1])) {
         fisher_chisq <- c(fisher_chisq, fishersMethod(p_values[i,], scores_direction[i,],expected_direction))
     }
-    names(fisher_chisq) <- rownames(p_values)
     
-    #adjusted p-value
+    # Adjusted p-value
     p_brown <- stats::pchisq(df=df, q=fisher_chisq/sf, lower.tail=FALSE)
     names(p_brown) <- rownames(p_values)
     p_brown
@@ -225,41 +217,33 @@ brownsMethod <- function(p_values, data_matrix = NULL, cov_matrix = NULL, scores
 
 stouffersMethod <- function (p_values, scores_direction,expected_direction){
     k = length(p_values)
-    if (!is.null(scores_direction) && !is.null(expected_direction)){
+    if (!is.null(scores_direction)){
         directionality <- expected_direction * scores_direction/abs(scores_direction)
-        p_values_directional <- p_values[names(p_values) %in% names(scores_direction)]
-        z_directional <- abs(sum(stats::qnorm(p_values_directional/2)*directionality))
-        
-        if (length(p_values_directional) != k){
-            p_values_nondirectional <- p_values[!names(p_values) %in% names(scores_direction)]
-            z_nondirectional <- abs(sum(stats::qnorm(p_values_nondirectional/2)))
-        } else {
-            z_nondirectional <- 0
-        }
+        p_values_directional <- p_values[!is.na(directionality)]
+        z_directional <- abs(sum(stats::qnorm(p_values_directional/2)*directionality[!is.na(directionality)]))
+        z_nondirectional <- abs(sum(stats::qnorm(p_values[is.na(directionality)]/2)))
         z_values <- c(z_directional, z_nondirectional)
     } else {
         z_values <- stats::qnorm(p_values/2)
     }
-    z <- sum(z_values)/sqrt(k)
-    z
+    sum(z_values)/sqrt(k)
 }
 
 
 strubesMethod <- function (p_values, scores_direction, expected_direction){
-    #acquiring the unadjusted z-value from Stouffer's method.
+    # Acquiring the unadjusted z-value from Stouffer's method
     stouffer_z <- c()
     for(i in 1:length(p_values[,1])){
         stouffer_z <- c(stouffer_z,stouffersMethod(p_values[i,], scores_direction[i,],expected_direction))
     }
-    names(stouffer_z) <- rownames(p_values)
-    k = length(p_values[1,])
  
-    #correlation matrix
+    # Correlation matrix
     cor_mtx <- stats::cor(p_values, use = "complete.obs")
     cor_mtx[is.na(cor_mtx)] <- 0
     cor_mtx <- abs(cor_mtx)
     
-    #adjusted p-value
+    # Adjusted p-value
+    k = length(p_values[1,])
     adjusted_z <- stouffer_z * sqrt(k) / sqrt(sum(cor_mtx))
     p_strube <- 2*stats::pnorm(-1*abs(adjusted_z))
     names(p_strube) <- rownames(p_values)

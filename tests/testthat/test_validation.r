@@ -25,12 +25,12 @@ test_that("scores is a numeric matrix with valid p-values", {
 
 test_that("scores_direction and expected_direction have valid input",{
   
-  expect_error(run_ap(scores_test, direction_test,NULL),'The expected_direction parameter must be provided')
-  expect_error(run_ap(scores_test, NULL,expected_direction = expected_direction_test),'The scores_direction parameter must be provided')
+  expect_error(run_ap(scores_test, direction_test,NULL),'Both scores_direction and expected_direction must be provided')
+  expect_error(run_ap(scores_test, NULL,expected_direction = expected_direction_test),'Both scores_direction and expected_direction must be provided')
   
   expected_dir <- c('a','b')
   expect_error(run_ap(scores_test,direction_test,expected_dir), 'expected_direction must be a numeric vector')
-  expect_error(run_ap(scores_test, direction_test, c(1,0)), 'expected_direction must contain 1 or -1 values')
+  expect_error(run_ap(scores_test, direction_test, c(1,0)), "scores_direction entries must be set to 0's for columns that do not contain directional information")
   
   dir_test <- direction_test
   dir_test[1,1] <- NA
@@ -38,7 +38,7 @@ test_that("scores_direction and expected_direction have valid input",{
   
   dir_test <- direction_test
   dir_test[1,1] <- 'a'
-  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'scores_direction must be numeric')
+  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'scores_direction must be a numeric matrix')
   
   dir_test <- direction_test
   rownames(dir_test) <- 1:length(direction_test[,1])
@@ -55,9 +55,15 @@ test_that("scores_direction and expected_direction have valid input",{
   expected_dir <- c(1,-1)
   names(expected_dir) <- c("protein","rna")
   expect_error(run_ap(scores_test,direction_test,expected_dir), 
-               'the expected_direction entries should match the order of scores_direction columns')
+               'the expected_direction entries should match the order of scores and scores_direction columns')
   
+  dir_test <- direction_test
+  colnames(dir_test) <- c("rna","Mutation")
+  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 
+               'scores_direction column names must match scores column names')
   
+  expected_dir <- c(1,0)
+  expect_error(run_ap(scores_test, direction_test, expected_dir), "scores_direction entries must be set to 0's for columns that do not contain directional information")
 })
 
 test_that("significant is valid", {

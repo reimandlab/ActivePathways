@@ -61,7 +61,7 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
         if (!(is.numeric(expected_direction) && is.vector(expected_direction))) stop("expected_direction must be a numeric vector")
         if (any(!expected_direction %in% c(1,-1,0))) stop("expected_direction must contain the values: 1, -1 or 0")
         if (!(is.vector(scores_direction) || is.matrix(scores_direction))) stop("scores_direction must be a matrix or vector")
-        if (all(class(scores_direction) == class(scores))) stop("scores and scores_direction must be the same data type")
+        if (!all(class(scores_direction) == class(scores))) stop("scores and scores_direction must be the same data type")
         if (any(is.na(scores_direction))) stop("scores_direction may not contain missing values")
         if (!is.numeric(scores_direction)) stop("scores_direction must be numeric")
         

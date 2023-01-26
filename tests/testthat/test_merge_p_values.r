@@ -73,10 +73,11 @@ rownames(test_direction_matrix) <- rownames(test_matrix)
 
 test_that("scores_direction and expected_direction are valid", {
       
-      expect_error(merge_p_values(test_matrix, "Fisher",test_direction_matrix),'The expected_direction parameter must be provided')
-      expect_error(merge_p_values(test_matrix, "Fisher",expected_direction = expected_dir),'The scores_direction parameter must be provided')
+      expect_error(merge_p_values(test_matrix, "Fisher",test_direction_matrix),'Both scores_direction and expected_direction must be provided')
+      expect_error(merge_p_values(test_matrix, "Fisher",expected_direction = expected_dir),'Both scores_direction and expected_direction must be provided')
       expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, c(1,"b")), 'expected_direction must be a numeric vector')
-      expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, c(1,0)), 'expected_direction must contain 1 or -1 values')
+      expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, c(1,0)), "scores_direction entries must be set to 0's for columns that do not contain directional information")
+      expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, c(1,5)), "expected_direction must contain the values: 1, -1 or 0")
       
       test_dir <- as.vector(test_direction_matrix)
       expect_error(merge_p_values(test_matrix, "Fisher", test_dir, c(1,1)), 'scores and scores_direction must be the same data type')
@@ -100,13 +101,13 @@ test_that("scores_direction and expected_direction are valid", {
       test_m <- test_matrix
       colnames(test_m) <- c("RNA","Mutation")
       expect_error(merge_p_values(test_m, "Fisher", test_direction_matrix, c(1,1)),
-                   'A minimum of two datasets from the scores matrix should have corresponding directionality data in scores_direction. Ensure column names are identical')
+                   'scores_direction column names must match scores column names')
       
       expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, c(1,1,-1)),
                    'expected_direction should have the same number of entries as columns in scores_direction')
       
       names(expected_dir) <- c("Protein","RNA")
       expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, expected_dir),
-                   'the expected_direction entries should match the order of scores_direction columns')
+                   'the expected_direction entries should match the order of scores and scores_direction columns')
 })
 

@@ -22,10 +22,11 @@ efficient when making many calls with the same data_matrix.
 Only one of \code{data_matrix} and \code{cov_matrix} must be given. If both are supplied,
 \code{data_matrix} is ignored.}
 
-\item{scores_direction}{A matrix of log2 fold-change values.}
+\item{scores_direction}{A matrix of log2 fold-change values. Datasets without directional information should be set to 0.}
 
 \item{expected_direction}{A numerical vector of +1 or -1 values corresponding to the expected
-directional relationship between columns in scores_direction.}
+directional relationship between columns in scores_direction. Datasets without directional information should
+be set to 0.}
 }
 \value{
 A p-value vector representing the merged significance of multiple p-values.

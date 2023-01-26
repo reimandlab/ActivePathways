@@ -68,11 +68,11 @@ column in the scores matrix. If NULL grDevices::rainbow is used by default.}
 \item{scores_direction}{A numerical matrix of log2 transformed fold-change values where each row is a
 gene and each column represents a dataset (evidence). Rownames correspond to the genes
 and colnames to the datasets. We recommend converting missing values to ones. 
-Only datasets with fold-change information and a known directional relationship should be included in this matrix.}
+Must contain the same dimensions as the scores parameter. Datasets without directional information should be set to 0.}
 
 \item{expected_direction}{A numerical vector of +1 or -1 values corresponding to the expected
-directional relationship between columns in scores_direction. The length of this vector 
-should match the number of columns in scores_direction.}
+directional relationship between columns in scores_direction. Datasets without directional information should
+be set to 0.}
 }
 \value{
 A data.table of terms (enriched pathways) containing the following columns:

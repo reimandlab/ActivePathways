@@ -1,9 +1,12 @@
 import pandas as pd
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.cm
 
 from gmt import write_gmt
+
 
 
 def create_legend(color_dict, cytoscape_file_tag):
@@ -53,32 +56,34 @@ def prepareCytoscape(terms, gmt, cytoscape_file_tag, col_significance = None, co
         evidence_cols = pd.DataFrame([list(map(lambda x: int(tests in x), col_significance['evidence'].to_numpy(dtype='<U64')))], columns = tests)
         evidence_cols.loc[:,'term_id'] = col_significance['term_id'].to_numpy()
 
-
+        mapped_colors = []
         # Acquire colours from grDevices::rainbow or RColorBrewer::brewer.pal if custom colors are not provided
-        # NOTE create a default color pallette
+        # NOTE create a default color palette
         if color_palette == None and custom_colors == None:
-            # create color pallette
-            custom_colors = ['#FFFFF0', 'red', 'green']
-
+            # create default color palette
+            cmap = mpl.cm.get_cmap('Set1', len(tests)-1)
+            mapped_colors = list(map(lambda x: mpl.colors.rgb2hex(cmap(x)),range(len(tests)-1)))
 
         # NOTE redundant based on end code
         elif custom_colors != None:
-            custom_colors.append(color_integrated_only)
-
+            mapped_colors = custom_colors
+            
         # NOTE create user-defined color pallette
         else:
             # create color pallette
-            custom_colors = ['#FFFFF0', 'red', 'green']
+            cmap = mpl.cm.get_cmap(color_palette, len(tests)-1)
+            mapped_colors = list(map(lambda x: mpl.colors.rgb2hex(cmap(x)),range(len(tests)-1)))
+            
 
-        custom_colors.append(color_integrated_only)
+        mapped_colors.append(color_integrated_only)
 
         # create a dictionary for colors
         color_dict = {}
-        for i, color in custom_colors:
+        for i, color in mapped_colors:
             color_dict[tests[i]] = color
 
         # cytoscape instructions to create pie charts
-        instruct_str = f'''piechart: attributelist="{",".join(tests)}" colorlist="{",".join(custom_colors)}" showlabels=FALSE'''
+        instruct_str = f'''piechart: attributelist="{",".join(tests)}" colorlist="{",".join(mapped_colors)}" showlabels=FALSE'''
         col_significance.loc[:,'instruct'] = instruct_str
         
 
@@ -93,5 +98,3 @@ def prepareCytoscape(terms, gmt, cytoscape_file_tag, col_significance = None, co
     terms.to_csv(outfile, sep='\t', index=False)
 
     write_gmt(gmt, (cytoscape_file_tag + "pathways.gmt"))
-
-

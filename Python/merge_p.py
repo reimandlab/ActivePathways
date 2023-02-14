@@ -6,75 +6,98 @@ from statsmodels.distributions.empirical_distribution import ECDF
 
 # can accept: numpy array, pandas data frame, or list
 def merge_p_values(scores, method='Fisher', scores_direction = None, expected_direction = None):
-    # validate types of scores variable
+    
+    ##### Validation #####
+    # scores
     if type(scores) == list:
         scores = np.array(scores)
     elif type(scores) == pd.Series:
         scores = scores.to_numpy()
-    if type(scores) != pd.DataFrame or type(scores) != np.ndarray:
+    if type(scores) != pd.DataFrame and type(scores) != np.ndarray:
         print("scores must be a pandas data frame, series, numpy array, or list")
         exit()
     if np.any(pd.isnull(scores)):
-        print("Scores may not contain missing values")
+        print("scores may not contain missing values")
         exit()
-    # check data type float
     try:
-        scores = scores.astype('float')
+        scores = scores.astype("float")
     except:
-        print('Scores must be numeric')
+        print("scores must be numeric")
         exit()
-    # check range of data
     if np.any(scores < 0) or np.any(scores > 1):
-        print('All values in scores must be in [0,1]')
+        print("All values in scores must be in [0,1]")
         exit()
-    # check merging method
+        
+    # method
     if method not in ["Fisher", "Brown", "Stouffer", "Strube"]:
         print("Only Fisher's, Brown's, Stouffer's and Strube's methods are currently supported")
         exit()
     
-    # check scores_direction and expected_direction
+    # scores_direction and expected_direction
     if np.logical_xor(scores_direction == None, expected_direction == None):
         print("Both scores_direction and expected_direction must be provided")
         exit()
-    
     if scores_direction != None:
-        # if only some p-values are directional, expected_direction must be a pandas dataframe or series
-        if type(scores) != pd.Series or type(scores) != pd.DataFrame:
-            print("Scores must be a pandas series or dataframe to apply directional penalty")
-            exit()
-
-        # check expected direction
+        # check expected_direction
         if type(expected_direction) == list:
             expected_direction = np.array(expected_direction)
-        if type(expected_direction) != np.array or type(expected_direction) != pd.Series or np.any(np.abs(expected_direction) != 1):
-            print("expected_direction must be a numeric type array composed of only -1's or 1's")
+        if type(expected_direction) != np.ndarray and type(expected_direction) != pd.Series:
+            print("expected_direction must be a numeric type array")
             exit()
-
-        # check scores_direction
-        if type(scores_direction) != pd.DataFrame:
-            print("scores_direction must be a pandas Dataframe column labels matching the column names of the p-values dataframe or numpy array")
+        if ~np.all(np.isin(expected_direction,[1,-1,0])):
+            print("expected_direction must contain the values: 1, -1 or 0")
             exit()
-        if np.any(scores_direction.isnull()):
-            print("scores_direction must not contain any missing values. Fill NA's with 1 before processing")
-            exit()
-        try:
-            scores_direction = scores_direction.astype('float')
-        except:
-            print("scores_direction must be numeric")
-            exit()
-        if np.any(~np.isin(scores_direction.index, scores.index)) or np.any(~np.isin(scores_direction.columns, scores.columns)):
-            print("scores_direction index and columns must match scores index and columns")
-            exit()
-        if scores_direction.shape[1] < 2:
-            print("A minimum of two datasets from the scores matrix should have corresponding directionality data in scores_direction. Ensure column names are identical")
-            exit()
-
-        # check both
-        if scores_direction.shape[1] != len(expected_direction):
-            print("expected_direction should have the same number of entries as columns in scores_direction")
         
+        # check scores_direction if scores is a dataframe
+        type(scores) == pd.DataFrame:
+            if type(scores_direction) != pd.DataFrame:
+                print("scores_direction must be a pandas data frame with column labels matching the column names of the scores data frame")
+                exit()
+            if np.any(scores_direction.isnull()):
+                print("scores_direction must not contain any missing values. Fill NA's with 1 before processing")
+                exit()
+            try:
+                scores_direction = scores_direction.astype("float")
+            except:
+                print("scores_direction must be numeric")
+                exit()
+            if np.any(~np.isin(scores_direction.index, scores.index)) or np.any(~np.isin(scores_direction.columns, scores.columns)):
+                print("scores_direction index and columns must match scores index and columns")
+                exit()
+            if scores_direction.shape[1] < 2:
+                print("A minimum of two datasets from the scores matrix should have corresponding directionality data in scores_direction. Ensure column names are identical")
+                exit()
+            if scores_direction.shape[1] != len(expected_direction):
+                print("expected_direction should have the same number of entries as columns in scores_direction")
+                exit()
+            if np.any(np.isin(expected_direction,0)) and ~np.all(scores_direction.loc[:,np.isin(expected_direction,0)] == 0):
+                print("scores_direction entries must be set to 0's for columns that do not contain directional information")
+                exit()
+        # check scores_direction if scores is a numpy array
+        type(scores) == np.ndarray:
+            if type(scores_direction) == list:
+                scores_direction = np.array(scores_direction)
+            elif type(scores_direction) == pd.Series:
+                scores_direction = scores_direction.to_numpy()
+            if type(scores_direction) != np.ndarray:
+                print("scores_direction must be a series, numpy array, or list. Ensure scores and scores_direction are the same data type")
+                exit()
+            if len(scores_direction) != len(scores) or len(scores_direction) != len(expected_direction):
+                print("scores_direction must contain the same number of entries as scores and expected_direction")
+                exit()
+            if len(scores_direction) < 2:
+                print("A minimum of two entries from scores should have corresponding directionality data in scores_direction")
+                exit()
+            if ~np.all(list(map(lambda x: isinstance(x,(int,float)), scores_direction))):
+                print("scores_direction must be numeric and cannot contain missing values. Fill NA's with 1 before processing")
+                exit()
+            if np.any(np.isin(expected_direction,0)) and ~np.all(scores_direction[np.isin(expected_direction,0)] == 0): 
+                print("scores_direction must be set to 0's for entries that do not contain directional information")
+                exit()
+            
+        
+    ##### Merge P-values #####
     
-
     # convert zeroes to smallest available floats
     scores[scores == 0] = 1e-300
 
@@ -239,5 +262,3 @@ def calculate_covariances(data_matrix):
     transformed_matrix = pd.DataFrame(list(map(lambda x: transform_data(data_matrix.loc[x,:].to_numpy()), data_matrix.index))).transpose()
     
     return transformed_matrix.cov()
-
-

@@ -148,16 +148,15 @@ def merge_p_values(scores, method='Fisher', scores_direction = None, expected_di
 def fishers_method(p_values, scores_direction = None, expected_direction = None):
     if scores_direction != None:
         # apply directionality penalty where applicable
-        directionality = expected_direction * scores_direction / np.abs(scores_direction)
-
-        direction_mask = np.isin(p_values.index, scores_direction.index)
-        p_values_directional = p_values[direction_mask]
+        d_mask = expected_direction != 0
+        directionality = expected_direction[d_mask] * scores_direction[d_mask] / np.abs(scores_direction[d_mask])
+        p_values_directional = p_values[d_mask]
 
         chisq_directional = np.abs(-2 * np.sum(np.log(p_values_directional) * directionality))
 
         # calculate for non-directionality p-values
-        if np.any(~direction_mask):
-            p_values_nondirectional = p_values[~direction_mask]
+        if np.any(~d_mask):
+            p_values_nondirectional = p_values[~d_mask]
             chisq_directional = np.concatenate([np.abs(-2 * sum(np.log(p_values_nondirectional))), chisq_directional])
 
     else:
@@ -202,16 +201,15 @@ def stouffers_method(p_values, scores_direction = None, expected_direction = Non
 
     if scores_direction != None:
         # apply directionality penalty where applicable
-        directionality = expected_direction * scores_direction / np.abs(scores_direction)
-
-        direction_mask = np.isin(p_values.index, scores_direction.index)
-        p_values_directional = p_values[direction_mask]
+        d_mask = expected_direction != 0
+        directionality = expected_direction[d_mask] * scores_direction[d_mask] / np.abs(scores_direction[d_mask])
+        p_values_directional = p_values[d_mask]
 
         z_directional = np.abs(sum(stats.norm.ppf(p_values_directional / 2) * directionality))
 
         # calculate for non-directionality p-values
-        if np.any(~direction_mask):
-            p_values_nondirectional = p_values[~direction_mask]
+        if np.any(~d_mask):
+            p_values_nondirectional = p_values[~d_mask]
             z_directional = np.concatenate([np.abs(np.sum(stats.norm.ppf(p_values_nondirectional / 2))), z_directional])
 
     else:

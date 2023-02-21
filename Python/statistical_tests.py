@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.stats as stats
+from sys import exit
 
 def hypergeomtric(counts):
     if np.any(counts < 0):

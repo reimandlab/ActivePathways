@@ -1,3 +1,7 @@
+import pandas as pd
+import numpy as np
+from sys import exit
+
 class GMT:
     def __init__(self, name_dict, genes_dict):
         self.name_dict = name_dict
@@ -24,17 +28,15 @@ def write_gmt(gmt, filename):
             outfile.write("\t".join([key, gmt.name_dict[key], '\t'.join(gmt.genes_dict[key])]) + "\n")
 
 def is_gmt(gmt):
-    return isinstance(GMT)
+    return isinstance(gmt,GMT)
 
 def make_background(genes_dict):
     # 
     try:
         genes = []
-        genes.extend(val for val in genes_dict.values())
+        genes.extend(val for sublist in genes_dict.values() for val in sublist)
         return np.unique(genes)
 
     except:
         print("gmt is not a valid GMT object")
         exit()
-
-

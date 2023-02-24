@@ -4,7 +4,7 @@ import numpy as np
 import scipy.stats as stats
 from statsmodels.distributions.empirical_distribution import ECDF
 
-# can accept: numpy array, pandas data frame, or list
+# can accept: numpy array, pandas dataframe, or list
 def merge_p_values(scores, method='Fisher', scores_direction = None, expected_direction = None):
     
     ##### Validation #####
@@ -15,87 +15,93 @@ def merge_p_values(scores, method='Fisher', scores_direction = None, expected_di
         scores = scores.to_numpy()
     if type(scores) != pd.DataFrame and type(scores) != np.ndarray:
         print("scores must be a pandas data frame, series, numpy array, or list")
-        exit()
+        return
     if np.any(pd.isnull(scores)):
         print("scores may not contain missing values")
-        exit()
+        return
     try:
         scores = scores.astype("float")
     except:
         print("scores must be numeric")
-        exit()
+        return
     if np.any(scores < 0) or np.any(scores > 1):
         print("All values in scores must be in [0,1]")
-        exit()
+        return
         
     # method
     if method not in ["Fisher", "Brown", "Stouffer", "Strube"]:
         print("Only Fisher's, Brown's, Stouffer's and Strube's methods are currently supported")
-        exit()
+        return
     
     # scores_direction and expected_direction
     if np.logical_xor(scores_direction == None, expected_direction == None):
         print("Both scores_direction and expected_direction must be provided")
-        exit()
+        return
     if scores_direction != None:
         # check expected_direction
         if type(expected_direction) == list:
             expected_direction = np.array(expected_direction)
         if type(expected_direction) != np.ndarray and type(expected_direction) != pd.Series:
             print("expected_direction must be a numeric type array")
-            exit()
+            return
         if ~np.all(np.isin(expected_direction,[1,-1,0])):
             print("expected_direction must contain the values: 1, -1 or 0")
-            exit()
+            return
         
         # check scores_direction if scores is a dataframe
-        type(scores) == pd.DataFrame:
+        if type(scores) == pd.DataFrame:
             if type(scores_direction) != pd.DataFrame:
                 print("scores_direction must be a pandas data frame with column labels matching the column names of the scores data frame")
-                exit()
+                return
             if np.any(scores_direction.isnull()):
                 print("scores_direction must not contain any missing values. Fill NA's with 1 before processing")
-                exit()
+                return
             try:
                 scores_direction = scores_direction.astype("float")
             except:
                 print("scores_direction must be numeric")
-                exit()
+                return
             if np.any(~np.isin(scores_direction.index, scores.index)) or np.any(~np.isin(scores_direction.columns, scores.columns)):
                 print("scores_direction index and columns must match scores index and columns")
-                exit()
+                return
             if scores_direction.shape[1] < 2:
                 print("A minimum of two datasets from the scores matrix should have corresponding directionality data in scores_direction. Ensure column names are identical")
-                exit()
+                return
             if scores_direction.shape[1] != len(expected_direction):
                 print("expected_direction should have the same number of entries as columns in scores_direction")
-                exit()
+                return
             if np.any(np.isin(expected_direction,0)) and ~np.all(scores_direction.loc[:,np.isin(expected_direction,0)] == 0):
                 print("scores_direction entries must be set to 0's for columns that do not contain directional information")
-                exit()
+                return
         # check scores_direction if scores is a numpy array
-        type(scores) == np.ndarray:
+        if type(scores) == np.ndarray:
             if type(scores_direction) == list:
                 scores_direction = np.array(scores_direction)
             elif type(scores_direction) == pd.Series:
                 scores_direction = scores_direction.to_numpy()
             if type(scores_direction) != np.ndarray:
                 print("scores_direction must be a series, numpy array, or list. Ensure scores and scores_direction are the same data type")
-                exit()
+                return
             if len(scores_direction) != len(scores) or len(scores_direction) != len(expected_direction):
                 print("scores_direction must contain the same number of entries as scores and expected_direction")
-                exit()
+                return
             if len(scores_direction) < 2:
                 print("A minimum of two entries from scores should have corresponding directionality data in scores_direction")
-                exit()
+                return
             if ~np.all(list(map(lambda x: isinstance(x,(int,float)), scores_direction))):
                 print("scores_direction must be numeric and cannot contain missing values. Fill NA's with 1 before processing")
-                exit()
+                return
             if np.any(np.isin(expected_direction,0)) and ~np.all(scores_direction[np.isin(expected_direction,0)] == 0): 
                 print("scores_direction must be set to 0's for entries that do not contain directional information")
-                exit()
+                return
             
-        
+    else:
+        if type(scores) == pd.DataFrame:
+            scores_direction = pd.DataFrame(np.zeros(scores.shape), index = scores.index, columns = scores.columns)
+        if type(scores) == np.ndarray:
+            scores_direction = np.zeros((len(scores)))
+
+
     ##### Merge P-values #####
     
     # convert zeroes to smallest available floats
@@ -105,10 +111,10 @@ def merge_p_values(scores, method='Fisher', scores_direction = None, expected_di
     if type(scores) == np.ndarray:
         if method in ['Brown', 'Strube']:
             print("Brown's or Strube's method cannot be used with a single list of p-values")
-            exit()
+            return
         
         if method == 'Fisher':
-            p_val = 1 - stats.chi2.cdf((fishers_method(scores, scores_direction, expected_direction), 2*len(scores)))
+            p_val = 1 - stats.chi2.cdf(fishers_method(scores, scores_direction, expected_direction), 2*len(scores))
             return p_val
         
         if method == 'Stouffer':
@@ -121,9 +127,10 @@ def merge_p_values(scores, method='Fisher', scores_direction = None, expected_di
 
     # if scores is a matrix with multiple columns, apply the following methods
     if method == 'Fisher':
-        p_val = np.array(list(map(lambda x: 1 - stats.chi2.cdf((fishers_method(scores.loc[x,:], scores_direction.loc[x,:], expected_direction), 2*len(scores))), scores.index)))
+        p_val = np.array(list(map(lambda x: 1 - stats.chi2.cdf(fishers_method(scores.loc[x,:], scores_direction.loc[x,:], expected_direction), 2*scores.shape[1]), scores.index)))
 
         # return dataframe
+        print(p_val)
         return pd.DataFrame(p_val, index = scores.index)
 
     if method == 'Brown':
@@ -145,8 +152,8 @@ def merge_p_values(scores, method='Fisher', scores_direction = None, expected_di
         return pd.DataFrame(p_val, index = scores.index)
 
 
-def fishers_method(p_values, scores_direction = None, expected_direction = None):
-    if scores_direction != None:
+def fishers_method(p_values, scores_direction, expected_direction = None):
+    if np.all(scores_direction != 0):
         # apply directionality penalty where applicable
         d_mask = expected_direction != 0
         directionality = expected_direction[d_mask] * scores_direction[d_mask] / np.abs(scores_direction[d_mask])
@@ -165,11 +172,11 @@ def fishers_method(p_values, scores_direction = None, expected_direction = None)
     return np.sum(chisq_directional)
 
 
-def browns_method(p_values, scores_direction = None, expected_direction = None, data_matrix=None, cov_matrix=None):
+def browns_method(p_values, scores_direction, expected_direction = None, data_matrix=None, cov_matrix=None):
     # what has been provided
     if data_matrix == None and cov_matrix == None:
         print("Either data_matrix or cov_matrix must be supplied")
-        exit()
+        return
     if data_matrix != None and cov_matrix != None:
         print("Both data_matrix and cov_matrix were supplied. Ignoring data_matrix")
     if cov_matrix == None:
@@ -186,20 +193,17 @@ def browns_method(p_values, scores_direction = None, expected_direction = None, 
         df = 2 * n_datasets
         sf = 1
 
-    try: 
-        p_val = np.array(list(map(lambda x: 1 - stats.chi2.cdf((fishers_method(p_values.loc[x,:], scores_direction.loc[x,:], expected_direction), 2*len(p_values))), p_values.index.to_numpy())))
-    except:
-        p_val = np.array(list(map(lambda x: 1 - stats.chi2.cdf((fishers_method(p_values.loc[x,:]), 2*len(p_values))), p_values.index.to_numpy())))
+    p_val = np.array(list(map(lambda x: 1 - stats.chi2.cdf(fishers_method(p_values.loc[x,:], scores_direction.loc[x,:], expected_direction), 2*p_values.shape[1]), p_values.index.to_numpy())))
 
     p_brown = 1 - stats.chi2.cdf(p_val / sf, df)
 
     return p_brown
 
 
-def stouffers_method(p_values, scores_direction = None, expected_direction = None):
+def stouffers_method(p_values, scores_direction, expected_direction = None):
     k = len(p_values)
 
-    if scores_direction != None:
+    if np.all(scores_direction != 0):
         # apply directionality penalty where applicable
         d_mask = expected_direction != 0
         directionality = expected_direction[d_mask] * scores_direction[d_mask] / np.abs(scores_direction[d_mask])
@@ -218,7 +222,7 @@ def stouffers_method(p_values, scores_direction = None, expected_direction = Non
     return np.sum(z_directional) / np.sqrt(k)
 
 
-def strubes_method(p_values, scores_direction = None, expected_direction = None):
+def strubes_method(p_values, scores_direction, expected_direction = None):
     # acquire the unadjusted z-value from stouffer's method
     try:
         stouffers_z_arr = np.array(list(map(lambda x: stouffers_method(p_values.loc[x,:], scores_direction.loc[x,:], expected_direction), p_values.index)))

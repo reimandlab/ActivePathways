@@ -1,11 +1,10 @@
 import numpy as np
 import scipy.stats as stats
-from sys import exit
 
 def hypergeomtric(counts):
     if np.any(counts < 0):
         print("counts contains negative values. Something went very wrong.")
-        exit()
+        return
     
     # NOTE check this
     m = counts[0,0] + counts[1,0]
@@ -17,7 +16,7 @@ def hypergeomtric(counts):
 
 def orderedHypergeometric(gene_arr, background, annotations):
     # Only test subsets of genelist that end with a gene in annotations since these are the only tests for which the p-value can decrease
-    genes_indices = np.where(gene_arr, annotations)[0]
+    genes_indices = np.where(np.isin(gene_arr, annotations))[0]
     if len(genes_indices) == 0:
         return 1, 1
 
@@ -31,7 +30,7 @@ def orderedHypergeometric(gene_arr, background, annotations):
     scores = [hypergeomtric(counts)]
 
     if len(genes_indices) == 1:
-        return scores[0], genes_indices
+        return scores[0], genes_indices[0]
 
 
     for i in range(1,len(genes_indices)):
@@ -45,7 +44,8 @@ def orderedHypergeometric(gene_arr, background, annotations):
         scores.append(hypergeomtric(counts))
 
     
-    min_score = np.min(scores)
+    scores = np.array(scores).astype("float64")
+    min_score = np.nanmin(scores)
 
     ind = genes_indices[np.max(np.where(scores == min_score))]
     p_val = min_score

@@ -12,7 +12,7 @@ def hypergeomtric(counts):
     k = counts[0,0] + counts[0,1]
     x = counts[0,0]
 
-    return 1 - stats.hypergeom.cdf(x-1, n, m, k,loc=0)
+    return 1 - stats.hypergeom.cdf(x-1, n+m, m, k,loc=0)
 
 def orderedHypergeometric(gene_arr, background, annotations):
     # Only test subsets of genelist that end with a gene in annotations since these are the only tests for which the p-value can decrease

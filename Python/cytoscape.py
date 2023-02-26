@@ -4,6 +4,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.cm
+import csv
 
 from gmt import write_gmt
 
@@ -46,50 +47,47 @@ def create_legend(color_dict, cytoscape_file_tag):
 
 def prepareCytoscape(terms, gmt, cytoscape_file_tag, col_significance = None, color_palette = None, custom_colors = None, color_integrated_only="#FFFFF0"):
 
-    if col_significance != None:
+    if type(col_significance) != None:
         # Obtain the name of each omics dataset and incorporate a 'combined' contribution
-        tests = col_significance.columns.to_numpy(dtype='<U64')[3:]
+        tests = col_significance.columns.to_numpy(dtype='<U64')[2:]
         tests = list(map(lambda x: x[6:], tests))
         tests.append("combined")
 
         # Create a matrix of ones and zeros, where columns are omics datasets + 'combined' and rows are enriched pathways
-        evidence_cols = pd.DataFrame([list(map(lambda x: int(tests in x), col_significance['evidence'].to_numpy(dtype='<U64')))], columns = tests)
-        evidence_cols.loc[:,'term_id'] = col_significance['term_id'].to_numpy()
-
+        evidence_cols = pd.DataFrame()
+        for i in range(len(tests)):
+            evidence_cols.loc[:,tests[i]] = list(map(lambda x: int(tests[i] in x), col_significance['evidence']))
+        #evidence_cols.loc[:,'term_id'] = col_significance['term_id'].to_numpy()
+        evidence_cols.insert(loc=0, column='term_id', value=col_significance['term_id'].to_numpy())
+        
         mapped_colors = []
-        # Acquire colours from grDevices::rainbow or RColorBrewer::brewer.pal if custom colors are not provided
-        # NOTE create a default color palette
         if color_palette == None and custom_colors == None:
-            # create default color palette
+            # Create default color palette
             cmap = mpl.cm.get_cmap('Set1', len(tests)-1)
             mapped_colors = list(map(lambda x: mpl.colors.rgb2hex(cmap(x)),range(len(tests)-1)))
-
-        # NOTE redundant based on end code
-        elif custom_colors != None:
-            mapped_colors = custom_colors
             
-        # NOTE create user-defined color pallette
+        elif custom_colors != None:
+            mapped_colors = custom_colors   
+            
+        # Create user-defined color pallette
         else:
-            # create color pallette
             cmap = mpl.cm.get_cmap(color_palette, len(tests)-1)
             mapped_colors = list(map(lambda x: mpl.colors.rgb2hex(cmap(x)),range(len(tests)-1)))
             
-
         mapped_colors.append(color_integrated_only)
 
         # create a dictionary for colors
         color_dict = {}
-        for i, color in mapped_colors:
+        for i, color in enumerate(mapped_colors):
             color_dict[tests[i]] = color
 
         # cytoscape instructions to create pie charts
         instruct_str = f'''piechart: attributelist="{",".join(tests)}" colorlist="{",".join(mapped_colors)}" showlabels=FALSE'''
-        col_significance.loc[:,'instruct'] = instruct_str
+        evidence_cols.loc[:,'instruct'] = instruct_str
         
-
         # Writing the Files
         outfile = cytoscape_file_tag + "subgroups.txt"
-        col_significance.to_csv(outfile, sep='\t', index=False)
+        evidence_cols.to_csv(outfile, sep='\t', index=False, quoting=csv.QUOTE_NONE)
 
         create_legend(color_dict, cytoscape_file_tag)
 

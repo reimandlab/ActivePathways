@@ -12,7 +12,7 @@ def hypergeomtric(counts):
     k = counts[0,0] + counts[0,1]
     x = counts[0,0]
 
-    return 1 - stats.hypergeom(m+n, k, m).cdf(x)
+    return 1 - stats.hypergeom.cdf(x-1, n, m, k,loc=0)
 
 def orderedHypergeometric(gene_arr, background, annotations):
     # Only test subsets of genelist that end with a gene in annotations since these are the only tests for which the p-value can decrease
@@ -20,8 +20,8 @@ def orderedHypergeometric(gene_arr, background, annotations):
     if len(genes_indices) == 0:
         return 1, 1
 
-    gl = gene_arr[1:]
-    cl = background[~(np.isin(background, gene_arr))]
+    gl = gene_arr[0:genes_indices[0]+1]
+    cl = background[~(np.isin(background, gl))]
     genelist0 = len(gl) - 1
     complement1 = np.sum(np.isin(cl, annotations))
     complement0 = len(cl) - complement1
@@ -36,7 +36,7 @@ def orderedHypergeometric(gene_arr, background, annotations):
     for i in range(1,len(genes_indices)):
         diff = genes_indices[i] - genes_indices[i - 1]
 
-        counts[0,0] = i
+        counts[0,0] = i + 1
         counts[1,0] = counts[1,0] + diff - 1
         counts[0,1] = counts[0,1] - 1
         counts[1,1] = counts[1,1] - diff + 1
@@ -51,5 +51,3 @@ def orderedHypergeometric(gene_arr, background, annotations):
     p_val = min_score
 
     return p_val, ind
-
-

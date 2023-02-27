@@ -237,7 +237,7 @@ def ActivePathways(scores, gmt, background = None,
     
     if contribution:
         sig_cols = columnSignificance(scores, gmt, background, cutoff, significant, correction_method, res.adjusted_p_val)
-        res = pd.concat([res, sig_cols.iloc[:,-1:]], axis=1)
+        res = pd.concat([res, sig_cols.iloc[:,1:]], axis=1)
     else:
         sig_cols = None
     

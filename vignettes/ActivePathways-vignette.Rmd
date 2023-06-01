@@ -132,7 +132,7 @@ Note that only the genes found in the background set are used for testing enrich
 ## Merging p-values
 A key feature of `ActivePathways` is the integration of multiple complementary omics datasets to prioritise genes for the pathway analysis. In this approach, genes with significant scores in multiple datasets will get the highest priority, and certain genes with weak scores in multiple datasets may be ranked higher, highlighting functions that would be missed when only single datasets were analysed. `ActivePathways` accomplishes this by merging the series of p-values in the columns of the scores matrix for each gene into a single combined P-value. The four methods to merge P-values are Fisher's method (the default), Brown's method (extension of Fisher's), Stouffer's method and Strube's method (extension of Stouffer's). The Brown's and Strube's methods are more conservative in the case when the input datasets show some large-scale similarities (i.e., covariation), since they will take that into account when prioritising genes across similar datasets. The Brown's or Strube's method are recommended for most cases since omics datasets are often not statistically independent of each other and genes with high scores in one dataset are more likely to have high scores in another dataset just by chance. 
 
-The following example compares the merged P-values of the first few genes between the four methods. Fisher's and Stouffer's method are two alternative strategies to merge p-values and as a result the top scoring genes and p-values may differ. The genes with the top scores for Brown's method are the same as Fisher's, but their P-values are somewhat more conservative. This is the case for Strube's method as well, in which the top scoring genes are the same as Stouffer's method, but the P-values are more conservative. Fisher's method is more sensitive to a single small p-value than Stouffer's method, which is why the merged P-values are much more conservative with Stouffer's method in this example. 
+The following example compares the merged P-values of the first few genes between the four methods. Fisher's and Stouffer's method are two alternative strategies to merge p-values and as a result the top scoring genes and p-values may differ. The genes with the top scores for Brown's method are the same as Fisher's, but their P-values are more conservative. This is the case for Strube's method as well, in which the top scoring genes are the same as Stouffer's method, but the P-values are more conservative. 
 ```{r}
 sort(merge_p_values(scores, 'Fisher'))[1:5]
 sort(merge_p_values(scores, 'Brown'))[1:5]
@@ -150,34 +150,6 @@ scores2[c(2179, 1760),]
 
 ActivePathways(scores, gmt_file)
 ActivePathways(scores2, gmt_file)
-```
-
-The scores_direction and expected_direction parameters have recently been introduced to merge_p_values() and ActivePathways() functions, which can incorporate directional logic into the p-value merging methods. For example, fold-change in protein expression would be expected to associate positively with mRNA change of the corresponding gene, while DNA methylation change of the gene promoter would be expected to associate negatively. We penalize genes where such directional interaction assumptions are violated. Using the expected_direction parameter we can encode our expected relationship between different datasets, and scores_direction would reflect the log2 fold-change values of each gene. The magnitude of the input log2 fold-change values in scores_direction is discarded and only the directional information is used for pathway enrichment analysis and merging p-values. 
-
-
-```{r}
-df <- read.table(system.file('extdata', 'Differential_expression_rna_protein.tsv', package = 'ActivePathways'), 
-header = TRUE,row.names = "gene", sep = '\t')
-df
-```
-
-
-The top 5 scoring genes differ if we penalize genes where this directional logic is violated. Using Stouffer's method the genes, KHNYN and PLA2G7 are penalized, whilst TPRG1 retains its significance. Interestingly, as a consequence of penalizing these two genes, other genes move up in rank (DCLK1, RALGAPA1, NOP9 and SCRN1 for example). Incorporating directional information into ActivePathways influences both gene and pathway level findings. 
-
-```{r}
-scores3 <- data.frame(row.names = rownames(df), rna = df[,1], protein = df[,3])
-scores3 <- as.matrix(scores3)
-scores3[is.na(scores3)] <- 1
-
-scores_direction <- data.frame(row.names = rownames(df), rna = df[,2], protein = df[,4])
-scores_direction <- as.matrix(scores_direction)
-scores_direction[is.na(scores_direction)] <- 1
-
-expected_direction <- c(1,1)
-
-df[c('TPRG1','KHNYN','PLA2G7','DCLK1','RALGAPA1'),]
-sort(merge_p_values(scores3, 'Stouffer'))[1:5]
-sort(merge_p_values(scores3, 'Stouffer',scores_direction, expected_direction))[1:5]
 ```
 
 
@@ -251,6 +223,131 @@ result_file <- paste('ActivePathways_results2.txt', sep = '/')
 data.table::fwrite(res, result_file, sep = '\t', sep2 = c('', ',', ''))
 cat(paste(readLines(result_file)[1:2], collapse = '\n'))
 ```
+
+
+## ActivePathways 2.0 directional data integration
+In ActivePathways 2.0, we extend our computational framework to account for directional activities of genes and proteins across the input omics datasets. For example, fold-change in protein expression would be expected to associate positively with mRNA change of the corresponding gene. We extend our method to encode such directional interactions and penalize genes and proteins where such assumptions are violated.
+
+The scores_direction and expected_direction parameters are provided in the merge_p_values() and ActivePathways() functions to incorporate this directional penalty into the data fusion and pathway enrichment analyses. Using the expected_direction parameter we can encode our expected relationship between different datasets, and scores_direction would reflect the log2 fold-change values of each gene.
+```{r}
+df <- read.table(system.file('extdata', 'Differential_expression_rna_protein.tsv',
+                 package = 'ActivePathways'), header = TRUE,row.names = "gene", sep = '\t')
+
+df[c('ACTN4','PIK3R4','PPIL1','NELFE','LUZP1','ITGB2'),]
+
+scores3 <- data.frame(row.names = rownames(df), rna = df[,1], protein = df[,3])
+scores3 <- as.matrix(scores3)
+scores3[is.na(scores3)] <- 1
+
+# A numerical matrix of log2 fold-changes values is required as input
+scores_direction <- data.frame(row.names = rownames(df), rna = df[,2], protein = df[,4])
+scores_direction <- as.matrix(scores_direction)
+scores_direction[is.na(scores_direction)] <- 1
+
+# This matrix has to be accompanied by a vector that provides the expected relationship between
+# different datasets
+expected_direction <- c(1,1)
+```
+
+The top 5 scoring genes differ if we penalize genes where this directional logic is violated. Using Brown's method the gene PIK3R4 is penalized, whilst the others retain significance. Interestingly, as a consequence of penalizing PIK3R4, other genes such as ITGB2 move up in rank.  
+```{r}
+brown_merged <- merge_p_values(scores3,"Brown")
+browndir_merged <- merge_p_values(scores3,"Brown",scores_direction,expected_direction)
+
+sort(brown_merged)[1:5] 
+sort(browndir_merged)[1:5]
+```
+
+To assess the impact of the directional penalty on gene merged P-value signals we create a plot showing directional results on the y axis and non-directional results on the x. Green dots are prioritized hits, red dots are penalized.
+```{r}
+library("ggplot2")
+lineplot_df <- data.frame(original = -log10(brown_merged), modified = -log10(browndir_merged))
+print(ggplot(lineplot_df) + geom_point(size = 2.4,shape = 19,aes(original, modified,color = ifelse(modified <= -log10(0.05),"#de2d26","#2ca25f"))) +
+            labs(title="", x ="Brown's Merged -log10(FDR)", y = "Directional Brown's Merged -log10(FDR)") + 
+            geom_hline(yintercept=1.301, linetype='dashed', col = 'black', size = 0.5)+
+            geom_vline(xintercept = 1.301, linetype = "dashed", col = "black", size = 0.5) + theme(
+                  plot.title = element_text(size=23,hjust = 0.5),
+                  axis.title.x = element_text(size=18,margin = unit(c(2, 0, 0, 0), "mm")),
+                  axis.title.y = element_text(size=18,margin = unit(c(0,4,0,0), "mm")),
+                  axis.text = element_text(size = 16),
+                  panel.background = element_blank(),
+                  axis.line = element_line(colour = "black"))+
+            geom_abline(size = 0.5, slope=1,intercept = 0) +
+            scale_color_identity())
+```
+
+To explore the impact of these gene-level changes on the biological pathways they influence, we compare our results with and without a directional penalty.
+```{r}
+fname_GMT2 <- system.file("extdata", "hsapiens_REAC_subset2.gmt", package = "ActivePathways")
+
+# Package default: no directionality
+res_brown <- ActivePathways(scores3, merge_method = "Brown", gmt = fname_GMT2,cytoscape_file_tag = "Original_")
+
+# Added feature: incorporating directionality
+res_browndir <- ActivePathways(scores3, merge_method = "Brown", gmt = fname_GMT2, cytoscape_file_tag = "Directional_",
+                               scores_direction = scores_direction, expected_direction = expected_direction)
+```
+
+We need to aggregate the two pathway results, whilst keeping track of lost/gained/maintained pathways between the two methods.
+```{r}
+## 1) Aggregate the results to create a subgroups.txt file
+dataset_colors <- c("#fdb863","#b2abd2","#bababa")
+names(dataset_colors) <- c('rna','protein','combined')
+
+all_pathways <- data.frame(term_id = c(res_brown$term_id,res_browndir$term_id))
+all_pathways$evidence <- append(res_brown$evidence, res_browndir$evidence)
+
+grouped_pathways <- all_pathways %>% group_by(term_id) %>% summarise(evidence = list(evidence))
+grouped_pathways$evidence <- lapply(grouped_pathways$evidence,'[[',1)
+evidence_columns <- do.call(rbind, lapply(grouped_pathways$evidence,
+                                         function(x) 0+(names(dataset_colors) %in% x)))
+colnames(evidence_columns) <- names(dataset_colors)
+grouped_pathways <- cbind(grouped_pathways[,"term_id"], evidence_columns)
+
+# check for shared/lost/gained pathways between methods
+lostp <- res_brown$term_id[!res_brown$term_id %in% res_browndir$term_id]
+gainedp <- res_browndir$term_id[!res_browndir$term_id %in% res_brown$term_id]
+grouped_pathways$directional_impact <- 0
+grouped_pathways$directional_impact[grouped_pathways$term_id %in% lostp] <- 1
+grouped_pathways$directional_impact[grouped_pathways$term_id %in% gainedp] <- 2
+
+grouped_pathways <- as.data.table(grouped_pathways)
+instruct.str <- paste('piechart:',
+                      ' attributelist="', 
+                      paste(names(dataset_colors), collapse=','),
+                      '" colorlist="', 
+                      paste(dataset_colors, collapse=','), 
+                      '" showlabels=FALSE', sep='')
+grouped_pathways[, "instruct" := instruct.str]
+utils::write.table(grouped_pathways, 
+                   file=paste0("Aggregated_", "subgroups.txt"), 
+                   row.names=FALSE, 
+                   sep="\t", 
+                   quote=FALSE)
+
+## 2) Aggregate the results to create a pathways.txt file
+df_pathways <- data.frame(term_id = c(res_brown$term_id,res_browndir$term_id),
+                             term_name = c(res_brown$term_name,res_browndir$term_name),
+                             adjusted_p_val = c(res_brown$adjusted_p_val,res_browndir$adjusted_p_val))
+grouped_pathways2 <- df_pathways %>% group_by(term_id,term_name) %>% summarise(adjusted_p_val = min(adjusted_p_val))
+grouped_pathways2 <- as.data.table(grouped_pathways2)
+
+utils::write.table(grouped_pathways2, 
+                   file=paste0("Aggregated_", "pathways.txt"), 
+                   row.names=FALSE, 
+                   sep="\t", 
+                   quote=FALSE)
+
+
+## 3) Aggregate results to create pathways.gmt file
+gmt_main <- read.GMT(fname_GMT2)
+gmt_main <- gmt_main[grouped_pathways2$term_id]
+write.GMT(gmt_main,paste0("Aggregated_","pathways.gmt"))
+```
+
+To compare the changes in biological pathways before and after incorporating directionality, we combine both outputs into a single enrichment map for [plotting](#visualizing-directional-impact-with-node-borders).
+
+
 
 # Visualising pathway enrichment results using enrichment maps in Cytoscape
 
@@ -360,6 +457,21 @@ To allow better interpretation of the enrichment map, `ActivePathways` generates
 ![](LegendView.png)
 
 Note that one of the colors corresponds to a subset of enriched pathways with *combined* evidence that were only detected through data fusion and P-value merging and not when any of the input datasets were detected separately. This exemplifies the added value of integrative multi-omics pathway enrichment analysis. 
+
+## Visualizing directional impact with node borders
+
+From the drop-down Properties menu, select *Border Line Type*.
+
+<img src="https://github.com/MSlobody/APW2_tutorial/blob/main/border_line_type.jpg" width="500" />
+
+Set *Column* to *directional impact* and *Mapping Type* to *Discrete Mapping*. To compare findings between a non-directional and a directional method, we highlight shared (0), lost (1), and gained (2) pathways between the approaches. Here, we have solid lines for the shared pathways, dots for the lost pathways, and vertical lines for the gained pathways. Border widths can be adjusted in the *Border Width* property, again with discrete mapping.
+
+<img src="https://github.com/MSlobody/APW2_tutorial/blob/main/set_aesthetic.jpg" width="500"/>
+
+This step changes node borders in the aggregated enrichment map, depicting the additional information provided by directional impact.
+
+<img src="https://github.com/MSlobody/APW2_tutorial/blob/main/new_map.png" width="800" /> 
+<img src="https://github.com/MSlobody/APW2_tutorial/blob/main/legend_sized.png" width="100" />
 
 
 ## Alternative node coloring

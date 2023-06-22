@@ -167,7 +167,7 @@ The parameter expected_direction is a vector that allows the user to represent t
 
 The parameter scores_direction is a matrix that reflects the directions that the genes/transcripts/protein show in the data. The matrix size is n_genes * n_datasets, that is the same size as the P-value matrix. This is a numeric matrix, but only the signs of the values are accounted for. 
 
-#### Gene-level insight
+#### Directional data integration at the gene level
 
 ```R 
 pvals_FCs <- read.table(system.file('extdata', 'Differential_expression_rna_protein.tsv',

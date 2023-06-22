@@ -1,11 +1,13 @@
 # ActivePathways
 
-**DATE TBD 2023: ActivePathways has now been updated to version 2.0.0. This update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
+**June 22 2023: ActivePathways version 2.0.0 is now available. This update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
 
 
-ActivePathways is a tool for multivariate pathway enrichment analysis. Pathway enrichment analysis identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list of genes of interest. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance and direction of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. Using this strategy, we can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
+ActivePathways is a tool for multivariate pathway enrichment analysis that identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list or matrix of genes. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance and direction of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. Using this strategy, we can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
 
-ActivePathways is published in Nature Communications with the PCAWG Pan-Cancer project. 
+
+
+The first version of ActivePathways was published in Nature Communications with the PCAWG Pan-Cancer project. 
 
 Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, Jüri Reimand & PCAWG Consortium. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11 735 (2020) (^ - co-first authors)
 https://www.nature.com/articles/s41467-019-13983-9
@@ -13,7 +15,7 @@ https://www.ncbi.nlm.nih.gov/pubmed/32024846
 
 ## Installation
 
-#### From CRAN
+#### From CRAN: ActivePathways 1.1.1 is currently the most recent version
 Open R and run `install.packages('ActivePathways')`
 
 #### Using devtools on our GitHub repository
@@ -33,9 +35,9 @@ See the vignette for more details. Run `browseVignettes(package='ActivePathways'
 
 
 ### Examples
-The simplest use of ActivePathways requires only a data table (matrix of p-values) and a list of gene sets in the form of a GMT [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file. 
+The simplest use of ActivePathways requires only a data table and a GMT file. The data table is a matrix of p-values of genes/transcripts/proteins as rows and omics datasets as columns. it also needs a list of gene sets in the form of a GMT [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file. 
 
-* The data table must be in the form of numerical matrix and cannot contain any missing values. One conservative option is to re-assign all missing values as ones, indicating our confidence that the missing values are not indicative of cancer drivers. Alternatively, one may consider removing genes with NA values.
+* The data table must be a numerical matrix. For a single gene list, a one-column matrix can be used. The matrix cannot contain any missing values, and one conservative option is to re-assign all missing values as 1s, indicating our confidence that the missing P-values are always insignificant. Alternatively, one may consider removing genes with NA values.
 
 * Gene sets in the form of a GMT file can be acquired from multiple [sources](https://baderlab.org/GeneSets) such as Gene Ontology, Reactome and others. For better accuracy and statistical power these pathway databases should be combined. Acquiring an [up-to-date GMT file](http://download.baderlab.org/EM_Genesets/current_release/) is essential to avoid using unreliable outdated annotations. 
 ```R
@@ -43,7 +45,7 @@ The simplest use of ActivePathways requires only a data table (matrix of p-value
 library(ActivePathways)
 
 ##
-# Run an example using the data files included in the ActivePathways package. 
+# Run an example using the data files included in the ActivePathways package. This basic example does not incorporate directionality. 
 ##
 
 fname_scores <- system.file("extdata", "Adenocarcinoma_scores_subset.tsv", package = "ActivePathways")
@@ -70,7 +72,7 @@ enriched_pathways <- ActivePathways(scores, fname_GMT)
 
 
 ##
-# list a few first results of the ActivePathways analysis
+# list a few first results of enriched pathways identified by ActivePathways
 ##
 
 enriched_pathways[1:3,]
@@ -124,7 +126,7 @@ export_as_CSV(enriched_pathways, "enriched_pathways.csv")
 # The scores matrix includes p-values for genes (rows) 
 #   and evidence of different omics datasets (columns).
 # This dataset includes predicted cancer driver mutations
-#   in gene CDS, UTR and core promoter sequences
+#   in gene coding/CDS, 5'UTR, 3'UTR, and core promoter sequences
 ##
 
 head(scores, n = 3)
@@ -139,6 +141,7 @@ head(scores, n = 3)
 # Each tab-separated line represents a gene set: 
 #   gene set ID, description followed by gene symbols.
 # Gene symbols in the scores table and the GMT file need to match. 
+# NB: this GMT file is a small subset of the real GMT file due to file size constrants. It should not be used for real analyses. 
 ##
 
 readLines(fname_GMT)[11:13]
@@ -150,55 +153,91 @@ readLines(fname_GMT)[11:13]
 
 ```
 
-### Examples - Incorporating directionality
-In ActivePathways 2.0, we extend our computational framework to account for directional activities of genes and proteins across the input omics datasets. For example, fold-change in protein expression would be expected to associate positively with mRNA change of the corresponding gene. We extend our method to encode such directional interactions and penalize genes and proteins where such assumptions are violated.
+### Examples - Directional integration of multi-omics data
 
-The scores_direction and expected_direction parameters are provided in the merge_p_values() and ActivePathways() functions to incorporate this directional penalty into the data fusion and pathway enrichment analyses. Using the expected_direction parameter we can encode our expected relationship between different datasets, and scores_direction would reflect the log2 fold-change values of each gene.
+ActivePathways 2.0 extends our integrative pathway analysis framework significantly. We can now define expected directional assumptions of input omics datasets for more accurate analyses. This allows us to prioritise genes and pathways where certain directional assumptions are met, and penalise those where the assumptions are violated. 
+
+For example, fold-change in protein expression would be expected to associate positively with mRNA fold-change of the corresponding gene, while negative associations would be unexpected and indicate more-complex situations or potential false positives. We can instruct the pathway analysis to prioritise positively-associated protein/mRNA pairs and penalise negative associations (or vice versa). 
+
+Two additional inputs are included in ActivePathways that allow diverse multi-omics analyses. These inputs are optional. 
+
+The scores_direction and expected_direction parameters are provided in the merge_p_values() and ActivePathways() functions to incorporate this directional penalty into the data fusion and pathway enrichment analyses. 
+
+The parameter expected_direction is a vector that allows the user to represent the expected relationship between the input omics datasets. The vector size is n_datasets. Values include +1, -1, and 0. 
+
+The parameter scores_direction is a matrix that reflects the directions that the genes/transcripts/protein show in the data. The matrix size is n_genes * n_datasets, that is the same size as the P-value matrix. This is a numeric matrix, but only the signs of the values are accounted for. 
 
 #### Gene-level insight
 
 ```R 
-df <- read.table(system.file('extdata', 'Differential_expression_rna_protein.tsv',
-                 package = 'ActivePathways'), header = TRUE,row.names = "gene", sep = '\t')
+pvals_FCs <- read.table(system.file('extdata', 'Differential_expression_rna_protein.tsv',
+                 package = 'ActivePathways'), header = TRUE, sep = '\t')
+                 
+# examine a few example genes
+example_genes = c('ACTN4','PIK3R4','PPIL1','NELFE','LUZP1','ITGB2')
+pvals_FCs[pvals_FCs$gene %in% example_genes,]
 
-df[c('ACTN4','PIK3R4','PPIL1','NELFE','LUZP1','ITGB2'),]
+#       gene     rna_pval rna_log2fc protein_pval protein_log2fc
+#73   PIK3R4 1.266285e-03  1.1557077 2.791135e-03     -0.8344799
+#74    PPIL1 1.276838e-03 -1.1694221 1.199303e-04     -1.1193605
+#606   NELFE 1.447553e-02 -0.9120687 1.615592e-05     -1.2630114
+#4048  LUZP1 3.253382e-05  1.5830796 4.129125e-02      0.5791377
+#4050  ITGB2 4.584450e-05  1.6472117 1.327997e-01      0.4221579
+#4052  ACTN4 5.725503e-05  1.5531533 8.238317e-07      1.4279158
 
-#       rna_pval        rna_log2fc   protein_pval     protein_log2fc
-#ACTN4  5.725503e-05    1.5531533    8.238317e-07      1.4279158
-#PIK3R4 1.266285e-03    1.1557077    2.791135e-03     -0.8344799
-#PPIL1  1.276838e-03   -1.1694221    1.199303e-04     -1.1193605
-#NELFE  1.447553e-02   -0.9120687    1.615592e-05     -1.2630114
-#LUZP1  3.253382e-05    1.5830796    4.129125e-02      0.5791377
-#ITGB2  4.584450e-05    1.6472117    1.327997e-01      0.4221579
+# create a matrix of gene/protein P-values where the columns are different omics datasets (mRNA and protein)
+pval_matrix <- data.frame(row.names = pvals_FCs$gene, rna = df$rna_pval, protein = df$protein_pval)
+pval_matrix <- as.matrix(pval_matrix)
+# convert missing values to P = 1
+pval_matrix[is.na(pval_matrix)] <- 1
 
-scores3 <- data.frame(row.names = rownames(df), rna = df[,1], protein = df[,3])
-scores3 <- as.matrix(scores3)
-scores3[is.na(scores3)] <- 1
+# Create a matrix of gene/protein directions similarly to the P-value matrix (i.e., scores_direction)
+dir_matrix <- data.frame(row.names = pvals_FCs$gene, rna = pvals_FCs$rna_log2fc, protein = pvals_FCs$protein_log2fc)
+dir_matrix <- as.matrix(dir_matrix)
+# ActivePathways will only use the signs of the direction values (ie +1 or -1).
+dir_matrix <- sign(dir_matrix)
+# 
+dir_matrix[is.na(dir_matrix)] <- 0
 
-# A numerical matrix of log2 fold-changes values is required as input
-scores_direction <- data.frame(row.names = rownames(df), rna = df[,2], protein = df[,4])
-scores_direction <- as.matrix(scores_direction)
-scores_direction[is.na(scores_direction)] <- 1
-
-# This matrix has to be accompanied by a vector that provides the expected relationship between
-# different datasets
+# This matrix has to be accompanied by a vector that provides the expected relationship between the
+# different datasets. Here, mRNA levels and protein levels are expected to have positive correlations. 
+# Alternatively, we can use c(1,-1) to prioritise genes/proteins where directions are the opposite.
 expected_direction <- c(1,1)
 
-# The top 5 scoring genes differ if we penalize genes where this directional logic is violated.
-# Using Brown's method the gene PIK3R4 is penalized, whilst the others retain
-# significance. Interestingly, as a consequence of penalizing PIK3R4, other genes such as ITGB2
-# move up in rank.  
-brown_merged <- merge_p_values(scores3,"Brown")
-browndir_merged <- merge_p_values(scores3,"Brown",scores_direction,expected_direction)
+# Alternatively, we can use another vector to prioritise genes/proteins where the directions are the opposite.
+# expected_direction <- c(1,-1)
 
-sort(brown_merged)[1:5]
+# Now we merge the P-values of the two datasets using directional assumtions and compare these with the plain non-directional merging. 
+# The top 5 scoring genes differ if we penalize genes where this directional logic is violated: While 4 of 5 genes retain significance, the gene PIK3R4 is penalized. 
+# Interestingly, as a consequence of penalizing PIK3R4, other genes such as ITGB2 move up in rank.  
+
+directional_merged_pvals <- merge_p_values(pval_matrix, method = "Brown", dir_matrix, expected_direction)
+
+merged_pvals <- merge_p_values(pval_matrix, method = "Brown")
+
+
+sort(merged_pvals)[1:5]
 #       ACTN4        PPIL1        NELFE        LUZP1       PIK3R4 
 #1.168708e-09 2.556067e-06 3.804646e-06 1.950607e-05 4.790125e-05 
 
 
-sort(browndir_merged)[1:5]
+sort(directional_merged_pvals)[1:5]
 #       ACTN4        PPIL1        NELFE        LUZP1        ITGB2 
 #1.168708e-09 2.556067e-06 3.804646e-06 1.950607e-05 7.920157e-05 
+
+# PIK3R4 is penalised because the fold-changes of its mRNA and protein levels are significant and have the opposite signs:
+pvals_FCs[pvals_FCs$gene == "PIK3R4",]
+#     gene    rna_pval rna_log2fc protein_pval protein_log2fc
+#73 PIK3R4 0.001266285   1.155708  0.002791135     -0.8344799
+
+pval_matrix["PIK3R4",]
+#        rna     protein
+#0.001266285 0.002791135
+
+dir_matrix["PIK3R4",]
+#    rna protein
+#      1      -1
+
 ```
 To assess the impact of the directional penalty on gene merged P-value signals we create a plot showing directional results on the y axis and non-directional results on the x. Green dots are prioritized hits, red dots are penalized. 
 

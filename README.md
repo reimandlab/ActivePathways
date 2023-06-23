@@ -341,7 +341,7 @@ Set *Column* to *directional impact* and *Mapping Type* to *Discrete Mapping*. T
 This step changes node borders in the aggregated enrichment map, depicting the additional information provided by directional impact.
 
 <img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/new_map.png" width="800" /> 
-<img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/legend_sized.png" width="100" />
+<img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/legend.png" width="100" />
 
 ## Alternative node coloring
 

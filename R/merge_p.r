@@ -46,7 +46,7 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
     # scores
     if (is.list(scores)) scores <- unlist(scores, recursive=FALSE)
     if (!(is.vector(scores) || is.matrix(scores))) stop("scores must be a matrix or vector")
-    if (any(is.na(scores))) stop("scores may not contain missing values")
+    if (any(is.na(scores))) stop("scores cannot contain missing values, we recommend replacing NA with 1 or removing")
     if (!is.numeric(scores)) stop("scores must be numeric")
     if (any(scores < 0 | scores > 1)) stop("All values in scores must be in [0,1]")
     
@@ -62,7 +62,7 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
         if (any(!expected_direction %in% c(1,-1,0))) stop("expected_direction must contain the values: 1, -1 or 0")
         if (!(is.vector(scores_direction) || is.matrix(scores_direction))) stop("scores_direction must be a matrix or vector")
         if (!all(class(scores_direction) == class(scores))) stop("scores and scores_direction must be the same data type")
-        if (any(is.na(scores_direction))) stop("scores_direction may not contain missing values")
+        if (any(is.na(scores_direction))) stop("scores_direction cannot contain missing values, we recommend replacing NA with 0 or removing")
         if (!is.numeric(scores_direction)) stop("scores_direction must be numeric")
         
         if (is.matrix(scores_direction)){

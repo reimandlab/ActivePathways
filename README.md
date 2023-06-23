@@ -186,7 +186,7 @@ pvals_FCs[pvals_FCs$gene %in% example_genes,]
 #4052  ACTN4 5.725503e-05  1.5531533 8.238317e-07      1.4279158
 
 # create a matrix of gene/protein P-values where the columns are different omics datasets (mRNA and protein)
-pval_matrix <- data.frame(row.names = pvals_FCs$gene, rna = df$rna_pval, protein = df$protein_pval)
+pval_matrix <- data.frame(row.names = pvals_FCs$gene, rna = pvals_FCs$rna_pval, protein = pvals_FCs$protein_pval)
 pval_matrix <- as.matrix(pval_matrix)
 # convert missing values to P = 1
 pval_matrix[is.na(pval_matrix)] <- 1

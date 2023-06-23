@@ -244,7 +244,7 @@ To assess the impact of the directional penalty on gene merged P-value signals w
 <img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/lineplot_tutorial.jpeg" width="300" /> 
 
 #### Pathway-level insight
-To explore the impact of these gene-level changes on the biological pathways they influence, we compare our results with and without a directional penalty.
+To explore how changes on the individual gene level impact biological pathways, we can compare results before and after incorporating a directional penalty.
 
 ```R 
 fname_GMT2 <- system.file("extdata", "hsapiens_REAC_subset2.gmt", package = "ActivePathways")
@@ -256,27 +256,27 @@ res_brown <- ActivePathways(scores3, merge_method = "Brown", gmt = fname_GMT2,cy
 res_browndir <- ActivePathways(scores3, merge_method = "Brown", gmt = fname_GMT2, cytoscape_file_tag = "Directional_",
                                scores_direction = scores_direction, expected_direction = expected_direction)               
 ```
-To compare the changes in biological pathways before and after incorporating directionality, we combine both outputs into a single enrichment map for [plotting](#visualizing-directional-impact-with-node-borders).
+To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualizing-directional-impact-with-node-borders).
 
 More thorough documentation of the ActivePathways function can be found in R with `?ActivePathways`, and complete tutorials can be found with `browseVignettes(package='ActivePathways')`.
 
 
 # Visualising pathway enrichment results using enrichment maps in Cytoscape
 
-The Cytoscape software and the EnrichmentMap app provide powerful tools to visualise the enriched pathways from `ActivePathways` as a network (i.e., an Enrichment Map). To facilitate this visualisation step, `ActivePathways` provides the files needed for building enrichment maps. To create these files, a file prefix must be supplied to `ActivePathways` using the argument `cytoscape_file_tag`. The prefix can be a path to an existing writable directory.
+Cytoscape provides powerful tools to visualise the enriched pathways from `ActivePathways` as a network (i.e., an enrichment map). `ActivePathways` provides the files needed for building enrichment maps in Cytoscape. To create these files, supply a file prefix to the argument `cytoscape_file_tag` in the ActivePathways() function. The prefix can be a path to an existing writable directory.
  
 ```{r}
 res <- ActivePathways(scores, fname_GMT, cytoscape_file_tag = "enrichmentMap__")
 ```
 Four files are written using the prefix:
 
-* `enrichmentMap__pathways.txt` contains the table of significant terms (i.e. molecular pathways, biological processes, other gene sets) and the associated adjusted P-values. Note that only terms with `adjusted_p_val <= significant` are written.
+* `enrichmentMap__pathways.txt`: a table of significant terms and the associated adjusted P-values. Terms include molecular pathways, biological processes, and other gene sets. Note that only terms with `adjusted_p_val <= significant` are written.
 
-* `enrichmentMap__subgroups.txt` contains a matrix indicating the columns of the input matrix of P-values that contributed to the discovery of the corresponding pathways. These values correspond to the `evidence` evaluation of input omics datasets discussed above, where a value of one indicates that the pathway was also detectable using a specific input omics dataset. A value of zero indicates otherwise. This file will be not generated if a single-column matrix of scores corresponding to just one omics dataset is provided to `ActivePathways`.
+* `enrichmentMap__subgroups.txt`: a matrix indicating which columns of the input matrix (i.e., which omics datasets) contributed to the discovery of each pathway. These values correspond to the `evidence` evaluation of input omics datasets discussed above. A value of one indicates the pathway was also detectable using a specific input omics dataset. A value of zero indicates otherwise. This file will be not generated if the input matrix is a single-column matrix of scores (just one omics dataset).
 
-* `enrichmentMap__pathways.gmt` contains a shortened version of the supplied GMT file which consists of only the significant pathways detected by `ActivePathways`. 
+* `enrichmentMap__pathways.gmt`: a shortened version of the supplied GMT file, containing only the significant pathways detected by `ActivePathways`. 
 
-* `enrichmentMap__legend.pdf` is a pdf file that displays a color legend of different omics datasets visualised in the enrichment map that can be used as a reference to the generated enrichment map.
+* `enrichmentMap__legend.pdf`: a pdf file containing a legend, with colors corresponding to the different omics datasets visualised in the enrichment map. This can be used as a reference to the generated enrichment map.
 
 ## Creating enrichment maps using results of ActivePathways 
 
@@ -306,11 +306,11 @@ Pathway enrichment analysis often leads to complex and redundant results. Enrich
 
 ## Colour the nodes of the network to visualise supporting omics datasets
 
-To color nodes in the network (i.e., molecular pathways, biological processes) according to the omics datasets supporting the enrichments, the third file `enrichmentMap__subgroups.txt` needs to be imported to Cytoscape directly. To import the file, activate the menu option *File -> Import -> Table from File* and select the file `enrichmentMap__subgroups.txt`. In the following dialogue, select *To a Network Collection* in the dropdown menu *Where to Import Table Data*. Click OK to proceed. 
+The third file `enrichmentMap__subgroups.txt` needs to be imported to Cytoscape directly in order to color nodes (i.e. terms) according to their source omics datasets. To import the file, select the menu option *File -> Import -> Table from File* and select the file `enrichmentMap__subgroups.txt`. In the following dialogue, select *To a Network Collection* in the dropdown menu *Where to Import Table Data*. Click OK to proceed. 
 
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/ImportStep_V2.png)
 
-Next, Cytoscape needs to use the imported information to color nodes using a pie chart visualisation. To enable this click the Style tab in the left control panel and select the Image/Chart1 Property in a series of dropdown menus (*Properties -> Paint -> Custom Paint 1 -> Image/Chart 1*). 
+Cytoscape uses the imported information to color nodes like a pie chart. To enable this click the Style tab in the left control panel and select the Image/Chart1 Property in a series of dropdown menus (*Properties -> Paint -> Custom Paint 1 -> Image/Chart 1*). 
 
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/PropertiesDropDown2_V2.png)
 
@@ -322,11 +322,11 @@ This step colours the nodes corresponding to the enriched pathways according to 
 
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/NetworkStep2_V2.png)
 
-To allow better interpretation of the enrichment map, `ActivePathways` generates a color legend in the file `enrichmentMap__legend.pdf` that shows which colors correspond to which omics datasets. 
+`ActivePathways` generates a color legend in the file `enrichmentMap__legend.pdf` that shows which colors correspond to which omics datasets. 
 
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView.png)
 
-Note that one of the colors corresponds to a subset of enriched pathways with *combined* evidence that were only detected through data fusion and P-value merging and not when any of the input datasets were detected separately. This exemplifies the added value of integrative multi-omics pathway enrichment analysis. 
+Note that one of the colors corresponds to a subset of enriched pathways with *combined* evidence. These terms were only detected through data fusion and P-value merging, and not with any of the input datasets individually. This exemplifies the added value of integrative multi-omics pathway enrichment analysis. 
 
 ## Visualizing directional impact with node borders
 
@@ -334,7 +334,7 @@ From the drop-down Properties menu, select *Border Line Type*.
 
 <img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/border_line_type.jpg" width="500" />
 
-Set *Column* to *directional impact* and *Mapping Type* to *Discrete Mapping*. To compare findings between a non-directional and a directional method, we highlight shared (0), lost (1), and gained (2) pathways between the approaches. Here, we have solid lines for the shared pathways, dots for the lost pathways, and vertical lines for the gained pathways. Border widths can be adjusted in the *Border Width* property, again with discrete mapping.
+Set *Column* to *directional impact* and *Mapping Type* to *Discrete Mapping*. Now we can compare findings between a non-directional and a directional method. We highlight pathways that were shared (0), lost (1), and gained (2) between the approaches. Here, we have solid lines for the shared pathways, dots for the lost pathways, and vertical lines for the gained pathways. Border widths can be adjusted in the *Border Width* property, again with discrete mapping.
 
 <img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/set_aesthetic.jpg" width="500"/>
 
@@ -351,8 +351,7 @@ res <- ActivePathways(scores, gmt_file, cytoscape_file_tag = "enrichmentMap__", 
 ```
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView_RColorBrewer.png)
 
-Instead, to manually input the color of each dataset the custom_colors parameter must be specified as a vector. This vector should contain the same number of colors as columns
-in the scores matrix.
+Alternatively, the custom_colors parameter can be specified as a vector to manually input the color of each dataset. This vector should contain the same number of colors as columns in the scores matrix.
 ```{r}
 res <- ActivePathways(scores, gmt_file, cytoscape_file_tag = "enrichmentMap__", custom_colors = c("violet","green","orange","red"))
 ```
@@ -360,7 +359,7 @@ res <- ActivePathways(scores, gmt_file, cytoscape_file_tag = "enrichmentMap__", 
 
 To change the color of the *combined* contribution, a color must be provided to the color_integrated_only parameter.
 
-Tip: if the coloring of nodes did not work in Cytoscape after setting the options in the Style panel, check that the EnhancedGraphics Cytoscape app is installed.
+**If the coloring of nodes did not work in Cytoscape after setting the options in the Style panel, check that the EnhancedGraphics Cytoscape app is installed.**
 
 ## References
 

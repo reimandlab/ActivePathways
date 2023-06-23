@@ -241,7 +241,16 @@ dir_matrix["PIK3R4",]
 ```
 To assess the impact of the directional penalty on gene merged P-value signals we create a plot showing directional results on the y axis and non-directional results on the x. Green dots are prioritized hits, red dots are penalized. 
 
-<img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/lineplot_tutorial.jpeg" width="300" /> 
+```R
+lineplot_df <- data.frame(original = -log10(merged_pvals), modified = -log10(directional_merged_pvals))
+ggplot(lineplot_df) + geom_point(size = 2.4,shape = 19,aes(original, modified,color = ifelse(modified <= -log10(0.05),"#de2d26","#2ca25f"))) +
+            labs(title="", x ="Merged -log10(P)", y = "Directional Merged -log10(P)") + 
+            geom_hline(yintercept=1.301, linetype='dashed', col = 'black', size = 0.5)+
+            geom_vline(xintercept = 1.301, linetype = "dashed", col = "black", size = 0.5) + 
+            geom_abline(size = 0.5, slope=1,intercept = 0) + scale_color_identity()
+```
+
+<img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/lineplot_tutorial.png" width="300" /> 
 
 #### Pathway-level insight
 To explore how changes on the individual gene level impact biological pathways, we can compare results before and after incorporating a directional penalty.
@@ -250,11 +259,11 @@ To explore how changes on the individual gene level impact biological pathways, 
 fname_GMT2 <- system.file("extdata", "hsapiens_REAC_subset2.gmt", package = "ActivePathways")
 
 # Package default: no directionality
-res_brown <- ActivePathways(scores3, merge_method = "Brown", gmt = fname_GMT2,cytoscape_file_tag = "Original_")
+res_brown <- ActivePathways(pval_matrix, merge_method = "Brown", gmt = fname_GMT2,cytoscape_file_tag = "Original_")
 
 # Added feature: incorporating directionality
-res_browndir <- ActivePathways(scores3, merge_method = "Brown", gmt = fname_GMT2, cytoscape_file_tag = "Directional_",
-                               scores_direction = scores_direction, expected_direction = expected_direction)               
+res_browndir <- ActivePathways(pval_matrix, merge_method = "Brown", gmt = fname_GMT2, cytoscape_file_tag = "Directional_",
+                               scores_direction = dir_matrix, expected_direction = expected_direction)               
 ```
 To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualizing-directional-impact-with-node-borders).
 

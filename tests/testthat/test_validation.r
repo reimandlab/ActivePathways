@@ -8,7 +8,7 @@ test_that("scores is a numeric matrix with valid p-values", {
 
   dat2 <- dat
   dat2[1, 1] <- NA
-  expect_error(run_ap_short(dat2), 'scores may not contain missing values')
+  expect_error(run_ap_short(dat2), 'scores cannot contain missing values, we recommend replacing NA with 1 or removing')
 
   dat2[1, 1] <- -0.1
   expect_error(run_ap_short(dat2), "All values in scores must be in [0,1]", fixed=TRUE)
@@ -34,7 +34,7 @@ test_that("scores_direction and expected_direction have valid input",{
   
   dir_test <- direction_test
   dir_test[1,1] <- NA
-  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'scores_direction may not contain missing values')
+  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'scores_direction cannot contain missing values, we recommend replacing NA with 0 or removing')
   
   dir_test <- direction_test
   dir_test[1,1] <- 'a'

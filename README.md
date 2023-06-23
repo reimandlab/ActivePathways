@@ -186,7 +186,7 @@ pvals_FCs[pvals_FCs$gene %in% example_genes,]
 #4052  ACTN4 5.725503e-05  1.5531533 8.238317e-07      1.4279158
 
 # create a matrix of gene/protein P-values where the columns are different omics datasets (mRNA and protein)
-pval_matrix <- data.frame(row.names = pvals_FCs$gene, rna = df$rna_pval, protein = df$protein_pval)
+pval_matrix <- data.frame(row.names = pvals_FCs$gene, rna = pvals_FCs$rna_pval, protein = pvals_FCs$protein_pval)
 pval_matrix <- as.matrix(pval_matrix)
 # convert missing values to P = 1
 pval_matrix[is.na(pval_matrix)] <- 1
@@ -241,7 +241,7 @@ dir_matrix["PIK3R4",]
 ```
 To assess the impact of the directional penalty on gene merged P-value signals we create a plot showing directional results on the y axis and non-directional results on the x. Green dots are prioritized hits, red dots are penalized. 
 
-<img src="https://github.com/MSlobody/APW2_tutorial/blob/main/lineplot_tutorial.jpeg" width="300" /> 
+<img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/lineplot_tutorial.jpeg" width="300" /> 
 
 #### Pathway-level insight
 To explore the impact of these gene-level changes on the biological pathways they influence, we compare our results with and without a directional penalty.
@@ -332,16 +332,16 @@ Note that one of the colors corresponds to a subset of enriched pathways with *c
 
 From the drop-down Properties menu, select *Border Line Type*.
 
-<img src="https://github.com/MSlobody/APW2_tutorial/blob/main/border_line_type.jpg" width="500" />
+<img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/border_line_type.jpg" width="500" />
 
 Set *Column* to *directional impact* and *Mapping Type* to *Discrete Mapping*. To compare findings between a non-directional and a directional method, we highlight shared (0), lost (1), and gained (2) pathways between the approaches. Here, we have solid lines for the shared pathways, dots for the lost pathways, and vertical lines for the gained pathways. Border widths can be adjusted in the *Border Width* property, again with discrete mapping.
 
-<img src="https://github.com/MSlobody/APW2_tutorial/blob/main/set_aesthetic.jpg" width="500"/>
+<img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/set_aesthetic.jpg" width="500"/>
 
 This step changes node borders in the aggregated enrichment map, depicting the additional information provided by directional impact.
 
-<img src="https://github.com/MSlobody/APW2_tutorial/blob/main/new_map.png" width="800" /> 
-<img src="https://github.com/MSlobody/APW2_tutorial/blob/main/legend_sized.png" width="100" />
+<img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/new_map.png" width="800" /> 
+<img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/legend.png" width="100" />
 
 ## Alternative node coloring
 

@@ -2,9 +2,9 @@ Package: ActivePathways
 Title: Integrative Pathway Enrichment Analysis of Multivariate Omics Data
 Version: 2.0.0
 Authors@R: c(person("Juri", "Reimand", email = "juri.reimand@utoronto.ca", role = c("aut", "cre")),
-           person("Jonathan", "Barenboim", email = "jon.barenboim@gmail.com", role = "aut"),
-           person("Mykhaylo", "Slobodyanyuk", email = "michael.slobodyanyuk@oicr.on.ca", role = "ctb"))
-Description: Framework for analysing multiple omics datasets in the context of molecular pathways, biological processes and other types of gene sets. The package uses p-value merging to combine gene- or protein-level signals, followed by ranked hypergeometric tests to determine enriched pathways and processes. This approach allows researchers to interpret a series of omics datasets in the context of known biology and gene function, and discover associations that are only apparent when several datasets are combined. The package is part of the following publication: Integrative Pathway Enrichment Analysis of Multivariate Omics Data. Paczkowska M^, Barenboim J^, Sintupisut N, Fox NS, Zhu H, Abd-Rabbo D, Mee MW, Boutros PC, PCAWG Drivers and Functional Interpretation Working Group; Reimand J, PCAWG Consortium. Nature Communications (2020) <doi:10.1038/s41467-019-13983-9>.
+           person("Jonathan", "Barenboim", email = "jon.barenboim@gmail.com", role = "ctb"),
+           person("Mykhaylo", "Slobodyanyuk", email = "michael.slobodyanyuk@oicr.on.ca", role = "aut"))
+Description: Framework for analysing multiple omics datasets in the context of molecular pathways, biological processes and other types of gene sets. The package uses p-value merging to combine gene- or protein-level signals, followed by ranked hypergeometric tests to determine enriched pathways and processes. This approach allows researchers to interpret a series of omics datasets in the context of known biology and gene function, and discover associations that are only apparent when several datasets are combined. The first version of the package is part of the following publication: Integrative Pathway Enrichment Analysis of Multivariate Omics Data. Paczkowska M^, Barenboim J^, Sintupisut N, Fox NS, Zhu H, Abd-Rabbo D, Mee MW, Boutros PC, PCAWG Drivers and Functional Interpretation Working Group; Reimand J, PCAWG Consortium. Nature Communications (2020) <doi:10.1038/s41467-019-13983-9>.
 Depends: R (>= 3.6)
 Imports:
     data.table,

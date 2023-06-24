@@ -45,11 +45,14 @@ The simplest use of ActivePathways requires only a data table and a GMT file. Th
 library(ActivePathways)
 
 ##
-# Run an example using the data files included in the ActivePathways package. This basic example does not incorporate directionality. 
+# Run an example using the data files included in the ActivePathways package. 
+# This basic example does not incorporate directionality. 
 ##
 
-fname_scores <- system.file("extdata", "Adenocarcinoma_scores_subset.tsv", package = "ActivePathways")
-fname_GMT <- system.file("extdata", "hsapiens_REAC_subset.gmt", package = "ActivePathways")
+fname_scores <- system.file("extdata", "Adenocarcinoma_scores_subset.tsv", 
+		package = "ActivePathways")
+fname_GMT <- system.file("extdata", "hsapiens_REAC_subset.gmt", 
+		package = "ActivePathways")
 
 ##
 # Numeric matrix of p-values is required as input. 
@@ -110,8 +113,8 @@ enriched_pathways[["overlap"]][[1]]
 # [9] "CDKN1A" "CDKN1B"
 
 ##
-# Save the resulting pathways as a Comma-Separated Values (CSV) file for spreadsheets 
-#  and computational pipelines.
+# Save the resulting pathways as a Comma-Separated Values (CSV) file
+# for spreadsheets and computational pipelines.
 # the data.table object cannot be saved directly as text.
 ##
 
@@ -141,7 +144,8 @@ head(scores, n = 3)
 # Each tab-separated line represents a gene set: 
 #   gene set ID, description followed by gene symbols.
 # Gene symbols in the scores table and the GMT file need to match. 
-# NB: this GMT file is a small subset of the real GMT file due to file size constrants. It should not be used for real analyses. 
+# NB: this GMT file is a small subset of the real GMT file for testing purposes. 
+#     It should not be used for real analyses. 
 ##
 
 readLines(fname_GMT)[11:13]
@@ -170,6 +174,11 @@ The parameter scores_direction is a matrix that reflects the directions that the
 #### Directional data integration at the gene level
 
 ```R 
+
+##
+# load a dataset of P-values and fold-changes for mRNA and protein levels
+##
+
 pvals_FCs <- read.table(system.file('extdata', 'Differential_expression_rna_protein.tsv',
                  package = 'ActivePathways'), header = TRUE, sep = '\t')
                  
@@ -185,33 +194,67 @@ pvals_FCs[pvals_FCs$gene %in% example_genes,]
 #4050  ITGB2 4.584450e-05  1.6472117 1.327997e-01      0.4221579
 #4052  ACTN4 5.725503e-05  1.5531533 8.238317e-07      1.4279158
 
-# create a matrix of gene/protein P-values where the columns are different omics datasets (mRNA and protein)
-pval_matrix <- data.frame(row.names = pvals_FCs$gene, rna = pvals_FCs$rna_pval, protein = pvals_FCs$protein_pval)
+##
+# create a matrix of gene/protein P-values. 
+# where the columns are different omics datasets (mRNA and protein)
+##
+
+pval_matrix <- data.frame(
+		row.names = pvals_FCs$gene, 
+		rna = pvals_FCs$rna_pval, 
+		protein = pvals_FCs$protein_pval)
 pval_matrix <- as.matrix(pval_matrix)
 # convert missing values to P = 1
 pval_matrix[is.na(pval_matrix)] <- 1
 
-# Create a matrix of gene/protein directions similarly to the P-value matrix (i.e., scores_direction)
-dir_matrix <- data.frame(row.names = pvals_FCs$gene, rna = pvals_FCs$rna_log2fc, protein = pvals_FCs$protein_log2fc)
+##
+# Create a matrix of gene/protein directions 
+# similarly to the P-value matrix (i.e., scores_direction)
+##
+
+dir_matrix <- data.frame(
+		row.names = pvals_FCs$gene, 
+		rna = pvals_FCs$rna_log2fc, 
+		protein = pvals_FCs$protein_log2fc)
 dir_matrix <- as.matrix(dir_matrix)
+
+##
 # ActivePathways will only use the signs of the direction values (ie +1 or -1).
+##
+
 dir_matrix <- sign(dir_matrix)
 # 
 dir_matrix[is.na(dir_matrix)] <- 0
 
-# This matrix has to be accompanied by a vector that provides the expected relationship between the
-# different datasets. Here, mRNA levels and protein levels are expected to have positive correlations. 
-# Alternatively, we can use c(1,-1) to prioritise genes/proteins where directions are the opposite.
+##
+# This matrix has to be accompanied by a vector that 
+# provides the expected relationship between the
+# different datasets. Here, mRNA levels and protein 
+# levels are expected to have positive correlations. 
+##
+
 expected_direction <- c(1,1)
 
-# Alternatively, we can use another vector to prioritise genes/proteins where the directions are the opposite.
+##
+# Alternatively, we can use another vector to prioritise 
+# genes/proteins where the directions are the opposite.
+##
+
 # expected_direction <- c(1,-1)
 
-# Now we merge the P-values of the two datasets using directional assumtions and compare these with the plain non-directional merging. 
-# The top 5 scoring genes differ if we penalize genes where this directional logic is violated: While 4 of 5 genes retain significance, the gene PIK3R4 is penalized. 
-# Interestingly, as a consequence of penalizing PIK3R4, other genes such as ITGB2 move up in rank.  
+##
+# Now we merge the P-values of the two datasets 
+# using directional assumtions and compare these 
+# with the plain non-directional merging. 
+# The top 5 scoring genes differ if we penalize genes 
+# where this directional logic is violated: 
+# While 4 of 5 genes retain significance, the gene PIK3R4 is penalized. 
+# Interestingly, as a consequence of penalizing PIK3R4, 
+# other genes such as ITGB2 move up in rank.  
+##
 
-directional_merged_pvals <- merge_p_values(pval_matrix, method = "Brown", dir_matrix, expected_direction)
+directional_merged_pvals <- merge_p_values(pval_matrix, 
+		method = "Brown", dir_matrix, expected_direction)
 
 merged_pvals <- merge_p_values(pval_matrix, method = "Brown")
 
@@ -225,7 +268,11 @@ sort(directional_merged_pvals)[1:5]
 #       ACTN4        PPIL1        NELFE        LUZP1        ITGB2 
 #1.168708e-09 2.556067e-06 3.804646e-06 1.950607e-05 7.920157e-05 
 
-# PIK3R4 is penalised because the fold-changes of its mRNA and protein levels are significant and have the opposite signs:
+##
+# PIK3R4 is penalised because the fold-changes of its mRNA and 
+# protein levels are significant and have the opposite signs:
+##
+
 pvals_FCs[pvals_FCs$gene == "PIK3R4",]
 #     gene    rna_pval rna_log2fc protein_pval protein_log2fc
 #73 PIK3R4 0.001266285   1.155708  0.002791135     -0.8344799
@@ -259,11 +306,15 @@ To explore how changes on the individual gene level impact biological pathways, 
 fname_GMT2 <- system.file("extdata", "hsapiens_REAC_subset2.gmt", package = "ActivePathways")
 
 # Package default: no directionality
-res_brown <- ActivePathways(pval_matrix, merge_method = "Brown", gmt = fname_GMT2,cytoscape_file_tag = "Original_")
+enriched_pathways <- ActivePathways(
+		pval_matrix, merge_method = "Brown", gmt = fname_GMT2, 
+		cytoscape_file_tag = "Original_")
 
 # Added feature: incorporating directionality
-res_browndir <- ActivePathways(pval_matrix, merge_method = "Brown", gmt = fname_GMT2, cytoscape_file_tag = "Directional_",
-                               scores_direction = dir_matrix, expected_direction = expected_direction)               
+enriched_pathways_directional <- ActivePathways(
+		pval_matrix, merge_method = "Brown", gmt = fname_GMT2, 
+		cytoscape_file_tag = "Directional_",
+		scores_direction = dir_matrix, expected_direction = expected_direction)               
 ```
 To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualizing-directional-impact-with-node-borders).
 

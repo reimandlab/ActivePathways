@@ -314,7 +314,39 @@ enriched_pathways <- ActivePathways(
 enriched_pathways_directional <- ActivePathways(
 		pval_matrix, merge_method = "Brown", gmt = fname_GMT2, 
 		cytoscape_file_tag = "Directional_",
-		scores_direction = dir_matrix, expected_direction = expected_direction)               
+		scores_direction = dir_matrix, expected_direction = expected_direction)
+
+# These are the pathways that are lost when direction is incorporated
+enriched_pathways[!enriched_pathways$term_id %in% enriched_pathways_directional$term_id,]
+
+#		term_id                              term_name  adjusted_p_val 	  term_size
+#1:  REAC:R-HSA-3858494 Beta-catenin independent WNT signaling     0.013437464          143
+#2:    REAC:R-HSA-69206                        G1/S Transition     0.026263457          130
+#3:    REAC:R-HSA-69242                                S Phase     0.009478766          162
+#4:  REAC:R-HSA-9013149                      RAC1 GTPase cycle     0.047568911          184
+
+#   				      overlap    evidence                                      Genes_rna
+#1:  PSMA5,PSMB4,PSMC5,PSMD11,PSMA8,GNG13,... rna,protein         GNG13,PSMC1,PSMA5,PSMB4,ITPR3,DVL1,...
+#2:   PSMA5,PSMB4,CDK4,PSMC5,PSMD11,CCNB1,...     protein                                             NA
+#3:    PSMA5,PSMB4,RFC3,CDK4,PSMC5,PSMD11,...    combined                                             NA
+#4:  SRGAP1,TIAM1,BAIAP2,FMNL1,DOCK9,PAK3,...         rna   SRGAP1,TIAM1,FMNL1,ARHGAP30,FARP2,DOCK10,...
+                        
+# 				Genes_protein
+#1: PSMA8,PSMD11,PSMA5,PRKG1,PSMD10,PSMB4,...
+#2:   PSMD11,PSMA5,PSMD10,PSMB4,CDK7,ORC2,...
+#3:                 		           NA
+#4:                                        NA
+
+# An example of a lost pathway is Beta-catenin independent WNT signaling. Out of the 32 genes that
+# contribute to this pathway being enriched, 10 are in directional conflict. By penalizing these
+# 10 genes with conflicting log2FC direction, the pathway is lost.
+pathway_genes <- unlist(enriched_pathways[enriched_pathways$term_id == "REAC:R-HSA-3858494",]$overlap)
+pathway_pvals_FCs <- pvals_FCs[pvals_FCs$gene %in% pathway_genes & !is.na(pvals_FCs$rna_pval) & !is.na(pvals_FCs$protein_pval),]
+dim(pathway_pvals_FCs[sign(pathway_pvals_FCs$rna_log2fc) != sign(pathway_pvals_FCs$protein_log2fc),])[1]
+# 10
+dim(pathway_pvals_FCs[sign(pathway_pvals_FCs$rna_log2fc) == sign(pathway_pvals_FCs$protein_log2fc),])[1]
+# 22
+       
 ```
 To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualizing-directional-impact-with-node-borders).
 

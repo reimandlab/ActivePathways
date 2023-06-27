@@ -289,12 +289,22 @@ dir_matrix["PIK3R4",]
 To assess the impact of the directional penalty on gene merged P-value signals we create a plot showing directional results on the y axis and non-directional results on the x. Green dots are prioritized hits, red dots are penalized. 
 
 ```R
-lineplot_df <- data.frame(original = -log10(merged_pvals), modified = -log10(directional_merged_pvals))
-ggplot(lineplot_df) + geom_point(size = 2.4,shape = 19,aes(original, modified,color = ifelse(modified <= -log10(0.05),"#de2d26","#2ca25f"))) +
-            labs(title="", x ="Merged -log10(P)", y = "Directional Merged -log10(P)") + 
-            geom_hline(yintercept=1.301, linetype='dashed', col = 'black', size = 0.5)+
-            geom_vline(xintercept = 1.301, linetype = "dashed", col = "black", size = 0.5) + 
-            geom_abline(size = 0.5, slope=1,intercept = 0) + scale_color_identity()
+lineplot_df <- data.frame(original = -log10(merged_pvals),
+			  modified = -log10(directional_merged_pvals))
+
+ggplot(lineplot_df) +
+	geom_point(size = 2.4, shape = 19,
+		aes(original, modified,
+		    color = ifelse(modified <= -log10(0.05), "#de2d26", "#2ca25f"))) +
+	labs(title="",
+		 x ="Merged -log10(P)",
+		 y = "Directional Merged -log10(P)") + 
+            geom_hline(yintercept = 1.301, linetype = "dashed",
+		       col = 'black', size = 0.5) +
+            geom_vline(xintercept = 1.301, linetype = "dashed",
+		       col = "black", size = 0.5) + 
+            geom_abline(size = 0.5, slope = 1,intercept = 0) +
+	    scale_color_identity()
 ```
 
 <img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/lineplot_tutorial.png" width="300" /> 
@@ -340,13 +350,18 @@ enriched_pathways[!enriched_pathways$term_id %in% enriched_pathways_directional$
 # An example of a lost pathway is Beta-catenin independent WNT signaling. Out of the 32 genes that
 # contribute to this pathway being enriched, 10 are in directional conflict. By penalizing these
 # 10 genes with conflicting log2FC direction, the pathway is lost.
+
 pathway_genes <- unlist(enriched_pathways[enriched_pathways$term_id == "REAC:R-HSA-3858494",]$overlap)
-pathway_pvals_FCs <- pvals_FCs[pvals_FCs$gene %in% pathway_genes & !is.na(pvals_FCs$rna_pval) & !is.na(pvals_FCs$protein_pval),]
+
+pathway_pvals_FCs <- pvals_FCs[pvals_FCs$gene %in% pathway_genes &
+			       !is.na(pvals_FCs$rna_pval) &
+			       !is.na(pvals_FCs$protein_pval),]
+
 dim(pathway_pvals_FCs[sign(pathway_pvals_FCs$rna_log2fc) != sign(pathway_pvals_FCs$protein_log2fc),])[1]
 # 10
+
 dim(pathway_pvals_FCs[sign(pathway_pvals_FCs$rna_log2fc) == sign(pathway_pvals_FCs$protein_log2fc),])[1]
 # 22
-       
 ```
 To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualizing-directional-impact-with-node-borders).
 
@@ -439,13 +454,17 @@ This step changes node borders in the aggregated enrichment map, depicting the a
 
 For a more diverse range of colors, ActivePathways supports any color palette from RColorBrewer. The color_palette parameter must be provided.
 ```{r}
-res <- ActivePathways(scores, gmt_file, cytoscape_file_tag = "enrichmentMap__", color_palette = "Pastel1")
+res <- ActivePathways(scores, gmt_file,
+		      cytoscape_file_tag = "enrichmentMap__",
+		      color_palette = "Pastel1")
 ```
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView_RColorBrewer.png)
 
 Alternatively, the custom_colors parameter can be specified as a vector to manually input the color of each dataset. This vector should contain the same number of colors as columns in the scores matrix.
 ```{r}
-res <- ActivePathways(scores, gmt_file, cytoscape_file_tag = "enrichmentMap__", custom_colors = c("violet","green","orange","red"))
+res <- ActivePathways(scores, gmt_file,
+		      cytoscape_file_tag = "enrichmentMap__",
+		      custom_colors = c("violet","green","orange","red"))
 ```
 ![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/LegendView_Custom.png)
 

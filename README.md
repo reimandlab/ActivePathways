@@ -437,7 +437,8 @@ enriched_pathways[enriched_pathways$term_id %in% pathways_lost_in_directional_in
 ##
 
 wnt_pathway_id <- "REAC:R-HSA-3858494"
-enriched_pathway_genes <- unlist(enriched_pathways[enriched_pathways$term_id == wnt_pathway_id,]$overlap)
+enriched_pathway_genes <- unlist(
+		enriched_pathways[enriched_pathways$term_id == wnt_pathway_id,]$overlap)
 enriched_pathway_genes
 # [1] "PSMA5"  "PSMB4"  "PSMC5"  "PSMD11" "PSMA8"  "GNG13"  "SMURF1" "PSMC1"
 # [9] "PSMA4"  "PLCB2"  "PRKG1"  "PSMD4"  "PSMD1"  "PSMD10" "PSMA6"  "PSMA2"

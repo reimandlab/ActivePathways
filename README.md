@@ -1,15 +1,15 @@
-# ActivePathways
+# ActivePathways - integrative pathway analysis of multi-omics data
 
-**June 22 2023: ActivePathways version 2.0.0 is now available. This update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
+**June 28th 2023: ActivePathways version 2.0.0 is now available. This update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
 
 
-ActivePathways is a tool for multivariate pathway enrichment analysis that identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list or matrix of genes. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance and direction of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. Using this strategy, we can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
+ActivePathways is a tool for multivariate pathway enrichment analysis that identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list or matrix of genes. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance and direction of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. We can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
 
 
 
 The first version of ActivePathways was published in Nature Communications with the PCAWG Pan-Cancer project. 
 
-Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, Jüri Reimand & PCAWG Consortium. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11 735 (2020) (^ - co-first authors)
+Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, Jüri Reimand. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11 735 (2020) (^ - co-first authors)
 https://www.nature.com/articles/s41467-019-13983-9
 https://www.ncbi.nlm.nih.gov/pubmed/32024846 
 
@@ -144,7 +144,7 @@ head(scores, n = 3)
 # Each tab-separated line represents a gene set: 
 #   gene set ID, description followed by gene symbols.
 # Gene symbols in the scores table and the GMT file need to match. 
-# NB: this GMT file is a small subset of the real GMT file for testing purposes. 
+# NB: this GMT file is a small subset of the real GMT file built for testing. 
 #     It should not be used for real analyses. 
 ##
 
@@ -177,13 +177,15 @@ The parameter scores_direction is a matrix that reflects the directions that the
 
 ##
 # load a dataset of P-values and fold-changes for mRNA and protein levels
+# this dataset is embedded in the package
 ##
-
-pvals_FCs <- read.table(system.file('extdata', 'Differential_expression_rna_protein.tsv',
-                 package = 'ActivePathways'), header = TRUE, sep = '\t')
+fname_data_matrix <- system.file('extdata', 
+		'Differential_expression_rna_protein.tsv',
+		package = 'ActivePathways')
+pvals_FCs <- read.table(fname_data_matrix, header = TRUE, sep = '\t')
                  
 # examine a few example genes
-example_genes = c('ACTN4','PIK3R4','PPIL1','NELFE','LUZP1','ITGB2')
+example_genes <- c('ACTN4','PIK3R4','PPIL1','NELFE','LUZP1','ITGB2')
 pvals_FCs[pvals_FCs$gene %in% example_genes,]
 
 #       gene     rna_pval rna_log2fc protein_pval protein_log2fc
@@ -196,7 +198,8 @@ pvals_FCs[pvals_FCs$gene %in% example_genes,]
 
 ##
 # create a matrix of gene/protein P-values. 
-# where the columns are different omics datasets (mRNA and protein)
+# where the columns are different omics datasets (mRNA, protein)
+# and the rows are genes. 
 ##
 
 pval_matrix <- data.frame(
@@ -204,7 +207,24 @@ pval_matrix <- data.frame(
 		rna = pvals_FCs$rna_pval, 
 		protein = pvals_FCs$protein_pval)
 pval_matrix <- as.matrix(pval_matrix)
+
+##
+# examine a few genes in the P-value matrix
+##
+
+pval_matrix[example_genes,]
+#                rna      protein
+#ACTN4  5.725503e-05 8.238317e-07
+#PIK3R4 1.266285e-03 2.791135e-03
+#PPIL1  1.276838e-03 1.199303e-04
+#NELFE  1.447553e-02 1.615592e-05
+#LUZP1  3.253382e-05 4.129125e-02
+#ITGB2  4.584450e-05 1.327997e-01
+
+##
 # convert missing values to P = 1
+##
+
 pval_matrix[is.na(pval_matrix)] <- 1
 
 ##
@@ -219,18 +239,36 @@ dir_matrix <- data.frame(
 dir_matrix <- as.matrix(dir_matrix)
 
 ##
-# ActivePathways will only use the signs of the direction values (ie +1 or -1).
+# ActivePathways only uses the signs of the direction values (ie +1 or -1).
 ##
 
 dir_matrix <- sign(dir_matrix)
-# 
+
+##
+# if directions are missing (NA), we recommend setting the values to zero 
+##
+
 dir_matrix[is.na(dir_matrix)] <- 0
+
+##
+# examine a few genes in the direction matrix
+##
+
+dir_matrix[example_genes,]
+#       rna protein
+#ACTN4    1       1
+#PIK3R4   1      -1
+#PPIL1   -1      -1
+#NELFE   -1      -1
+#LUZP1    1       1
+#ITGB2    1       1
 
 ##
 # This matrix has to be accompanied by a vector that 
 # provides the expected relationship between the
 # different datasets. Here, mRNA levels and protein 
-# levels are expected to have positive correlations. 
+# levels are expected to have consistent directions:
+# either both positive or both negative (eg log fold-change).  
 ##
 
 expected_direction <- c(1,1)
@@ -285,6 +323,14 @@ dir_matrix["PIK3R4",]
 #    rna protein
 #      1      -1
 
+merged_pvals["PIK3R4"]
+#      PIK3R4
+#4.790125e-05
+
+directional_merged_pvals["PIK3R4"]
+#   PIK3R4
+#0.8122527
+
 ```
 To assess the impact of the directional penalty on gene merged P-value signals we create a plot showing directional results on the y axis and non-directional results on the x. Green dots are prioritized hits, red dots are penalized. 
 
@@ -296,7 +342,7 @@ ggplot(lineplot_df) +
 	geom_point(size = 2.4, shape = 19,
 		aes(original, modified,
 		    color = ifelse(modified <= -log10(0.05), "#de2d26", "#2ca25f"))) +
-	labs(title="",
+	labs(title = "",
 		 x ="Merged -log10(P)",
 		 y = "Directional Merged -log10(P)") + 
             geom_hline(yintercept = 1.301, linetype = "dashed",
@@ -313,55 +359,134 @@ ggplot(lineplot_df) +
 To explore how changes on the individual gene level impact biological pathways, we can compare results before and after incorporating a directional penalty.
 
 ```R 
-fname_GMT2 <- system.file("extdata", "hsapiens_REAC_subset2.gmt", package = "ActivePathways")
 
-# Package default: no directionality
+##
+# use the example GMT file embedded in the package
+##
+
+fname_GMT2 <- system.file("extdata", "hsapiens_REAC_subset2.gmt", 
+		package = "ActivePathways")
+##
+# Integrative pathway enrichment analysis with no directionality
+##
 enriched_pathways <- ActivePathways(
-		pval_matrix, merge_method = "Brown", gmt = fname_GMT2, 
-		cytoscape_file_tag = "Original_")
+		pval_matrix, gmt = fname_GMT2, cytoscape_file_tag = "Original_")
 
-# Added feature: incorporating directionality
+##
+# Directional integration and pathway enrichment analysis
+# this analysis the directional coefficients and expected_direction from 
+# the gene-based analysis described above
+##
+
+expected_direction
+# [1] 1 1
+
+dir_matrix[example_genes,]
+#       rna protein
+#ACTN4    1       1
+#PIK3R4   1      -1
+#PPIL1   -1      -1
+#NELFE   -1      -1
+#LUZP1    1       1
+#ITGB2    1       1
+
 enriched_pathways_directional <- ActivePathways(
-		pval_matrix, merge_method = "Brown", gmt = fname_GMT2, 
-		cytoscape_file_tag = "Directional_",
+		pval_matrix, gmt = fname_GMT2, cytoscape_file_tag = "Directional_",
 		scores_direction = dir_matrix, expected_direction = expected_direction)
+		
+## 
+# Examine the pathways that are lost when 
+# directional information is incorporated in the data integration
+## 
 
-# These are the pathways that are lost when direction is incorporated
-enriched_pathways[!enriched_pathways$term_id %in% enriched_pathways_directional$term_id,]
+pathways_lost_in_directional_integration = 
+		setdiff(enriched_pathways$term_id, enriched_pathways_directional$term_id)
+pathways_lost_in_directional_integration
+#[1] "REAC:R-HSA-3858494" "REAC:R-HSA-69206"   "REAC:R-HSA-69242"
+#[4] "REAC:R-HSA-9013149"
 
-#		term_id                              term_name  adjusted_p_val 	  term_size
-#1:  REAC:R-HSA-3858494 Beta-catenin independent WNT signaling     0.013437464          143
-#2:    REAC:R-HSA-69206                        G1/S Transition     0.026263457          130
-#3:    REAC:R-HSA-69242                                S Phase     0.009478766          162
-#4:  REAC:R-HSA-9013149                      RAC1 GTPase cycle     0.047568911          184
-
-#   				      overlap    evidence                                      Genes_rna
-#1:  PSMA5,PSMB4,PSMC5,PSMD11,PSMA8,GNG13,... rna,protein         GNG13,PSMC1,PSMA5,PSMB4,ITPR3,DVL1,...
-#2:   PSMA5,PSMB4,CDK4,PSMC5,PSMD11,CCNB1,...     protein                                             NA
-#3:    PSMA5,PSMB4,RFC3,CDK4,PSMC5,PSMD11,...    combined                                             NA
-#4:  SRGAP1,TIAM1,BAIAP2,FMNL1,DOCK9,PAK3,...         rna   SRGAP1,TIAM1,FMNL1,ARHGAP30,FARP2,DOCK10,...
-                        
-# 				Genes_protein
+enriched_pathways[enriched_pathways$term_id %in% pathways_lost_in_directional_integration,] 
+#              term_id                              term_name adjusted_p_val
+#1: REAC:R-HSA-3858494 Beta-catenin independent WNT signaling    0.013437464
+#2:   REAC:R-HSA-69206                        G1/S Transition    0.026263457
+#3:   REAC:R-HSA-69242                                S Phase    0.009478766
+#4: REAC:R-HSA-9013149                      RAC1 GTPase cycle    0.047568911
+#   term_size                                  overlap    evidence
+#1:       143 PSMA5,PSMB4,PSMC5,PSMD11,PSMA8,GNG13,... rna,protein
+#2:       130  PSMA5,PSMB4,CDK4,PSMC5,PSMD11,CCNB1,...     protein
+#3:       162   PSMA5,PSMB4,RFC3,CDK4,PSMC5,PSMD11,...    combined
+#4:       184 SRGAP1,TIAM1,BAIAP2,FMNL1,DOCK9,PAK3,...         rna
+#                                      Genes_rna
+#1:       GNG13,PSMC1,PSMA5,PSMB4,ITPR3,DVL1,...
+#2:                                           NA
+#3:                                           NA
+#4: SRGAP1,TIAM1,FMNL1,ARHGAP30,FARP2,DOCK10,...
+#                               Genes_protein
 #1: PSMA8,PSMD11,PSMA5,PRKG1,PSMD10,PSMB4,...
 #2:   PSMD11,PSMA5,PSMD10,PSMB4,CDK7,ORC2,...
-#3:                 		           NA
+#3:                                        NA
 #4:                                        NA
 
-# An example of a lost pathway is Beta-catenin independent WNT signaling. Out of the 32 genes that
-# contribute to this pathway being enriched, 10 are in directional conflict. By penalizing these
-# 10 genes with conflicting log2FC direction, the pathway is lost.
 
-pathway_genes <- unlist(enriched_pathways[enriched_pathways$term_id == "REAC:R-HSA-3858494",]$overlap)
+##
+# An example of a lost pathway is Beta-catenin independent WNT signaling. 
+# Out of the 32 genes that contribute to this pathway enrichment, 
+# 10 genes are in directional conflict. The enrichment is no longer 
+# identified when these genes are penalised due to the conflicting 
+# log2 fold-change directions.
+##
 
-pathway_pvals_FCs <- pvals_FCs[pvals_FCs$gene %in% pathway_genes &
-			       !is.na(pvals_FCs$rna_pval) &
-			       !is.na(pvals_FCs$protein_pval),]
+wnt_pathway_id <- "REAC:R-HSA-3858494"
+enriched_pathway_genes <- unlist(enriched_pathways[enriched_pathways$term_id == wnt_pathway_id,]$overlap)
+enriched_pathway_genes
+# [1] "PSMA5"  "PSMB4"  "PSMC5"  "PSMD11" "PSMA8"  "GNG13"  "SMURF1" "PSMC1"
+# [9] "PSMA4"  "PLCB2"  "PRKG1"  "PSMD4"  "PSMD1"  "PSMD10" "PSMA6"  "PSMA2"
+#[17] "PSMA1"  "PRKCA"  "PSMC6"  "RHOA"   "PSMB3"  "PSMB1"  "PSME3"  "ITPR3"
+#[25] "AGO4"   "DVL3"   "PSMA3"  "PPP3R1" "DVL1"   "CLTA"   "PSME2"  "CALM1"
+#[33] "PSMD6"  "PSMB6"
 
-dim(pathway_pvals_FCs[sign(pathway_pvals_FCs$rna_log2fc) != sign(pathway_pvals_FCs$protein_log2fc),])[1]
-# 10
+##
+# examine the pathway genes that have directional disagreement and 
+# contribute to the lack of pathway enrichment in the directional analysis
+##
 
-dim(pathway_pvals_FCs[sign(pathway_pvals_FCs$rna_log2fc) == sign(pathway_pvals_FCs$protein_log2fc),])[1]
-# 22
+pathway_gene_pvals = pval_matrix[enriched_pathway_genes,]
+pathway_gene_directions = dir_matrix[enriched_pathway_genes,]
+
+directional_conflict_genes = names(which(
+		pathway_gene_directions[,1] != pathway_gene_directions[,2] &
+		pathway_gene_directions[,1] != 0 & pathway_gene_directions[,2] != 0))
+
+pathway_gene_pvals[directional_conflict_genes,]
+#              rna     protein
+#PSMD11 0.34121101 0.002094310
+#PSMA8  0.55510836 0.001415197
+#SMURF1 0.03353629 0.042995333
+#PSMD1  0.04650877 0.100178048
+#RHOA   0.01786687 0.474628084
+#PSME3  0.07148904 0.130184883
+#ITPR3  0.01660850 0.589929787
+#DVL3   0.46381447 0.022535743
+#PSME2  0.03274707 0.514351089
+#PSMB6  0.02863259 0.677224905
+
+#pathway_gene_directions[directional_conflict_genes,]
+#       rna protein
+#PSMD11   1      -1
+#PSMA8    1      -1
+#SMURF1   1      -1
+#PSMD1    1      -1
+#RHOA    -1       1
+#PSME3    1      -1
+#ITPR3    1      -1
+#DVL3     1      -1
+#PSME2   -1       1
+#PSMB6   -1       1
+
+length(directional_conflict_genes)
+#[1] 10
+
+
 ```
 To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualizing-directional-impact-with-node-borders).
 

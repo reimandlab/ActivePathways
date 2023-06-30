@@ -471,7 +471,7 @@ pathway_gene_pvals[directional_conflict_genes,]
 #PSME2  0.03274707 0.514351089
 #PSMB6  0.02863259 0.677224905
 
-#pathway_gene_directions[directional_conflict_genes,]
+pathway_gene_directions[directional_conflict_genes,]
 #       rna protein
 #PSMD11   1      -1
 #PSMA8    1      -1

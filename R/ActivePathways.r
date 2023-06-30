@@ -32,7 +32,7 @@
 #'   "combined" pathway contribution.
 #' @param scores_direction A numerical matrix of log2 transformed fold-change values where each row is a
 #'   gene and each column represents a dataset (evidence). Rownames correspond to the genes
-#'   and colnames to the datasets. We recommend converting missing values to ones. 
+#'   and colnames to the datasets. We recommend converting missing values to zero. 
 #'   Must contain the same dimensions as the scores parameter. Datasets without directional information should be set to 0.
 #' @param expected_direction A numerical vector of +1 or -1 values corresponding to the expected
 #'   directional relationship between columns in scores_direction. Datasets without directional information should

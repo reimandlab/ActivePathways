@@ -37,7 +37,7 @@ orderedHypergeometric <- function(genelist, background, annotations) {
         q = i - 1, #overlap - 1 
         m = length(annotations),
         n = length(background) - length(annotations),
-        k = length(genelist),
+        k = which.in[i],
         lower.tail = FALSE)
   }
   

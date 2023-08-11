@@ -10,14 +10,14 @@ orderedHypergeometric(genelist, background, annotations)
 \item{genelist}{Character vector of gene names, assumed to be ordered by decreasing importance. 
 For example, the genes could be ranked by decreasing significance of differential expression.}
 
-\item{background}{Character vector of gene names. List of all genes used as a statistical background (i.e., the universe)}
+\item{background}{Character vector of gene names. List of all genes used as a statistical background (i.e., the universe).}
 
 \item{annotations}{Character vector of gene names. A gene set representing a functional term, process or biological pathway.}
 }
 \value{
 a list with the items:
   \describe{
-    \item{p.val}{The lowest obtained p-value}
+    \item{p_val}{The lowest obtained p-value}
     \item{ind}{The index of \code{genelist} such that \code{genelist[1:ind]}
       gives the lowest p-value}
  }

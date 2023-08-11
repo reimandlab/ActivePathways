@@ -8,16 +8,18 @@ ActivePathways(
   scores,
   gmt,
   background = makeBackground(gmt),
-  geneset.filter = c(5, 1000),
+  geneset_filter = c(5, 1000),
   cutoff = 0.1,
   significant = 0.05,
-  merge.method = c("Brown", "Fisher"),
-  correction.method = c("holm", "fdr", "hochberg", "hommel", "bonferroni", "BH", "BY",
+  merge_method = c("Brown", "Fisher", "Stouffer", "Strube"),
+  correction_method = c("holm", "fdr", "hochberg", "hommel", "bonferroni", "BH", "BY",
     "none"),
-  cytoscape.file.tag = NA,
+  cytoscape_file_tag = NA,
   color_palette = NULL,
   custom_colors = NULL,
-  color_integrated_only = "#FFFFF0"
+  color_integrated_only = "#FFFFF0",
+  scores_direction = NULL,
+  constraints_vector = NULL
 )
 }
 \arguments{
@@ -33,11 +35,11 @@ GMT object will be read from the file.}
 statistical background. By default, the background is all genes that appear
 in \code{gmt}.}
 
-\item{geneset.filter}{A numeric vector of length two giving the lower and 
+\item{geneset_filter}{A numeric vector of length two giving the lower and 
 upper limits for the size of the annotated geneset to pathways in gmt.
-Pathways with a geneset shorter than \code{geneset.filter[1]} or longer
-than \code{geneset.filter[2]} will be removed. Set either value to NA to
-to not enforce a minimum or maximum value, or set \code{geneset.filter} to 
+Pathways with a geneset shorter than \code{geneset_filter[1]} or longer
+than \code{geneset_filter[2]} will be removed. Set either value to NA
+to not enforce a minimum or maximum value, or set \code{geneset_filter} to 
 \code{NULL} to skip filtering.}
 
 \item{cutoff}{A maximum merged p-value for a gene to be used for analysis.
@@ -45,14 +47,14 @@ Any genes with merged, unadjusted \code{p > significant} will be discarded
 before testing.}
 
 \item{significant}{Significance cutoff for selecting enriched pathways. Pathways with
-\code{adjusted.p.val < significant} will be selected as results.}
+\code{adjusted_p_val <= significant} will be selected as results.}
 
-\item{merge.method}{Statistical method to merge p-values. See section on Merging P-Values}
+\item{merge_method}{Statistical method to merge p-values. See section on Merging P-Values}
 
-\item{correction.method}{Statistical method to correct p-values. See
+\item{correction_method}{Statistical method to correct p-values. See
 \code{\link[stats]{p.adjust}} for details.}
 
-\item{cytoscape.file.tag}{The directory and/or file prefix to which the output files
+\item{cytoscape_file_tag}{The directory and/or file prefix to which the output files
 for generating enrichment maps should be written. If NA, files will not be written.}
 
 \item{color_palette}{Color palette from RColorBrewer::brewer.pal to color each
@@ -62,14 +64,23 @@ column in the scores matrix. If NULL grDevices::rainbow is used by default.}
 
 \item{color_integrated_only}{A character vector of length 1 specifying the color of the 
 "combined" pathway contribution.}
+
+\item{scores_direction}{A numerical matrix of log2 transformed fold-change values where each row is a
+gene and each column represents a dataset (evidence). Rownames correspond to the genes
+and colnames to the datasets. We recommend converting missing values to zero. 
+Must contain the same dimensions as the scores parameter. Datasets without directional information should be set to 0.}
+
+\item{constraints_vector}{A numerical vector of +1 or -1 values corresponding to the user-defined
+directional relationship between columns in scores_direction. Datasets without directional information should
+be set to 0.}
 }
 \value{
 A data.table of terms (enriched pathways) containing the following columns:
   \describe{
-    \item{term.id}{The database ID of the term}
-    \item{term.name}{The full name of the term}
-    \item{adjusted.p.val}{The associated p-value, adjusted for multiple testing}
-    \item{term.size}{The number of genes annotated to the term}
+    \item{term_id}{The database ID of the term}
+    \item{term_name}{The full name of the term}
+    \item{adjusted_p_val}{The associated p-value, adjusted for multiple testing}
+    \item{term_size}{The number of genes annotated to the term}
     \item{overlap}{A character vector of the genes enriched in the term}
     \item{evidence}{Columns of \code{scores} (i.e., omics datasets) that contributed 
          individually to the enrichment of the term. Each input column is evaluated 
@@ -83,7 +94,7 @@ ActivePathways
 
 To obtain a single p-value for each gene across the multiple omics datasets considered, 
 the p-values in \code{scores} #' are merged row-wise using a data fusion approach of p-value merging. 
-The two available methods are:
+The four available methods are:
 \describe{
  \item{Fisher}{Fisher's method assumes p-values are uniformly
  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
@@ -94,6 +105,12 @@ The two available methods are:
  tests of significance used to create the columns in \code{scores} are not
  necessarily independent. The Brown's method is therefore recommended for 
  many omics integration approaches.}
+ \item{Stouffer}{Stouffer's method assumes p-values are uniformly distributed
+ and transforms p-values into a Z-score using the cumulative distribution function of a
+ standard normal distribution. This method is appropriate when the columns in \code{scores}
+  are independent.}
+ \item{Strube}{Strube's method extends Stouffer's method by accounting for the 
+ covariance in the columns of \code{scores}.}
 }
 }
 
@@ -101,17 +118,17 @@ The two available methods are:
 
   To visualize and interpret enriched pathways, ActivePathways provides an option
   to further analyse results as enrichment maps in the Cytoscape software. 
-  If \code{!is.na(cytoscape.file.tag)}, four files will be written that can be used 
+  If \code{!is.na(cytoscape_file_tag)}, four files will be written that can be used 
   to build enrichment maps. This requires the EnrichmentMap and enhancedGraphics apps.
 
 The four files written are:
   \describe{
     \item{pathways.txt}{A list of significant terms and the
-    associated p-value. Only terms with \code{adjusted.p.val <= significant} are
+    associated p-value. Only terms with \code{adjusted_p_val <= significant} are
     written to this file.}
     \item{subgroups.txt}{A matrix indicating whether the significant terms (pathways)
     were also found to be significant when considering only one column from
-    \code{scores}. A one indicates that that term was found to be significant 
+    \code{scores}. A one indicates that term was found to be significant 
 			when only p-values in that column were used to select genes.}
     \item{pathways.gmt}{A Shortened version of the supplied GMT
     file, containing only the significantly enriched terms in pathways.txt. }

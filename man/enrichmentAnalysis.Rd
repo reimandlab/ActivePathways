@@ -18,10 +18,10 @@ as a statistical background}
 \value{
 a data.table of terms with the following columns:
   \describe{
-    \item{term.id}{The id of the term}
-    \item{term.name}{The full name of the term}
-    \item{adjusted.p.val}{The associated p-value adjusted for multiple testing}
-    \item{term.size}{The number of genes annotated to the term}
+    \item{term_id}{The id of the term}
+    \item{term_name}{The full name of the term}
+    \item{adjusted_p_val}{The associated p-value adjusted for multiple testing}
+    \item{term_size}{The number of genes annotated to the term}
     \item{overlap}{A character vector of the genes that overlap between the
        term and the query}
   }

@@ -41,7 +41,7 @@ an object inherits from GMT.
 \details{
 A GMT file describes gene sets, such as biological terms and pathways. GMT files are 
 tab delimited text files. Each row of a GMT file contains a single term with its 
-database ID and a term name, followed all genes annotated to the term.
+database ID and a term name, followed by all the genes annotated to the term.
 }
 \examples{
   fname_GMT <- system.file("extdata", "hsapiens_REAC_subset.gmt", package = "ActivePathways")

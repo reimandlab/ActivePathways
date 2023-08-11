@@ -2,23 +2,37 @@
 % Please edit documentation in R/merge_p.r
 \name{brownsMethod}
 \alias{brownsMethod}
-\title{Merge p-values using the Brown's method.}
+\title{Merge p-values using the Brown's method. If scores_direction and constraints_vector parameters
+ are provided this method is called DPM}
 \usage{
-brownsMethod(p.values, data.matrix = NULL, cov.matrix = NULL)
+brownsMethod(
+  p_values,
+  data_matrix = NULL,
+  cov_matrix = NULL,
+  scores_direction,
+  constraints_vector
+)
 }
 \arguments{
-\item{p.values}{A vector of m p-values.}
+\item{p_values}{A matrix of m x n p-values.}
 
-\item{data.matrix}{An m x n matrix representing m tests and n samples. NA's are not allowed.}
+\item{data_matrix}{An m x n matrix representing m tests and n samples. NA's are not allowed.}
 
-\item{cov.matrix}{A pre-calculated covariance matrix of \code{data.matrix}. This is more
-efficient when making many calls with the same data.matrix.
-Only one of \code{data.matrix} and \code{cov.matrix} must be given. If both are supplied,
-\code{data.matrix} is ignored.}
+\item{cov_matrix}{A pre-calculated covariance matrix of \code{data_matrix}. This is more
+efficient when making many calls with the same data_matrix.
+Only one of \code{data_matrix} and \code{cov_matrix} must be given. If both are supplied,
+\code{data_matrix} is ignored.}
+
+\item{scores_direction}{A matrix of log2 fold-change values. Datasets without directional information should be set to 0.}
+
+\item{constraints_vector}{A numerical vector of +1 or -1 values corresponding to the user-defined
+directional relationship between columns in scores_direction. Datasets without directional information should
+be set to 0.}
 }
 \value{
-A single p-value representing the merged significance of multiple p-values.
+A p-value vector representing the merged significance of multiple p-values.
 }
 \description{
-Merge p-values using the Brown's method.
+Merge p-values using the Brown's method. If scores_direction and constraints_vector parameters
+ are provided this method is called DPM
 }

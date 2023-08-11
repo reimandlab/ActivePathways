@@ -7,24 +7,25 @@
 prepareCytoscape(
   terms,
   gmt,
-  cytoscape.file.tag,
-  col.significance,
+  cytoscape_file_tag,
+  col_significance,
   color_palette = NULL,
   custom_colors = NULL,
   color_integrated_only = "#FFFFF0"
 )
 }
 \arguments{
-\item{terms}{A data.table object with the columns 'term.id', 'term.name', 'adjusted.p.val'.}
+\item{terms}{A data.table object with the columns 'term_id', 'term_name', 'adjusted_p_val'.}
 
 \item{gmt}{An abridged GMT object containing only the pathways that were
 found to be significant in the ActivePathways analysis.}
 
-\item{cytoscape.file.tag}{The user-defined file prefix and/or directory defining the location of the files.}
+\item{cytoscape_file_tag}{The user-defined file prefix and/or directory defining the location of the files.}
 
-\item{col.significance}{A data.table object with a column 'term.id' and a column
-for each type of omics evidence indicating whether a term was also found to be signficiant or not
-when considering only the genes and p-values in the corresponding column of the \code{scores} matrix. If term was not found, NA's are shown in columns, otherwise the relevant lists of genes are shown.}
+\item{col_significance}{A data.table object with a column 'term_id' and a column
+for each type of omics evidence indicating whether a term was also found to be significant or not
+when considering only the genes and p-values in the corresponding column of the \code{scores} matrix.
+If term was not found, NA's are shown in columns, otherwise the relevant lists of genes are shown.}
 
 \item{color_palette}{Color palette from RColorBrewer::brewer.pal to color each
 column in the scores matrix. If NULL grDevices::rainbow is used by default.}
@@ -38,11 +39,11 @@ None
 }
 \description{
 This function writes four text files that are used to build an network using
-Cytoscape and the EnrichmentMap app. The files are prefixed with \code{cytoscape.file.tag}. 
+Cytoscape and the EnrichmentMap app. The files are prefixed with \code{cytoscape_file_tag}. 
   The four files written are:
   \describe{
     \item{pathways.txt}{A list of significant terms and the
-    associated p-value. Only terms with \code{adjusted.p.val <= significant} are
+    associated p-value. Only terms with \code{adjusted_p_val <= significant} are
     written to this file}
     \item{subgroups.txt}{A matrix indicating whether the significant
     pathways are found to be significant when considering only one column (i.e., type of omics evidence) from

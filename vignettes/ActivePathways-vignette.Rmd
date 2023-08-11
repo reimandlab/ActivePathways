@@ -401,6 +401,7 @@ First perform integrative pathway enrichment analysis with no directionality. Th
 enriched_pathways <- ActivePathways(
 		pval_matrix, gmt = fname_GMT2, cytoscape_file_tag = "Original_")
 
+constraints_vector <- c(1,1)
 constraints_vector
 dir_matrix[example_genes,]
 

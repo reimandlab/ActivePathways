@@ -1,6 +1,6 @@
 ---
 title: "Analysing and visualising pathway enrichment in multi-omics data using ActivePathways"
-author: "Juri Reimand, Jonathan Barenboim and Mykhaylo Slobodyanyuk"
+author: "Mykhaylo Slobodyanyuk, Jonathan Barenboim and Juri Reimand"
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
@@ -29,7 +29,7 @@ ActivePathways is a tool for multivariate pathway enrichment analysis that ident
 
 The first version of ActivePathways was published in Nature Communications with the PCAWG Pan-Cancer project.
 
-Marta Paczkowska\^, Jonathan Barenboim\^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, J�ri Reimand. Integrative pathway enrichment analysis of multivariate omics data. Nature Communications 11 735 (2020) (\^ - co-first authors) <https://www.nature.com/articles/s41467-019-13983-9> <https://www.ncbi.nlm.nih.gov/pubmed/32024846>
+Marta Paczkowska\^, Jonathan Barenboim\^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, Juri Reimand. Integrative pathway enrichment analysis of multivariate omics data. Nature Communications 11 735 (2020) (\^ - co-first authors) <https://www.nature.com/articles/s41467-019-13983-9> <https://www.ncbi.nlm.nih.gov/pubmed/32024846>
 
 ## Pathway enrichment analysis using the ranked hypergeometric test
 
@@ -154,7 +154,7 @@ sort(merge_p_values(scores, 'Stouffer'))[1:5]
 sort(merge_p_values(scores, 'Strube'))[1:5]
 ```
 
-This function can be used to combine some of the data before the analysis for any follow-up analysis or visualisation. For example, we can merge the columns `X5UTR`, `X3UTR`, and `promCore` into a single `non_coding` column (these correspond to predictions of driver mutations in 5âUTRs, 3âUTRs and core promoters of genes, respectively). This will consider the three non-coding regions as a single column, rather than giving them all equal weight to the `CDS` column.
+This function can be used to combine some of the data before the analysis for any follow-up analysis or visualisation. For example, we can merge the columns `X5UTR`, `X3UTR`, and `promCore` into a single `non_coding` column (these correspond to predictions of driver mutations in 5'UTRs, 3'UTRs, and core promoters of genes, respectively). This will consider the three non-coding regions as a single column, rather than giving them all equal weight to the `CDS` column.
 
 ```{r}
 scores2 <- cbind(scores[, 'CDS'], merge_p_values(scores[, c('X3UTR', 'X5UTR', 'promCore')], 'Brown'))

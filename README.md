@@ -5,13 +5,11 @@
 
 
 
-ActivePathways is a tool for multivariate pathway enrichment analysis that identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list or matrix of genes. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance and direction of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. We can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
-
-
+ActivePathways is a tool for multivariate pathway enrichment analysis that identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list or matrix of genes. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritises genes based on the significance and direction of signals from the omics datasets, and performs pathway enrichment analysis of these prioritised genes. We can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
 
 The first version of ActivePathways was published in Nature Communications with the PCAWG Pan-Cancer project. 
 
-Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, J�ri Reimand. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11 735 (2020) (^ - co-first authors)
+Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, Juri Reimand. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11 735 (2020) (^ - co-first authors)
 https://www.nature.com/articles/s41467-019-13983-9
 https://www.ncbi.nlm.nih.gov/pubmed/32024846 
 
@@ -288,10 +286,10 @@ constraints_vector <- c(1,1)
 # Now we merge the P-values of the two datasets 
 # using directional assumtions and compare these 
 # with the plain non-directional merging. 
-# The top 5 scoring genes differ if we penalize genes 
+# The top 5 scoring genes differ if we penalise genes
 # where this directional logic is violated: 
-# While 4 of 5 genes retain significance, the gene PIK3R4 is penalized. 
-# Interestingly, as a consequence of penalizing PIK3R4, 
+# While 4 of 5 genes retain significance, the gene PIK3R4 is penalised. 
+# Interestingly, as a consequence of penalising PIK3R4, 
 # other genes such as ITGB2 move up in rank.  
 ##
 
@@ -336,7 +334,7 @@ directional_merged_pvals["PIK3R4"]
 #0.8122527
 
 ```
-To assess the impact of the directional penalty on gene merged P-value signals we create a plot showing directional results on the y axis and non-directional results on the x. Green dots are prioritized hits, red dots are penalized. 
+To assess the impact of the directional penalty on gene merged P-value signals we create a plot showing directional results on the y axis and non-directional results on the x. Green dots are prioritised hits, red dots are penalised.
 
 ```R
 lineplot_df <- data.frame(original = -log10(merged_pvals),
@@ -493,7 +491,7 @@ length(directional_conflict_genes)
 
 
 ```
-To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualizing-directional-impact-with-node-borders).
+To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualising-directional-impact-with-node-borders).
 
 More thorough documentation of the ActivePathways function can be found in R with `?ActivePathways`, and complete tutorials can be found with `browseVignettes(package='ActivePathways')`.
 
@@ -565,7 +563,7 @@ This step colours the nodes corresponding to the enriched pathways according to 
 
 Note that one of the colors corresponds to a subset of enriched pathways with *combined* evidence. These terms were only detected through data fusion and P-value merging, and not with any of the input datasets individually. This exemplifies the added value of integrative multi-omics pathway enrichment analysis. 
 
-## Visualizing directional impact with node borders
+## Visualising directional impact with node borders
 
 From the drop-down Properties menu, select *Border Line Type*.
 

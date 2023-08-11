@@ -1,6 +1,8 @@
 # ActivePathways - integrative pathway analysis of multi-omics data
 
+
 **August 11th 2023: ActivePathways version 2.0.0 is now available. This update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
+
 
 
 ActivePathways is a tool for multivariate pathway enrichment analysis that identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list or matrix of genes. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance and direction of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. We can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
@@ -9,7 +11,7 @@ ActivePathways is a tool for multivariate pathway enrichment analysis that ident
 
 The first version of ActivePathways was published in Nature Communications with the PCAWG Pan-Cancer project. 
 
-Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, Jüri Reimand. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11 735 (2020) (^ - co-first authors)
+Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, Jï¿½ri Reimand. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11 735 (2020) (^ - co-first authors)
 https://www.nature.com/articles/s41467-019-13983-9
 https://www.ncbi.nlm.nih.gov/pubmed/32024846 
 
@@ -35,11 +37,13 @@ See the vignette for more details. Run `browseVignettes(package='ActivePathways'
 
 
 ### Examples
+
 The simplest use of ActivePathways requires only a data table and a GMT file. The data table is a matrix of p-values of genes/transcripts/proteins as rows and omics datasets as columns. it also needs a list of gene sets in the form of a GMT [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file. 
 
 * The data table must be a numerical matrix. For a single gene list, a one-column matrix can be used. The matrix cannot contain any missing values, and one conservative option is to re-assign all missing values as 1s, indicating our confidence that the missing P-values are always insignificant. Alternatively, one may consider removing genes with NA values.
 
 * Gene sets in the form of a GMT file can be acquired from multiple [sources](https://baderlab.org/GeneSets) such as Gene Ontology, Reactome and others. For better accuracy and statistical power these pathway databases should be combined. Acquiring an [up-to-date GMT file](http://download.baderlab.org/EM_Genesets/current_release/) is essential to avoid using unreliable outdated annotations [(see this paper)](https://www.nature.com/articles/nmeth.3963). 
+
 ```R
 
 library(ActivePathways)

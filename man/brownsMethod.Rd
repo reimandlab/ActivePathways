@@ -2,14 +2,15 @@
 % Please edit documentation in R/merge_p.r
 \name{brownsMethod}
 \alias{brownsMethod}
-\title{Merge p-values using the Brown's method.}
+\title{Merge p-values using the Brown's method. If scores_direction and constraints_vector parameters
+ are provided this method is called DPM}
 \usage{
 brownsMethod(
   p_values,
   data_matrix = NULL,
   cov_matrix = NULL,
   scores_direction,
-  expected_direction
+  constraints_vector
 )
 }
 \arguments{
@@ -24,7 +25,7 @@ Only one of \code{data_matrix} and \code{cov_matrix} must be given. If both are 
 
 \item{scores_direction}{A matrix of log2 fold-change values. Datasets without directional information should be set to 0.}
 
-\item{expected_direction}{A numerical vector of +1 or -1 values corresponding to the expected
+\item{constraints_vector}{A numerical vector of +1 or -1 values corresponding to the user-defined
 directional relationship between columns in scores_direction. Datasets without directional information should
 be set to 0.}
 }
@@ -32,5 +33,6 @@ be set to 0.}
 A p-value vector representing the merged significance of multiple p-values.
 }
 \description{
-Merge p-values using the Brown's method.
+Merge p-values using the Brown's method. If scores_direction and constraints_vector parameters
+ are provided this method is called DPM
 }

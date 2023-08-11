@@ -1,6 +1,6 @@
 # ActivePathways - integrative pathway analysis of multi-omics data
 
-**June 28th 2023: ActivePathways version 2.0.0 is now available. This update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
+**August 11th 2023: ActivePathways version 2.0.0 is now available. This update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
 
 
 ActivePathways is a tool for multivariate pathway enrichment analysis that identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list or matrix of genes. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance and direction of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. We can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
@@ -9,7 +9,7 @@ ActivePathways is a tool for multivariate pathway enrichment analysis that ident
 
 The first version of ActivePathways was published in Nature Communications with the PCAWG Pan-Cancer project. 
 
-Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, JÃ¼ri Reimand. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11 735 (2020) (^ - co-first authors)
+Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, Jüri Reimand. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11 735 (2020) (^ - co-first authors)
 https://www.nature.com/articles/s41467-019-13983-9
 https://www.ncbi.nlm.nih.gov/pubmed/32024846 
 
@@ -159,15 +159,15 @@ readLines(fname_GMT)[11:13]
 
 ### Examples - Directional integration of multi-omics data
 
-ActivePathways 2.0 extends our integrative pathway analysis framework significantly. We can now define expected directional assumptions of input omics datasets for more accurate analyses. This allows us to prioritise genes and pathways where certain directional assumptions are met, and penalise those where the assumptions are violated. 
+ActivePathways 2.0 extends our integrative pathway analysis framework significantly. Users can now provide directional assumptions of input omics datasets for more accurate analyses. This allows us to prioritise genes and pathways where certain directional assumptions are met, and penalise those where the assumptions are violated. 
 
 For example, fold-change in protein expression would be expected to associate positively with mRNA fold-change of the corresponding gene, while negative associations would be unexpected and indicate more-complex situations or potential false positives. We can instruct the pathway analysis to prioritise positively-associated protein/mRNA pairs and penalise negative associations (or vice versa). 
 
 Two additional inputs are included in ActivePathways that allow diverse multi-omics analyses. These inputs are optional. 
 
-The scores_direction and expected_direction parameters are provided in the merge_p_values() and ActivePathways() functions to incorporate this directional penalty into the data fusion and pathway enrichment analyses. 
+The scores_direction and constraints_vector parameters are provided in the merge_p_values() and ActivePathways() functions to incorporate this directional penalty into the data fusion and pathway enrichment analyses. 
 
-The parameter expected_direction is a vector that allows the user to represent the expected relationship between the input omics datasets. The vector size is n_datasets. Values include +1, -1, and 0. 
+The parameter constraints_vector is a vector that allows the user to represent the expected relationship between the input omics datasets. The vector size is n_datasets. Values include +1, -1, and 0. 
 
 The parameter scores_direction is a matrix that reflects the directions that the genes/transcripts/protein show in the data. The matrix size is n_genes * n_datasets, that is the same size as the P-value matrix. This is a numeric matrix, but only the signs of the values are accounted for. 
 
@@ -271,14 +271,14 @@ dir_matrix[example_genes,]
 # either both positive or both negative (eg log fold-change).  
 ##
 
-expected_direction <- c(1,1)
+constraints_vector <- c(1,1)
 
 ##
 # Alternatively, we can use another vector to prioritise 
 # genes/proteins where the directions are the opposite.
 ##
 
-# expected_direction <- c(1,-1)
+# constraints_vector <- c(1,-1)
 
 ##
 # Now we merge the P-values of the two datasets 
@@ -292,7 +292,7 @@ expected_direction <- c(1,1)
 ##
 
 directional_merged_pvals <- merge_p_values(pval_matrix, 
-		method = "Brown", dir_matrix, expected_direction)
+		method = "Brown", dir_matrix, constraints_vector)
 
 merged_pvals <- merge_p_values(pval_matrix, method = "Brown")
 
@@ -374,11 +374,11 @@ enriched_pathways <- ActivePathways(
 
 ##
 # Directional integration and pathway enrichment analysis
-# this analysis the directional coefficients and expected_direction from 
+# this analysis the directional coefficients and constraints_vector from 
 # the gene-based analysis described above
 ##
 
-expected_direction
+constraints_vector
 # [1] 1 1
 
 dir_matrix[example_genes,]
@@ -392,7 +392,7 @@ dir_matrix[example_genes,]
 
 enriched_pathways_directional <- ActivePathways(
 		pval_matrix, gmt = fname_GMT2, cytoscape_file_tag = "Directional_",
-		scores_direction = dir_matrix, expected_direction = expected_direction)
+		scores_direction = dir_matrix, constraints_vector = constraints_vector)
 		
 ## 
 # Examine the pathways that are lost when 

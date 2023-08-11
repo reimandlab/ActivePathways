@@ -4,7 +4,7 @@
 #' @param method Method to merge p-values. See 'methods' section below.
 #' @param scores_direction Either a vector of log2 transformed fold-change values or a matrix where each column is a test. 
 #' Must contain the same dimensions as the scores parameter. Datasets without directional information should be set to 0. 
-#' @param expected_direction  A numerical vector of +1 or -1 values corresponding to the expected
+#' @param constraints_vector  A numerical vector of +1 or -1 values corresponding to the user-defined
 #'   directional relationship between the columns in scores_direction. Datasets without directional information should
 #'   be set to 0. 
 #'
@@ -40,7 +40,7 @@
 #' 
 #' @export
 merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL, 
-                           expected_direction = NULL) {
+                           constraints_vector = NULL) {
     
     ##### Validation #####
     # scores
@@ -51,15 +51,15 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
     if (any(scores < 0 | scores > 1)) stop("All values in scores must be in [0,1]")
     
     # method
-	if (!method %in% c("Fisher", "Brown", "Stouffer","Strube")){
-	    stop("Only Fisher's, Brown's, Stouffer's and Strube's methods are currently supported")
-	}
+    if (!method %in% c("Fisher", "Brown", "Stouffer","Strube")){
+        stop("Only Fisher's, Brown's, Stouffer's and Strube's methods are currently supported")
+    }
     
-    # scores_direction and expected_direction
-    if (xor(!is.null(scores_direction),!is.null(expected_direction))) stop("Both scores_direction and expected_direction must be provided")
-    if (!is.null(scores_direction) && !is.null(expected_direction)){
-        if (!(is.numeric(expected_direction) && is.vector(expected_direction))) stop("expected_direction must be a numeric vector")
-        if (any(!expected_direction %in% c(1,-1,0))) stop("expected_direction must contain the values: 1, -1 or 0")
+    # scores_direction and constraints_vector
+    if (xor(!is.null(scores_direction),!is.null(constraints_vector))) stop("Both scores_direction and constraints_vector must be provided")
+    if (!is.null(scores_direction) && !is.null(constraints_vector)){
+        if (!(is.numeric(constraints_vector) && is.vector(constraints_vector))) stop("constraints_vector must be a numeric vector")
+        if (any(!constraints_vector %in% c(1,-1,0))) stop("constraints_vector must contain the values: 1, -1 or 0")
         if (!(is.vector(scores_direction) || is.matrix(scores_direction))) stop("scores_direction must be a matrix or vector")
         if (!all(class(scores_direction) == class(scores))) stop("scores and scores_direction must be the same data type")
         if (any(is.na(scores_direction))) stop("scores_direction cannot contain missing values, we recommend replacing NA with 0 or removing")
@@ -69,22 +69,22 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
             if (any(!rownames(scores_direction) %in% rownames(scores))) stop ("scores_direction gene names must match scores genes")
             if (is.null(colnames(scores)) || is.null(colnames(scores_direction))) stop("column names must be provided to scores and scores_direction")
             if (any(!colnames(scores_direction) %in% colnames(scores))) stop("scores_direction column names must match scores column names")
-            if (length(expected_direction) != length(colnames(scores_direction))) stop("expected_direction should have the same number of entries as columns in scores_direction")
-            if (any(expected_direction %in% 0) &&  !all(scores_direction[,expected_direction %in% 0] == 0)) 
+            if (length(constraints_vector) != length(colnames(scores_direction))) stop("constraints_vector should have the same number of entries as columns in scores_direction")
+            if (any(constraints_vector %in% 0) &&  !all(scores_direction[,constraints_vector %in% 0] == 0)) 
                 stop("scores_direction entries must be set to 0's for columns that do not contain directional information")
-            if (!is.null(names(expected_direction))){
-                if (!all.equal(names(expected_direction), colnames(scores_direction), colnames(scores)) == TRUE){
-                    stop("the expected_direction entries should match the order of scores and scores_direction columns")
+            if (!is.null(names(constraints_vector))){
+                if (!all.equal(names(constraints_vector), colnames(scores_direction), colnames(scores)) == TRUE){
+                    stop("the constraints_vector entries should match the order of scores and scores_direction columns")
                 }}}
         
         if (is.vector(scores_direction)){
-            if (length(expected_direction) != length(scores_direction)) stop("expected_direction should have the same number of entries as scores_direction")
+            if (length(constraints_vector) != length(scores_direction)) stop("constraints_vector should have the same number of entries as scores_direction")
             if (length(scores_direction) != length(scores)) stop("scores_direction should have the same number of entries as scores")
-            if (any(expected_direction %in% 0) &&  !all(scores_direction[expected_direction %in% 0] == 0)) 
+            if (any(constraints_vector %in% 0) &&  !all(scores_direction[constraints_vector %in% 0] == 0)) 
                 stop("scores_direction entries that do not contain directional information must be set to 0's")
-            if (!is.null(names(expected_direction))){
-                if (!all.equal(names(expected_direction), names(scores_direction), names(scores)) == TRUE){
-                    stop("the expected_direction entries should match the order of scores and scores_direction")
+            if (!is.null(names(constraints_vector))){
+                if (!all.equal(names(constraints_vector), names(scores_direction), names(scores)) == TRUE){
+                    stop("the constraints_vector entries should match the order of scores and scores_direction")
                 }}}}
     
     ##### Merge P-values #####
@@ -94,16 +94,16 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
         if (method == "Brown" || method == "Strube") {
             stop("Brown's or Strube's method cannot be used with a single list of p-values")
         }
-            
+        
         # Convert zeroes to smallest available doubles
         scores <- sapply(scores, function(x) ifelse (x == 0, 1e-300, x))
         if (method == "Fisher"){
-            p_fisher <- stats::pchisq(fishersMethod(scores, scores_direction,expected_direction),
-                                         2*length(scores), lower.tail = FALSE)
+            p_fisher <- stats::pchisq(fishersMethod(scores, scores_direction,constraints_vector),
+                                      2*length(scores), lower.tail = FALSE)
             return(p_fisher)
         } 
         if (method == "Stouffer"){
-            p_stouffer <- 2*stats::pnorm(-1*abs(stouffersMethod(scores,scores_direction,expected_direction)))
+            p_stouffer <- 2*stats::pnorm(-1*abs(stouffersMethod(scores,scores_direction,constraints_vector)))
             return(p_stouffer)
         } 
     }
@@ -117,7 +117,7 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
     if (method == "Fisher"){
         fisher_merged <- c()
         for(i in 1:length(scores[,1])) {
-            p_fisher <- stats::pchisq(fishersMethod(scores[i,], scores_direction[i,],expected_direction),
+            p_fisher <- stats::pchisq(fishersMethod(scores[i,], scores_direction[i,],constraints_vector),
                                       2*length(scores[i,]), lower.tail = FALSE)
             fisher_merged <- c(fisher_merged,p_fisher)
         }
@@ -127,28 +127,28 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
     if (method == "Brown") {
         cov_matrix <- calculateCovariances(t(scores))
         brown_merged <- brownsMethod(scores, cov_matrix = cov_matrix, scores_direction = scores_direction,
-                                     expected_direction = expected_direction)
+                                     constraints_vector = constraints_vector)
         return(brown_merged)
     }
     if (method == "Stouffer"){
         stouffer_merged <- c()
         for(i in 1:length(scores[,1])){
-            p_stouffer <- 2*stats::pnorm(-1*abs(stouffersMethod(scores[i,], scores_direction[i,],expected_direction)))
+            p_stouffer <- 2*stats::pnorm(-1*abs(stouffersMethod(scores[i,], scores_direction[i,],constraints_vector)))
             stouffer_merged <- c(stouffer_merged,p_stouffer)
         }
         names(stouffer_merged) <- rownames(scores)
         return(stouffer_merged)
     }
     if (method == "Strube"){
-        strube_merged <- strubesMethod(scores,scores_direction,expected_direction)
+        strube_merged <- strubesMethod(scores,scores_direction,constraints_vector)
         return(strube_merged)
     }
 }
 
 
-fishersMethod <- function(p_values, scores_direction, expected_direction) {
+fishersMethod <- function(p_values, scores_direction, constraints_vector) {
     if (!is.null(scores_direction)){
-        directionality <- expected_direction * scores_direction/abs(scores_direction)
+        directionality <- constraints_vector * scores_direction/abs(scores_direction)
         p_values_directional <- p_values[!is.na(directionality)]
         chisq_directional <- abs(-2 * sum(log(p_values_directional)*directionality[!is.na(directionality)]))
         chisq_nondirectional <- abs(-2 * sum(log(p_values[is.na(directionality)])))
@@ -160,7 +160,8 @@ fishersMethod <- function(p_values, scores_direction, expected_direction) {
 }
 
 
-#' Merge p-values using the Brown's method. 
+#' Merge p-values using the Brown's method. If scores_direction and constraints_vector parameters
+#'  are provided this method is called DPM 
 #'
 #' @param p_values A matrix of m x n p-values.
 #' @param data_matrix An m x n matrix representing m tests and n samples. NA's are not allowed.
@@ -169,7 +170,7 @@ fishersMethod <- function(p_values, scores_direction, expected_direction) {
 #'   Only one of \code{data_matrix} and \code{cov_matrix} must be given. If both are supplied,
 #'   \code{data_matrix} is ignored.
 #' @param scores_direction A matrix of log2 fold-change values. Datasets without directional information should be set to 0. 
-#' @param expected_direction  A numerical vector of +1 or -1 values corresponding to the expected
+#' @param constraints_vector  A numerical vector of +1 or -1 values corresponding to the user-defined
 #'   directional relationship between columns in scores_direction. Datasets without directional information should
 #'   be set to 0.
 #' @return A p-value vector representing the merged significance of multiple p-values.
@@ -181,7 +182,7 @@ fishersMethod <- function(p_values, scores_direction, expected_direction) {
 # pre-calculated covariance matrix
 # 
 brownsMethod <- function(p_values, data_matrix = NULL, cov_matrix = NULL, scores_direction,
-                         expected_direction) {
+                         constraints_vector) {
     if (missing(data_matrix) && missing(cov_matrix)) {
         stop ("Either data_matrix or cov_matrix must be supplied")
     }
@@ -205,7 +206,7 @@ brownsMethod <- function(p_values, data_matrix = NULL, cov_matrix = NULL, scores
     # Acquiring the unadjusted chi-squared value from Fisher's method
     fisher_chisq <- c()
     for(i in 1:length(p_values[,1])) {
-        fisher_chisq <- c(fisher_chisq, fishersMethod(p_values[i,], scores_direction[i,],expected_direction))
+        fisher_chisq <- c(fisher_chisq, fishersMethod(p_values[i,], scores_direction[i,],constraints_vector))
     }
     
     # Adjusted p-value
@@ -215,10 +216,10 @@ brownsMethod <- function(p_values, data_matrix = NULL, cov_matrix = NULL, scores
 }
 
 
-stouffersMethod <- function (p_values, scores_direction,expected_direction){
+stouffersMethod <- function (p_values, scores_direction,constraints_vector){
     k = length(p_values)
     if (!is.null(scores_direction)){
-        directionality <- expected_direction * scores_direction/abs(scores_direction)
+        directionality <- constraints_vector * scores_direction/abs(scores_direction)
         p_values_directional <- p_values[!is.na(directionality)]
         z_directional <- abs(sum(stats::qnorm(p_values_directional/2)*directionality[!is.na(directionality)]))
         z_nondirectional <- abs(sum(stats::qnorm(p_values[is.na(directionality)]/2)))
@@ -230,13 +231,13 @@ stouffersMethod <- function (p_values, scores_direction,expected_direction){
 }
 
 
-strubesMethod <- function (p_values, scores_direction, expected_direction){
+strubesMethod <- function (p_values, scores_direction, constraints_vector){
     # Acquiring the unadjusted z-value from Stouffer's method
     stouffer_z <- c()
     for(i in 1:length(p_values[,1])){
-        stouffer_z <- c(stouffer_z,stouffersMethod(p_values[i,], scores_direction[i,],expected_direction))
+        stouffer_z <- c(stouffer_z,stouffersMethod(p_values[i,], scores_direction[i,],constraints_vector))
     }
- 
+    
     # Correlation matrix
     cor_mtx <- stats::cor(p_values, use = "complete.obs")
     cor_mtx[is.na(cor_mtx)] <- 0
@@ -256,7 +257,7 @@ transformData <- function(dat) {
     # matrix will be the zero matrix, and brown's method gives the p-value as y
     # Otherwise (dat - dmv) / dvsd is NaN and ecdf throws an error
     if (isTRUE(all.equal(min(dat), max(dat)))) return(dat)
-
+    
     dvm <- mean(dat, na.rm=TRUE)
     dvsd <- pop.sd(dat)
     s <- (dat - dvm) / dvsd

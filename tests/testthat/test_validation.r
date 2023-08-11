@@ -5,130 +5,130 @@ test_that("scores is a numeric matrix with valid p-values", {
   dat2 <- dat
   dat2[1, 1] <- 'a'
   expect_error(run_ap_short(dat2), 'scores must be a numeric matrix')
-
+  
   dat2 <- dat
   dat2[1, 1] <- NA
   expect_error(run_ap_short(dat2), 'scores cannot contain missing values, we recommend replacing NA with 1 or removing')
-
+  
   dat2[1, 1] <- -0.1
   expect_error(run_ap_short(dat2), "All values in scores must be in [0,1]", fixed=TRUE)
-
+  
   dat2[1, 1] <- 1.1
   expect_error(run_ap_short(dat2), "All values in scores must be in [0,1]", fixed=TRUE)
-
+  
   dat2[1, 1] <- 1
   expect_error(run_ap_short(dat2), NA)
-
+  
   dat2[1, 1] <- 0
   expect_error(run_ap_short(dat2), NA)
 })
 
-test_that("scores_direction and expected_direction have valid input",{
+test_that("scores_direction and constraints_vector have valid input",{
   
-  expect_error(run_ap(scores_test, direction_test,NULL),'Both scores_direction and expected_direction must be provided')
-  expect_error(run_ap(scores_test, NULL,expected_direction = expected_direction_test),'Both scores_direction and expected_direction must be provided')
+  expect_error(run_ap(scores_test, direction_test,NULL),'Both scores_direction and constraints_vector must be provided')
+  expect_error(run_ap(scores_test, NULL,constraints_vector = constraints_vector_test),'Both scores_direction and constraints_vector must be provided')
   
-  expected_dir <- c('a','b')
-  expect_error(run_ap(scores_test,direction_test,expected_dir), 'expected_direction must be a numeric vector')
+  constraints_vector <- c('a','b')
+  expect_error(run_ap(scores_test,direction_test,constraints_vector), 'constraints_vector must be a numeric vector')
   expect_error(run_ap(scores_test, direction_test, c(1,0)), "scores_direction entries must be set to 0's for columns that do not contain directional information")
   
   dir_test <- direction_test
   dir_test[1,1] <- NA
-  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'scores_direction cannot contain missing values, we recommend replacing NA with 0 or removing')
+  expect_error(run_ap(scores_test,dir_test,constraints_vector_test), 'scores_direction cannot contain missing values, we recommend replacing NA with 0 or removing')
   
   dir_test <- direction_test
   dir_test[1,1] <- 'a'
-  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'scores_direction must be a numeric matrix')
+  expect_error(run_ap(scores_test,dir_test,constraints_vector_test), 'scores_direction must be a numeric matrix')
   
   dir_test <- direction_test
   rownames(dir_test) <- 1:length(direction_test[,1])
-  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'scores_direction gene names must match scores genes')
-
+  expect_error(run_ap(scores_test,dir_test,constraints_vector_test), 'scores_direction gene names must match scores genes')
+  
   dir_test <- direction_test
   colnames(dir_test) <- NULL
-  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 'column names must be provided to scores and scores_direction')
+  expect_error(run_ap(scores_test,dir_test,constraints_vector_test), 'column names must be provided to scores and scores_direction')
   
-  expected_dir <- c(1,1,-1)
-  expect_error(run_ap(scores_test,direction_test,expected_dir), 
-               'expected_direction should have the same number of entries as columns in scores_direction')
+  constraints_vector <- c(1,1,-1)
+  expect_error(run_ap(scores_test,direction_test,constraints_vector), 
+               'constraints_vector should have the same number of entries as columns in scores_direction')
   
-  expected_dir <- c(1,-1)
-  names(expected_dir) <- c("protein","rna")
-  expect_error(run_ap(scores_test,direction_test,expected_dir), 
-               'the expected_direction entries should match the order of scores and scores_direction columns')
+  constraints_vector <- c(1,-1)
+  names(constraints_vector) <- c("protein","rna")
+  expect_error(run_ap(scores_test,direction_test,constraints_vector), 
+               'the constraints_vector entries should match the order of scores and scores_direction columns')
   
   dir_test <- direction_test
   colnames(dir_test) <- c("rna","Mutation")
-  expect_error(run_ap(scores_test,dir_test,expected_direction_test), 
+  expect_error(run_ap(scores_test,dir_test,constraints_vector_test), 
                'scores_direction column names must match scores column names')
   
-  expected_dir <- c(1,0)
-  expect_error(run_ap(scores_test, direction_test, expected_dir), "scores_direction entries must be set to 0's for columns that do not contain directional information")
+  constraints_vector <- c(1,0)
+  expect_error(run_ap(scores_test, direction_test, constraints_vector), "scores_direction entries must be set to 0's for columns that do not contain directional information")
 })
 
 test_that("significant is valid", {
-    expect_error(ActivePathways(dat, gmt, significant=-0.1),
-                 "significant must be a value in [0,1]", fixed=TRUE)
-    expect_error(ActivePathways(dat, gmt, significant = 1.1),
-                 "significant must be a value in [0,1]", fixed=TRUE)
-    expect_error(ActivePathways(dat, gmt, significant=NULL),
-                 "length(significant) == 1 is not TRUE", fixed=TRUE)
-    expect_error(ActivePathways(dat, gmt, significant=c(1,2)),
-                 "length(significant) == 1 is not TRUE", fixed=TRUE)
-    expect_error(ActivePathways(dat, gmt, significant='qwe'),
-                 "is.numeric(significant) is not TRUE", fixed=TRUE)
-    expect_warning(ActivePathways(dat, gmt, significant = 0),
-                   "No significant terms were found")
-    expect_error(ActivePathways(dat, gmt, significant = 1), NA)
+  expect_error(ActivePathways(dat, gmt, significant=-0.1),
+               "significant must be a value in [0,1]", fixed=TRUE)
+  expect_error(ActivePathways(dat, gmt, significant = 1.1),
+               "significant must be a value in [0,1]", fixed=TRUE)
+  expect_error(ActivePathways(dat, gmt, significant=NULL),
+               "length(significant) == 1 is not TRUE", fixed=TRUE)
+  expect_error(ActivePathways(dat, gmt, significant=c(1,2)),
+               "length(significant) == 1 is not TRUE", fixed=TRUE)
+  expect_error(ActivePathways(dat, gmt, significant='qwe'),
+               "is.numeric(significant) is not TRUE", fixed=TRUE)
+  expect_warning(ActivePathways(dat, gmt, significant = 0),
+                 "No significant terms were found")
+  expect_error(ActivePathways(dat, gmt, significant = 1), NA)
 })
 
 
 test_that("cutoff is valid", {
-    expect_error(ActivePathways(dat, gmt, cutoff=-0.1),
-                 "cutoff must be a value in [0,1]", fixed=TRUE)
-    expect_error(ActivePathways(dat, gmt, cutoff = 1.1),
-                 "cutoff must be a value in [0,1]", fixed=TRUE)
-    expect_error(ActivePathways(dat, gmt, cutoff=NULL),
-                 "length(cutoff) == 1 is not TRUE", fixed=TRUE)
-    expect_error(ActivePathways(dat, gmt, cutoff=c(1,2)),
-                 "length(cutoff) == 1 is not TRUE", fixed=TRUE)
-    expect_error(ActivePathways(dat, gmt, cutoff='qwe'),
-                 "is.numeric(cutoff) is not TRUE", fixed=TRUE)
-    expect_error(ActivePathways(dat, gmt, cutoff=0),
-                 "No genes made the cutoff", fixed=TRUE)
-    expect_error(ActivePathways(dat, gmt, cutoff=1), NA)
+  expect_error(ActivePathways(dat, gmt, cutoff=-0.1),
+               "cutoff must be a value in [0,1]", fixed=TRUE)
+  expect_error(ActivePathways(dat, gmt, cutoff = 1.1),
+               "cutoff must be a value in [0,1]", fixed=TRUE)
+  expect_error(ActivePathways(dat, gmt, cutoff=NULL),
+               "length(cutoff) == 1 is not TRUE", fixed=TRUE)
+  expect_error(ActivePathways(dat, gmt, cutoff=c(1,2)),
+               "length(cutoff) == 1 is not TRUE", fixed=TRUE)
+  expect_error(ActivePathways(dat, gmt, cutoff='qwe'),
+               "is.numeric(cutoff) is not TRUE", fixed=TRUE)
+  expect_error(ActivePathways(dat, gmt, cutoff=0),
+               "No genes made the cutoff", fixed=TRUE)
+  expect_error(ActivePathways(dat, gmt, cutoff=1), NA)
 })
 
 
 test_that("background is a character vector", {
-    error_msg <- "background must be a character vector"
-    expect_error(ActivePathways(dat, gmt, background=c(1,5,2)), error_msg)
-    expect_error(ActivePathways(dat, gmt, background=matrix(c('a', 'b', 'c', 'd'), 2)), error_msg)
+  error_msg <- "background must be a character vector"
+  expect_error(ActivePathways(dat, gmt, background=c(1,5,2)), error_msg)
+  expect_error(ActivePathways(dat, gmt, background=matrix(c('a', 'b', 'c', 'd'), 2)), error_msg)
 })
 
 
 test_that("genes not found in background are removed", {
-    expect_message(ActivePathways(dat, gmt, background=rownames(dat)[-(1:10)], significant=1, cutoff=1),
-                   "10 rows were removed from scores because they are not found in the background")
-    expect_error(ActivePathways(dat, gmt, background='qwerty'),
-                 "scores does not contain any genes in the background")
+  expect_message(ActivePathways(dat, gmt, background=rownames(dat)[-(1:10)], significant=1, cutoff=1),
+                 "10 rows were removed from scores because they are not found in the background")
+  expect_error(ActivePathways(dat, gmt, background='qwerty'),
+               "scores does not contain any genes in the background")
 })
 
 test_that("geneset_filter is a numeric vector of length 2", {
-    expect_error(ActivePathways(dat, gmt, geneset_filter=1), 
-                 "geneset_filter must be length 2")
-    expect_error(ActivePathways(dat, gmt, geneset_filter=list(1,2)),
-                 "geneset_filter must be a numeric vector")
-    expect_error(ActivePathways(dat, gmt, geneset_filter=c('q', 2)),
-                 "geneset_filter must be a numeric vector")
-    expect_error(ActivePathways(dat, gmt, geneset_filter=c(1, -2)),
-                 "geneset_filter limits must be positive")
-    expect_error(ActivePathways(dat, gmt, geneset_filter=c(0, 0)), 
-                 "No pathways in gmt made the geneset_filter", fixed=TRUE)
-    expect_message(ActivePathways(dat, gmt, geneset_filter=c(NA, 10)),
-                   "[0-9]+ terms were removed from gmt because they did not make the geneset_filter")
-    expect_error(ActivePathways(dat, gmt, geneset_filter=c(0, NA)), NA)
-    expect_error(ActivePathways(dat, gmt, geneset_filter=NULL), NA)
+  expect_error(ActivePathways(dat, gmt, geneset_filter=1), 
+               "geneset_filter must be length 2")
+  expect_error(ActivePathways(dat, gmt, geneset_filter=list(1,2)),
+               "geneset_filter must be a numeric vector")
+  expect_error(ActivePathways(dat, gmt, geneset_filter=c('q', 2)),
+               "geneset_filter must be a numeric vector")
+  expect_error(ActivePathways(dat, gmt, geneset_filter=c(1, -2)),
+               "geneset_filter limits must be positive")
+  expect_error(ActivePathways(dat, gmt, geneset_filter=c(0, 0)), 
+               "No pathways in gmt made the geneset_filter", fixed=TRUE)
+  expect_message(ActivePathways(dat, gmt, geneset_filter=c(NA, 10)),
+                 "[0-9]+ terms were removed from gmt because they did not make the geneset_filter")
+  expect_error(ActivePathways(dat, gmt, geneset_filter=c(0, NA)), NA)
+  expect_error(ActivePathways(dat, gmt, geneset_filter=NULL), NA)
 }) 
 
 test_that("custom colors is a character vector that is equal in length to the number of columns in scores",{

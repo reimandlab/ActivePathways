@@ -8,7 +8,7 @@ merge_p_values(
   scores,
   method = "Fisher",
   scores_direction = NULL,
-  expected_direction = NULL
+  constraints_vector = NULL
 )
 }
 \arguments{
@@ -19,7 +19,7 @@ merge_p_values(
 \item{scores_direction}{Either a vector of log2 transformed fold-change values or a matrix where each column is a test. 
 Must contain the same dimensions as the scores parameter. Datasets without directional information should be set to 0.}
 
-\item{expected_direction}{A numerical vector of +1 or -1 values corresponding to the expected
+\item{constraints_vector}{A numerical vector of +1 or -1 values corresponding to the user-defined
 directional relationship between the columns in scores_direction. Datasets without directional information should
 be set to 0.}
 }

@@ -8,23 +8,23 @@ background <- makeBackground(gmt)
 # filenames for cytoscape
 CStag = "CS_files"
 
-# Prepare testing data for scores_direction and expected_direction
+# Prepare testing data for scores_direction and constraints_vector
 df <- read.table('test_data_rna_protein.tsv', header = TRUE, row.names = "gene", sep = '\t')
-scores_test <- data.frame(row.names = rownames(df), rna = df[,1], protein = df[,3])
+scores_test <- data.frame(row.names = rownames(df), rna = df$rna_pval, protein = df$protein_pval)
 scores_test <- as.matrix(scores_test)
 scores_test[is.na(scores_test)] <- 1
-direction_test <- data.frame(row.names = rownames(df), rna = df[,2], protein = df[,4])
+direction_test <- data.frame(row.names = rownames(df), rna = df$rna_log2fc, protein = df$protein_log2fc)
 direction_test <- as.matrix(direction_test)
-direction_test[is.na(direction_test)] <- 1
-expected_direction_test <- c(1,1)
+direction_test[is.na(direction_test)] <- 0
+constraints_vector_test <- c(1,1)
 
 # Run ActivePathways quickly
 run_ap_short <- function(dat) ActivePathways(dat[,1, drop = F], gmt[1:3], cutoff=1, significant=1)
 run_ap_short_contribution <- function(dat) ActivePathways(dat, gmt[1:3], cutoff=1, significant=1)
-run_ap <- function(scores_test,direction_test,expected_direction_test) ActivePathways(scores = scores_test,
-                                                                                  gmt_reac, cutoff=1, significant=1,
-                                                                                  scores_direction = direction_test,
-                                                                                  expected_direction = expected_direction_test)
+run_ap <- function(scores_test,direction_test,constraints_vector_test) ActivePathways(scores = scores_test,
+                                                                                      gmt_reac, cutoff=1, significant=1,
+                                                                                      scores_direction = direction_test,
+                                                                                      constraints_vector = constraints_vector_test)
 
 
 

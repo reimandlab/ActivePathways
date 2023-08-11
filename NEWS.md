@@ -3,7 +3,7 @@
 ## Major Changes
 
 ### ActivePathways 2.0.0
-* Incorporated scores_direction' and 'expected_direction' parameters to ActivePathways() and merge_p_values() to account for the direction between datasets when performing p-value merging. 
+* Incorporated scores_direction' and 'constraints_vector' parameters to ActivePathways() and merge_p_values() to account for the direction between datasets when performing p-value merging.
 * Added the 'Stouffer' and 'Strube' p-value merging methods as alternatives to 'Fisher' and "Brown', respectively. 
 * Changed the naming convention of parameters and objects, substituting a period '.' for an underscore '_'. 
 

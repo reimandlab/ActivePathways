@@ -29,11 +29,11 @@ ActivePathways is a tool for multivariate pathway enrichment analysis that ident
 
 The first version of ActivePathways was published in Nature Communications with the PCAWG Pan-Cancer project.
 
-Marta Paczkowska\^, Jonathan Barenboim\^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, Jüri Reimand. Integrative pathway enrichment analysis of multivariate omics data. Nature Communications 11 735 (2020) (\^ - co-first authors) <https://www.nature.com/articles/s41467-019-13983-9> <https://www.ncbi.nlm.nih.gov/pubmed/32024846>
+Marta Paczkowska\^, Jonathan Barenboim\^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, Jï¿½ri Reimand. Integrative pathway enrichment analysis of multivariate omics data. Nature Communications 11 735 (2020) (\^ - co-first authors) <https://www.nature.com/articles/s41467-019-13983-9> <https://www.ncbi.nlm.nih.gov/pubmed/32024846>
 
 ## Pathway enrichment analysis using the ranked hypergeometric test
 
-From a matrix of p-values, `ActivePathways` creates a ranked gene list where genes are prioritised based on their combined significance. The combined significance of each gene is determined by performing statistical data fusion on a series of omics datasets provided in the input matrix. The ranked gene list includes the most significant genes first. `ActivePathways` then performs a ranked hypergeometric test to determine if a pathway (i.e., a gene set with a common functional annotation) is enriched in the ranked gene list, by performing a series of hypergeometric tests (also known as Fisher's exact tests). In each such test, a larger set of genes from the top of the ranked gene list is considered. At the end of the series, the ranked hypergeometric test returns the top most significant p-value from the series, corresponding to the point in the ranked gene list where the pathway enrichment reached the greatest significance of enrichment. This approach is useful when the genes in our ranked gene list have varying signals of biological importance in the input omics datasets, as the test identifies the top subset of genes that are the most relevant to the enrichment of the pathway.
+From a matrix of p-values, `ActivePathways` creates a ranked gene list where genes are prioritised based on their combined significance. The combined significance of each gene is determined by performing statistical data fusion on a series of omics datasets provided in the input matrix. The ranked gene list includes the most significant genes first. `ActivePathways` then performs a ranked hypergeometric test to determine if a pathway (i.e., a gene set with a common functional annotation) is enriched in the ranked gene list, by performing a series of hypergeometric tests (also known as Fisher's exact tests). In each such test, a larger set of genes from the top of the ranked gene list is considered. At the end of the series, the ranked hypergeometric test returns the top, most significant p-value from the series, corresponding to the point in the ranked gene list where the pathway enrichment reached the greatest significance of enrichment. This approach is useful when the genes in our ranked gene list have varying signals of biological importance in the input omics datasets, as the test identifies the top subset of genes that are the most relevant to the enrichment of the pathway.
 
 ## Using the package
 
@@ -63,7 +63,7 @@ scores[is.na(scores)] <- 1
 
 The basic use of `ActivePathways` requires only two input parameters, the matrix of P-values with genes in rows and datasets in columns, as prepared above, and the path to the GMT file in the file system. Importantly, the gene IDs (symbols, accession numbers, etc) in the P-value matrix need to match those in the GMT file.
 
-Here we use a GMT file provided with the package. This GMT file is heavily filtered and outdated, thus users must provide their own GMT file when using the package. These GMT files can be acquired from multiple [sources](https://baderlab.org/GeneSets) such as Gene Ontology, Reactome and others. For better accuracy and statistical power these pathway databases should be combined. Acquiring an [up-to-date GMT file](http://download.baderlab.org/EM_Genesets/current_release/) is essential to avoid using unreliable outdated annotations [(see this paper)](https://www.nature.com/articles/nmeth.3963).
+Here we use a GMT file provided with the package. This GMT file is heavily filtered and outdated; thus users must provide their own GMT file when using the package. These GMT files can be acquired from multiple [sources](https://baderlab.org/GeneSets) such as Gene Ontology, Reactome and others. For better accuracy and statistical power these pathway databases should be combined. Acquiring an [up-to-date GMT file](http://download.baderlab.org/EM_Genesets/current_release/) is essential to avoid using unreliable outdated annotations [(see this paper)](https://www.nature.com/articles/nmeth.3963).
 
 ```{r}
 library(ActivePathways)
@@ -111,7 +111,7 @@ The new GMT object can now be used for analysis with `ActivePathways`
 ActivePathways(scores, gmt)
 ```
 
-This filtering can also be done automatically using the `geneset_filter` option to the `ActivePathways` function. By default, `ActivePathways` removes gene sets with less than five or more than a thousand genes from the GMT prior to analysis. In general, gene sets that are too large are likely not specific and less useful in interpreting the data and may also cause statistical inflation of enrichment scores in the analysis. Gene sets that are too small are likely too specific for most analyses and also make the multiple testing corrections more stringent, potentially causing deflation of results. A stricter filter can be applied by running `ActivePathways` with the parameter `geneset_filter = c(10, 500)`.
+This filtering can also be done automatically using the `geneset_filter` option to the `ActivePathways` function. By default, `ActivePathways` removes gene sets with less than five or more than a thousand genes from the GMT prior to analysis. In general, gene sets that are too large are likely not specific and less useful in interpreting the data and may also cause statistical inflation of enrichment scores in the analysis. Gene sets that are too small are likely too specific for most analyses and make the multiple testing corrections more stringent, potentially causing deflation of results. A stricter filter can be applied by running `ActivePathways` with the parameter `geneset_filter = c(10, 500)`.
 
 ```{r}
 ActivePathways(scores, gmt_file, geneset_filter = c(10, 500))
@@ -125,7 +125,7 @@ write.GMT(gmt, 'hsapiens_REAC_subset_filtered.gmt')
 
 ## Background gene set for statistical analysis
 
-To perform pathway enrichment analysis, a global set of genes needs to be defined as a statistical background set. This represents the universe of all genes in the organism that the analysis can potentially consider. By default, this background gene set includes every gene that is found in the GMT file in any of the biological processes and pathways. Another option is to provide the full set of all protein-coding genes, however this may cause statistical inflation of the results since a sizable fraction of all protein-coding genes still lack any known function.
+To perform pathway enrichment analysis, a global set of genes needs to be defined as a statistical background set. This represents the universe of all genes in the organism that the analysis can potentially consider. By default, this background gene set includes every gene that is found in the GMT file in any of the biological processes and pathways. Another option is to provide the full set of all protein-coding genes, however, this may cause statistical inflation of the results since a sizable fraction of all protein-coding genes still lack any known function.
 
 Sometimes the statistical background set needs to be considerably narrower than the GMT file or the full set of genes. Genes need to be excluded from the background if the analysis or experiment specifically excluded these genes initially. An example would be a targeted screen or sequencing panel that only considered a specific class of genes or proteins (e.g., kinases). In analysing such data, all non-kinase genes need to be excluded from the background set to avoid statistical inflation of all gene sets related to kinase signalling, phosphorylation and similar functions.
 
@@ -144,6 +144,7 @@ Note that only the genes found in the background set are used for testing enrich
 A key feature of `ActivePathways` is the integration of multiple complementary omics datasets to prioritise genes for the pathway analysis. In this approach, genes with significant scores in multiple datasets will get the highest priority, and certain genes with weak scores in multiple datasets may be ranked higher, highlighting functions that would be missed when only single datasets were analysed. `ActivePathways` accomplishes this by merging the series of p-values in the columns of the scores matrix for each gene into a single combined P-value. The four methods to merge P-values are Fisher's method (the default), Brown's method (extension of Fisher's), Stouffer's method and Strube's method (extension of Stouffer's). The Brown's and Strube's methods are more conservative in the case when the input datasets show some large-scale similarities (i.e., covariation), since they will take that into account when prioritising genes across similar datasets. The Brown's or Strube's method are recommended for most cases since omics datasets are often not statistically independent of each other and genes with high scores in one dataset are more likely to have high scores in another dataset just by chance.
 
 The following example compares the merged P-values of the first few genes between the four methods. Fisher's and Stouffer's method are two alternative strategies to merge p-values and as a result the top scoring genes and p-values may differ. The genes with the top scores for Brown's method are the same as Fisher's, but their P-values are more conservative. This is the case for Strube's method as well, in which the top scoring genes are the same as Stouffer's method, but the P-values are more conservative.
+
 
 ```{r}
 sort(merge_p_values(scores, 'Fisher'))[1:5]
@@ -167,7 +168,7 @@ ActivePathways(scores2, gmt_file)
 
 ## Cutoff for filtering the ranked gene list for pathway enrichment analysis
 
-To perform pathway enrichment of the ranked gene list of merged P-values, `ActivePathways` defines a P-value cutoff to filter genes that have little or no significance in the series of omics datasets. This threshold represents the maximum p-value for a gene to be considered of interest in our analysis. The threshold is `0.1` by default, but can be changed using the `cutoff` option. The default option considers raw P-values that have not been adjusted for multiple-testing correction. Therefore the default option provides a relatively lenient approach to filtering the input data. This is useful for finding additional genes with weaker signals that associate with well-annotated and strongly significant genes in the pathway and functional context.
+To perform pathway enrichment of the ranked gene list of merged P-values, `ActivePathways` defines a P-value cutoff to filter genes that have little or no significance in the series of omics datasets. This threshold represents the maximum p-value for a gene to be considered of interest in our analysis. The threshold is `0.1` by default but can be changed using the `cutoff` option. The default option considers raw P-values that have not been adjusted for multiple-testing correction. Therefore, the default option provides a relatively lenient approach to filtering the input data. This is useful for finding additional genes with weaker signals that associate with well-annotated and strongly significant genes in the pathway and functional context.
 
 ```{r}
 
@@ -238,7 +239,7 @@ cat(paste(readLines(result_file)[1:2], collapse = '\n'))
 
 ## ActivePathways 2.0 Directional integration of multi-omics data
 
-ActivePathways 2.0 extends our integrative pathway analysis framework significantly. Users can now provide directional assumptions of input omics datasets for more accurate analyses. This allows us to prioritise genes and pathways where certain directional assumptions are met, and penalise those where the assumptions are violated.
+ActivePathways 2.0 extends our integrative pathway analysis framework significantly. Users can now provide directional assumptions of input omics datasets for more accurate analyses. This allows us to prioritise genes and pathways where certain directional assumptions are met and penalise those where the assumptions are violated.
 
 For example, fold-change in protein expression would be expected to associate positively with mRNA fold-change of the corresponding gene, while negative associations would be unexpected and indicate more-complex situations or potential false positives. We can instruct the pathway analysis to prioritise positively-associated protein/mRNA pairs and penalise negative associations (or vice versa).
 
@@ -303,7 +304,7 @@ constraints_vector
 # constraints_vector <- c(1,-1)
 ```
 
-Now we merge the P-values of the two datasets using directional assumtions and compare these with the plain non-directional merging. The top 5 scoring genes differ if we penalise genes where this directional logic is violated: While 4 of 5 genes retain significance, the gene PIK3R4 is penalised. Interestingly, as a consequence of penalizing PIK3R4, other genes such as ITGB2 move up in rank.
+Now we merge the P-values of the two datasets using directional assumptions and compare these with the plain non-directional merging. The top 5 scoring genes differ if we penalise genes where this directional logic is violated: While 4 of 5 genes retain significance, the gene PIK3R4 is penalised. Interestingly, as a consequence of penalizing PIK3R4, other genes such as ITGB2 move up in rank.
 
 ```{r}
 directional_merged_pvals <- merge_p_values(pval_matrix, 
@@ -348,11 +349,46 @@ ggplot(lineplot_df) +
 	    scale_color_identity()
 ```
 
+### Constraints vector intuition
+
+The constraints_vector parameter is provided in the merge_p_values() and ActivePathways() functions to incorporate directional penalty into the data fusion and pathway enrichment analyses. The constraints_vector parameter is a vector of size n_datasets that allows the user to represent the expected relationship between the input omics datasets, and includes the values +1, -1, and 0.
+
+The constraints_vector should reflect the expected *relative* directional relationship between datasets. For example, the two constraints_vector values shown below are functionally identical.
+
+```{r}
+constraints_vector <- c(-1,1)
+
+constraints_vector <- c(1,-1)
+```
+
+
+We use different constraints_vector values depending on the type of data we are analyzing and the specific question we are asking. The simplest directional use case and the default for the ActivePathways package is to assume that the datasets have no directional constraints. This is useful when merging datasets where the relative impact of gene perturbations is not clear. For example, gene-level mutational burden and chromatin-immunoprecipitation sequencing (ChIP-seq) experiments can provide gene-level information, however, we cannot know from these datatypes whether gene function is increased or decreased. Therefore, we would set the constraints_vector for gene mutational burden and ChIP-seq datatypes to 0. 
+
+```{r}
+constraints_vector <- c(0,0)
+```
+
+When combining datasets that have directional information, we provide the expected relative directions between datasets in the constraints_vector. This is useful when measuring different data types or different conditions.
+
+To investigate the transcriptomic differences following gene knockdown or overexpression, we would provide constraints_vector values that reflect the expected opposing relationship between gene knockdown and gene overexpression.
+
+```{r}
+constraints_vector <- c(1,-1)
+```
+
+The constraints_vector is also useful when merging different data types such as gene and protein expression, promoter methylation, and chromatin accessibility. Importantly, the expected relative direction between each datatype must be closely considered given the experimental conditions. For example, when combining gene expression, protein expression, and promoter methylation data measured in the same biological condition, we would provide a constraints_vector to reflect the expected agreement between gene and protein expression and disagreement with promoter methylation.
+
+```{r}
+constraints_vector <- c(1,1,-1)
+```
+
+The intuition for merging these datasets is that direction of change in gene expression and protein expression tend to associate with each other according to the central dogma of biology while the direction of change of promoter methylation has the opposite effect as methylation insulates genes from transcription. 
+
 ### Pathway-level insight
 
 To explore how changes on the individual gene level impact biological pathways, we can compare results before and after incorporating a directional penalty.
 
-Use the example GMT file embedded in the package
+Use the example GMT file embedded in the package.
 
 ```{r}
 fname_GMT2 <- system.file("extdata", "hsapiens_REAC_subset2.gmt", 
@@ -559,7 +595,7 @@ To color nodes in the network (i.e., molecular pathways, biological processes) a
 
 ![](ImportStep_V2.png)
 
-Next, Cytoscape needs to use the imported information to color nodes using a pie chart visualisation. To enable this click the Style tab in the left control panel and select the Image/Chart1 Property in a series of dropdown menus (*Properties -\> Paint -\> Custom Paint 1 -\> Image/Chart 1*).
+Next, Cytoscape needs to use the imported information to color nodes using a pie chart visualisation. To enable this, click the Style tab in the left control panel and select the Image/Chart1 Property in a series of dropdown menus (*Properties -\> Paint -\> Custom Paint 1 -\> Image/Chart 1*).
 
 ![](PropertiesDropDown2_V2.png)
 

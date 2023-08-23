@@ -2,6 +2,9 @@
 
 ## Major Changes
 
+### ActivePathways 2.0.1
+* Changed how very small P-values are processed before P-value merging. P-values of '0' or anything less than '1e-300' are converted to '1e-300'.
+
 ### ActivePathways 2.0.0
 * Incorporated scores_direction' and 'constraints_vector' parameters to ActivePathways() and merge_p_values() to account for the direction between datasets when performing p-value merging.
 * Added the 'Stouffer' and 'Strube' p-value merging methods as alternatives to 'Fisher' and "Brown', respectively. 

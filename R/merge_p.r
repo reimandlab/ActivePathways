@@ -95,8 +95,12 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
             stop("Brown's or Strube's method cannot be used with a single list of p-values")
         }
         
-        # Convert zeroes to smallest available doubles
-        scores <- sapply(scores, function(x) ifelse (x == 0, 1e-300, x))
+        # Convert 0 or very small p-values to 1e-300
+        if(min(scores) < 1e-300){  
+            message(paste('warning: p-values smaller than ', 1e-300, ' are replaced with ', 1e-300))
+            scores <- sapply(scores, function(x) ifelse (x < 1e-300, 1e-300, x))
+        }
+      
         if (method == "Fisher"){
             p_fisher <- stats::pchisq(fishersMethod(scores, scores_direction,constraints_vector),
                                       2*length(scores), lower.tail = FALSE)
@@ -112,7 +116,10 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
     if (ncol(scores) == 1) return (scores[, 1, drop=TRUE])
     
     # If scores is a matrix with multiple columns, apply the following methods
-    scores <- apply(scores, c(1,2), function(x) ifelse (x == 0, 1e-300, x))
+    if(min(scores) < 1e-300){
+        message(paste('warning: p-values smaller than ', 1e-300, ' are replaced with ', 1e-300))
+        scores <- apply(scores, c(1,2), function(x) ifelse (x < 1e-300, 1e-300, x))
+    }
     
     if (method == "Fisher"){
         fisher_merged <- c()

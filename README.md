@@ -1,7 +1,7 @@
 # ActivePathways - integrative pathway analysis of multi-omics data
 
 
-**August 11th 2023: ActivePathways version 2.0.0 is now available. This update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
+**August 11th 2023: ActivePathways version 2.0.0 is now available on CRAN and in this GitHub. This update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
 
 
 
@@ -15,7 +15,7 @@ https://www.ncbi.nlm.nih.gov/pubmed/32024846
 
 ## Installation
 
-#### From CRAN: ActivePathways 1.1.1 is currently the most recent version
+#### From CRAN: ActivePathways 2.0.0 is currently the most recent version
 Open R and run `install.packages('ActivePathways')`
 
 #### Using devtools on our GitHub repository

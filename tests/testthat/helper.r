@@ -21,10 +21,11 @@ constraints_vector_test <- c(1,1)
 # Run ActivePathways quickly
 run_ap_short <- function(dat) ActivePathways(dat[,1, drop = F], gmt[1:3], cutoff=1, significant=1)
 run_ap_short_contribution <- function(dat) ActivePathways(dat, gmt[1:3], cutoff=1, significant=1)
-run_ap <- function(scores_test,direction_test,constraints_vector_test) ActivePathways(scores = scores_test,
+run_ap <- function(scores_test,direction_test,constraints_vector_test) ActivePathways(scores=scores_test,
+                                                                                      merge_method="DPM",
                                                                                       gmt_reac, cutoff=1, significant=1,
-                                                                                      scores_direction = direction_test,
-                                                                                      constraints_vector = constraints_vector_test)
+                                                                                      scores_direction=direction_test,
+                                                                                      constraints_vector=constraints_vector_test)
 
 
 

@@ -53,23 +53,34 @@
 #' @section Merging P-values:
 #' To obtain a single p-value for each gene across the multiple omics datasets considered, 
 #' the p-values in \code{scores} #' are merged row-wise using a data fusion approach of p-value merging. 
-#' The four available methods are:
+#' The eight available methods are:
 #' \describe{
 #'  \item{Fisher}{Fisher's method assumes p-values are uniformly
 #'  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
 #'  This method is most appropriate when the columns in \code{scores} are
 #'  independent.}
+#'  \item{Fisher_directional}{Fisher's method modification that allows for 
+#'  directional information to be incorporated with the \code{scores_direction}
+#'  and \code{constraints_vector} parameters.}
 #'  \item{Brown}{Brown's method extends Fisher's method by accounting for the
 #'  covariance in the columns of \code{scores}. It is more appropriate when the
 #'  tests of significance used to create the columns in \code{scores} are not
 #'  necessarily independent. The Brown's method is therefore recommended for 
 #'  many omics integration approaches.}
+#'  \item{DPM}{DPM extends Brown's method by incorporating directional information
+#'  using the \code{scores_direction} and \code{constraints_vector} parameters.}
 #'  \item{Stouffer}{Stouffer's method assumes p-values are uniformly distributed
 #'  and transforms p-values into a Z-score using the cumulative distribution function of a
 #'  standard normal distribution. This method is appropriate when the columns in \code{scores}
 #'   are independent.}
+#'  \item{Stouffer_directional}{Stouffer's method modification that allows for 
+#'  directional information to be incorporated with the \code{scores_direction}
+#'  and \code{constraints_vector} parameters.}
 #'  \item{Strube}{Strube's method extends Stouffer's method by accounting for the 
 #'  covariance in the columns of \code{scores}.}
+#'  \item{Strube_directional}{Strube's method modification that allows for 
+#'  directional information to be incorporated with the \code{scores_direction}
+#'  and \code{constraints_vector} parameters.}
 #' }
 #'
 #' @section Cytoscape:
@@ -119,7 +130,8 @@
 
 ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
                             geneset_filter = c(5, 1000), cutoff = 0.1, significant = 0.05,
-                            merge_method = c("Brown", "Fisher", "Stouffer","Strube"),
+                            merge_method = c("Fisher", "Fisher_directional", "Brown", "DPM", "Stouffer",
+                                            "Stouffer_directional", "Strube", "Strube_directional"),
                             correction_method = c("holm", "fdr", "hochberg", "hommel",
                                                   "bonferroni", "BH", "BY", "none"),
                             cytoscape_file_tag = NA, color_palette = NULL, custom_colors = NULL, 
@@ -147,6 +159,7 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
       if (is.null(colnames(scores)) || is.null(colnames(scores_direction))) stop("column names must be provided to scores and scores_direction")
       if (any(!colnames(scores_direction) %in% colnames(scores))) stop("scores_direction column names must match scores column names")
       if (length(constraints_vector) != length(colnames(scores_direction))) stop("constraints_vector should have the same number of entries as columns in scores_direction")
+      if (merge_method %in% c("Fisher","Brown","Stouffer","Strube")) stop("Only DPM, Fisher_directional, Stouffer_directional, and Strube_directional methods support directional integration")
       if (any(constraints_vector %in% 0) &&  !all(scores_direction[,constraints_vector %in% 0] == 0)) 
          stop("scores_direction entries must be set to 0's for columns that do not contain directional information")
       if (!is.null(names(constraints_vector))){
@@ -258,7 +271,7 @@ ActivePathways <-  function(scores, gmt, background = makeBackground(gmt),
    
    # merge p-values to get a single score for each gene and remove any genes
    # that don't make the cutoff
-   merged_scores <- merge_p_values(scores, merge_method,scores_direction,constraints_vector)
+   merged_scores <- merge_p_values(scores, merge_method, scores_direction, constraints_vector)
    merged_scores <- merged_scores[merged_scores <= cutoff]
    
    if (length(merged_scores) == 0) stop("No genes made the cutoff")

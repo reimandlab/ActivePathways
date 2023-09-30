@@ -32,24 +32,35 @@ Merge a list or matrix of p-values
 }
 \section{Methods}{
 
-Four methods are available to merge a list of p-values:
+Eight methods are available to merge a list of p-values:
 \describe{
  \item{Fisher}{Fisher's method (default) assumes that p-values are uniformly
  distributed and performs a chi-squared test on the statistic sum(-2 log(p)).
  This method is most appropriate when the columns in \code{scores} are
  independent.}
+ \item{Fisher_directional}{Fisher's method modification that allows for 
+ directional information to be incorporated with the \code{scores_direction}
+ and \code{constraints_vector} parameters.}
  \item{Brown}{Brown's method extends Fisher's method by accounting for the
  covariance in the columns of \code{scores}. It is more appropriate when the
  tests of significance used to create the columns in \code{scores} are not
  necessarily independent. Note that the "Brown" method cannot be used with a 
  single list of p-values. However, in this case Brown's method is identical 
  to Fisher's method and should be used instead.}
+ \item{DPM}{DPM extends Brown's method by incorporating directional information
+ using the \code{scores_direction} and \code{constraints_vector} parameters.}
  \item{Stouffer}{Stouffer's method assumes p-values are uniformly distributed
  and transforms p-values into a Z-score using the cumulative distribution function of a
  standard normal distribution. This method is appropriate when the columns in \code{scores}
   are independent.}
+ \item{Stouffer_directional}{Stouffer's method modification that allows for 
+ directional information to be incorporated with the \code{scores_direction}
+ and \code{constraints_vector} parameters.}
  \item{Strube}{Strube's method extends Stouffer's method by accounting for the 
  covariance in the columns of \code{scores}.}
+ \item{Strube_directional}{Strube's method modification that allows for 
+ directional information to be incorporated with the \code{scores_direction}
+ and \code{constraints_vector} parameters.}
   
 }
 }

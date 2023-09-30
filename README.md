@@ -294,7 +294,7 @@ constraints_vector <- c(1,1)
 ##
 
 directional_merged_pvals <- merge_p_values(pval_matrix, 
-		method = "Brown", dir_matrix, constraints_vector)
+		method = "DPM", dir_matrix, constraints_vector)
 
 merged_pvals <- merge_p_values(pval_matrix, method = "Brown")
 
@@ -394,7 +394,7 @@ dir_matrix[example_genes,]
 
 enriched_pathways_directional <- ActivePathways(
 		pval_matrix, gmt = fname_GMT2, cytoscape_file_tag = "Directional_",
-		scores_direction = dir_matrix, constraints_vector = constraints_vector)
+		merge_method = "DPM", scores_direction = dir_matrix, constraints_vector = constraints_vector)
 		
 ## 
 # Examine the pathways that are lost when 

@@ -69,6 +69,14 @@ test_that("Merged p-values are correct", {
    expect_equal(merge_p_values(test_pval_vector,"Fisher_directional",test_direction_vector,constraints_vector1),
                 merge_p_values(test_pval_vector,"Fisher_directional",test_direction_vector,constraints_vector2))
    
+   inflated_pvals <- c(1, 1e-400)
+   threshold_pvals <- c(1, 1e-300)
+   expect_equal(merge_p_values(inflated_pvals), merge_p_values(threshold_pvals))
+   
+   inflated_pval_matrix = matrix(c(1, 1, 1e-320, 1e-310), ncol = 2)
+   threshold_pval_matrix = matrix(c(1, 1, 1e-300, 1e-300), ncol = 2)
+   expect_equal(merge_p_values(inflated_pval_matrix), merge_p_values(threshold_pval_matrix))
+   
 })
 
 
@@ -122,3 +130,17 @@ test_that("scores_direction and constraints_vector are valid", {
                 'the constraints_vector entries should match the order of scores and scores_direction columns')
 })
 
+
+
+test_that("P-value merging methods are correct", {
+   expect_error(merge_p_values(c(0.05,0.10), "Fisher", c(1,1), c(1,1)),
+                'Only DPM, Fisher_directional, Stouffer_directional, and Strube_directional methods support directional integration')
+   
+   expect_error(merge_p_values(c(0.05,0.10), "Tippett"),
+                'Only Fisher, Brown, Stouffer and Strube methods are currently supported for non-directional analysis. 
+             And only DPM, Fisher_directional, Stouffer_directional, and Strube_directional are supported for directional analysis')
+   
+   expect_error(merge_p_values(c(0.05,0.10), "Fisher_directional"),
+                'scores_direction and constraints_vector must be provided for directional analyses')
+   
+})

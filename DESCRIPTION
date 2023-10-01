@@ -1,6 +1,6 @@
 Package: ActivePathways
 Title: Integrative Pathway Enrichment Analysis of Multivariate Omics Data
-Version: 2.0.1
+Version: 2.0.2
 Authors@R: c(person("Juri", "Reimand", email = "juri.reimand@utoronto.ca", role = c("aut", "cre")),
            person("Jonathan", "Barenboim", email = "jon.barenboim@gmail.com", role = "ctb"),
            person("Mykhaylo", "Slobodyanyuk", email = "michael.slobodyanyuk@oicr.on.ca", role = "aut"))

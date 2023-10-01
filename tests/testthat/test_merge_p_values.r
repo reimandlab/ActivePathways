@@ -13,9 +13,9 @@ test_that("scores is a numeric matrix or list with valid p-values", {
    
    expect_error(merge_p_values(unlist(test_list), "Fisher"), NA)
    expect_error(merge_p_values(test_list, "Brown"), 
-                "Brown's or Strube's method cannot be used with a single list of p-values")
+                "Brown's, DPM, Strube's, and Strube_directional methods cannot be used with a single list of p-values")
    expect_error(merge_p_values(unlist(test_list), "Brown"), 
-                "Brown's or Strube's method cannot be used with a single list of p-values")
+                "Brown's, DPM, Strube's, and Strube_directional methods cannot be used with a single list of p-values")
    
    
    
@@ -66,8 +66,16 @@ test_that("Merged p-values are correct", {
    constraints_vector1 <- c(-1,1)
    constraints_vector2 <- c(1,-1)
    
-   expect_equal(merge_p_values(test_pval_vector,"Fisher",test_direction_vector,constraints_vector1),
-                merge_p_values(test_pval_vector,"Fisher",test_direction_vector,constraints_vector2))
+   expect_equal(merge_p_values(test_pval_vector,"Fisher_directional",test_direction_vector,constraints_vector1),
+                merge_p_values(test_pval_vector,"Fisher_directional",test_direction_vector,constraints_vector2))
+   
+   inflated_pvals <- c(1, 1e-400)
+   threshold_pvals <- c(1, 1e-300)
+   expect_equal(merge_p_values(inflated_pvals), merge_p_values(threshold_pvals))
+   
+   inflated_pval_matrix = matrix(c(1, 1, 1e-320, 1e-310), ncol = 2)
+   threshold_pval_matrix = matrix(c(1, 1, 1e-300, 1e-300), ncol = 2)
+   expect_equal(merge_p_values(inflated_pval_matrix), merge_p_values(threshold_pval_matrix))
    
 })
 
@@ -84,41 +92,55 @@ rownames(test_direction_matrix) <- rownames(test_matrix)
 
 test_that("scores_direction and constraints_vector are valid", {
    
-   expect_error(merge_p_values(test_matrix, "Fisher",test_direction_matrix),'Both scores_direction and constraints_vector must be provided')
-   expect_error(merge_p_values(test_matrix, "Fisher",constraints_vector = constraints_vector),'Both scores_direction and constraints_vector must be provided')
-   expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, c(1,"b")), 'constraints_vector must be a numeric vector')
-   expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, c(1,0)), "scores_direction entries must be set to 0's for columns that do not contain directional information")
-   expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, c(1,5)), "constraints_vector must contain the values: 1, -1 or 0")
+   expect_error(merge_p_values(test_matrix, "Fisher_directional",test_direction_matrix),'Both scores_direction and constraints_vector must be provided')
+   expect_error(merge_p_values(test_matrix, "Fisher_directional",constraints_vector = constraints_vector),'Both scores_direction and constraints_vector must be provided')
+   expect_error(merge_p_values(test_matrix, "Fisher_directional", test_direction_matrix, c(1,"b")), 'constraints_vector must be a numeric vector')
+   expect_error(merge_p_values(test_matrix, "Fisher_directional", test_direction_matrix, c(1,0)), "scores_direction entries must be set to 0's for columns that do not contain directional information")
+   expect_error(merge_p_values(test_matrix, "Fisher_directional", test_direction_matrix, c(1,5)), "constraints_vector must contain the values: 1, -1 or 0")
    
    test_dir <- as.vector(test_direction_matrix)
-   expect_error(merge_p_values(test_matrix, "Fisher", test_dir, c(1,1)), 'scores and scores_direction must be the same data type')
+   expect_error(merge_p_values(test_matrix, "Fisher_directional", test_dir, c(1,1)), 'scores and scores_direction must be the same data type')
    
    test_dir <- test_direction_matrix
    test_dir[1,1] <- NA
-   expect_error(merge_p_values(test_matrix, "Fisher", test_dir, c(1,1)), 'scores_direction cannot contain missing values, we recommend replacing NA with 0 or removing')
+   expect_error(merge_p_values(test_matrix, "Fisher_directional", test_dir, c(1,1)), 'scores_direction cannot contain missing values, we recommend replacing NA with 0 or removing')
    
    test_dir <- test_direction_matrix
    test_dir[1,1] <- 'a'
-   expect_error(merge_p_values(test_matrix, "Fisher", test_dir, c(1,1)), 'scores_direction must be numeric')
+   expect_error(merge_p_values(test_matrix, "Fisher_directional", test_dir, c(1,1)), 'scores_direction must be numeric')
    
    test_dir <- test_direction_matrix
    colnames(test_dir) <- NULL
-   expect_error(merge_p_values(test_matrix, "Fisher", test_dir, c(1,1)), 'column names must be provided to scores and scores_direction')
+   expect_error(merge_p_values(test_matrix, "Fisher_directional", test_dir, c(1,1)), 'column names must be provided to scores and scores_direction')
    
    test_m <- test_matrix
    rownames(test_m) <- c("TP53", "GENE2", "GENE3")
-   expect_error(merge_p_values(test_m, "Fisher", test_direction_matrix, c(1,1)), 'scores_direction gene names must match scores genes')
+   expect_error(merge_p_values(test_m, "Fisher_directional", test_direction_matrix, c(1,1)), 'scores_direction gene names must match scores genes')
    
    test_m <- test_matrix
    colnames(test_m) <- c("RNA","Mutation")
-   expect_error(merge_p_values(test_m, "Fisher", test_direction_matrix, c(1,1)),
+   expect_error(merge_p_values(test_m, "Fisher_directional", test_direction_matrix, c(1,1)),
                 'scores_direction column names must match scores column names')
    
-   expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, c(1,1,-1)),
+   expect_error(merge_p_values(test_matrix, "Fisher_directional", test_direction_matrix, c(1,1,-1)),
                 'constraints_vector should have the same number of entries as columns in scores_direction')
    
    names(constraints_vector) <- c("Protein","RNA")
-   expect_error(merge_p_values(test_matrix, "Fisher", test_direction_matrix, constraints_vector),
+   expect_error(merge_p_values(test_matrix, "Fisher_directional", test_direction_matrix, constraints_vector),
                 'the constraints_vector entries should match the order of scores and scores_direction columns')
 })
 
+
+
+test_that("P-value merging methods are correct", {
+   expect_error(merge_p_values(c(0.05,0.10), "Fisher", c(1,1), c(1,1)),
+                'Only DPM, Fisher_directional, Stouffer_directional, and Strube_directional methods support directional integration')
+   
+   expect_error(merge_p_values(c(0.05,0.10), "Tippett"),
+                'Only Fisher, Brown, Stouffer and Strube methods are currently supported for non-directional analysis. 
+             And only DPM, Fisher_directional, Stouffer_directional, and Strube_directional are supported for directional analysis')
+   
+   expect_error(merge_p_values(c(0.05,0.10), "Fisher_directional"),
+                'scores_direction and constraints_vector must be provided for directional analyses')
+   
+})

@@ -141,7 +141,7 @@ Now we merge the P-values of the two datasets using directional assumptions and 
 
 ```{r}
 directional_merged_pvals <- merge_p_values(pval_matrix, 
-		method = "Brown", dir_matrix, constraints_vector)
+		method = "DPM", dir_matrix, constraints_vector)
 
 merged_pvals <- merge_p_values(pval_matrix, method = "Brown")
 
@@ -239,7 +239,7 @@ constraints_vector
 dir_matrix[example_genes,]
 
 enriched_pathways_directional <- ActivePathways(
-		pval_matrix, gmt = fname_GMT2, cytoscape_file_tag = "Directional_",
+		pval_matrix, gmt = fname_GMT2, cytoscape_file_tag = "Directional_", merge_method = "DPM",
 		scores_direction = dir_matrix, constraints_vector = constraints_vector)
 ```
 
@@ -350,7 +350,7 @@ Note that only the genes found in the background set are used for testing enrich
 
 ## Merging p-values
 
-A key feature of `ActivePathways` is the integration of multiple complementary omics datasets to prioritise genes for the pathway analysis. In this approach, genes with significant scores in multiple datasets will get the highest priority, and certain genes with weak scores in multiple datasets may be ranked higher, highlighting functions that would be missed when only single datasets were analysed. `ActivePathways` accomplishes this by merging the series of p-values in the columns of the scores matrix for each gene into a single combined P-value. The four methods to merge P-values are Fisher's method (the default), Brown's method (extension of Fisher's), Stouffer's method and Strube's method (extension of Stouffer's). The Brown's and Strube's methods are more conservative in the case when the input datasets show some large-scale similarities (i.e., covariation), since they will take that into account when prioritising genes across similar datasets. The Brown's or Strube's method are recommended for most cases since omics datasets are often not statistically independent of each other and genes with high scores in one dataset are more likely to have high scores in another dataset just by chance.
+A key feature of `ActivePathways` is the integration of multiple complementary omics datasets to prioritise genes for the pathway analysis. In this approach, genes with significant scores in multiple datasets will get the highest priority, and certain genes with weak scores in multiple datasets may be ranked higher, highlighting functions that would be missed when only single datasets were analysed. `ActivePathways` accomplishes this by merging the series of p-values in the columns of the scores matrix for each gene into a single combined P-value. The four methods to merge P-values are Fisher's method (the default), Brown's method (extension of Fisher's), Stouffer's method and Strube's method (extension of Stouffer's). Each of these methods have been extended to account for the directional activity of genes across multi-omics datasets with Fisher_directional, DPM, Stouffer_directional, and Strube_directional methods. The Brown's and Strube's methods are more conservative in the case when the input datasets show some large-scale similarities (i.e., covariation), since they will take that into account when prioritising genes across similar datasets. The Brown's or Strube's method are recommended for most cases since omics datasets are often not statistically independent of each other and genes with high scores in one dataset are more likely to have high scores in another dataset just by chance.
 
 The following example compares the merged P-values of the first few genes between the four methods. Fisher's and Stouffer's method are two alternative strategies to merge p-values and as a result the top scoring genes and p-values may differ. The genes with the top scores for Brown's method are the same as Fisher's, but their P-values are more conservative. This is the case for Strube's method as well, in which the top scoring genes are the same as Stouffer's method, but the P-values are more conservative.
 
@@ -559,15 +559,17 @@ Note that one of the colors corresponds to a subset of enriched pathways with *c
 
 From the drop-down Properties menu, select *Border Line Type*.
 
-<img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/border_line_type.jpg" width="500"/>
+![](border_line_type.jpg)
 
 Set *Column* to *directional impact* and *Mapping Type* to *Discrete Mapping*. Now we can compare findings between a non-directional and a directional method. We highlight pathways that were shared (0), lost (1), and gained (2) between the approaches. Here, we have solid lines for the shared pathways, dots for the lost pathways, and vertical lines for the gained pathways. Border widths can be adjusted in the *Border Width* property, again with discrete mapping.
 
-<img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/set_aesthetic.jpg" width="500"/>
+![](set_aesthetic.jpg)
 
 This step changes node borders in the aggregated enrichment map, depicting the additional information provided by directional impact.
 
-<img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/new_map.png" width="800"/> <img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.0/vignettes/legend.png" width="100"/>
+![](new_map.png)
+![](legend.png)
+
 
 ## Alternative node coloring
 

@@ -525,7 +525,7 @@ Pathway enrichment analysis often leads to complex and redundant results. Enrich
 
 1.	Cytoscape, see <https://cytoscape.org/download.html>
 2.	EnrichmentMap app of Cytoscape, see menu Apps>App manager or <https://apps.cytoscape.org/apps/enrichmentmap> 
-3.	EhancedGraphics app of Cytoscape, see menu Apps>App manager or <https://apps.cytoscape.org/apps/enhancedGraphics> 
+3.	EnhancedGraphics app of Cytoscape, see menu Apps>App manager or <https://apps.cytoscape.org/apps/enhancedGraphics> 
 
 ## Creating the enrichment map
 

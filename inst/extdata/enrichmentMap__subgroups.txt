@@ -1,21 +1,34 @@
-term.id	CDS	X3UTR	promCore	combined	instruct
-REAC:2424491	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:422475	0	1	1	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:177929	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:2559583	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:180292	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:2262752	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:198203	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:1257604	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:212436	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:186797	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:3214842	0	0	0	1	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:1236394	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:449147	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:1433557	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:5654695	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:5654736	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:2172127	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:5655253	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:5673000	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
-REAC:190236	1	0	0	0	piechart: attributelist="CDS,X3UTR,promCore,combined" colorlist="#FF0000FF,#80FF00FF,#00FFFFFF,#8000FFFF" showlabels=FALSE
+term_id	X3UTR	X5UTR	CDS	promCore	combined	instruct
+REAC:2424491	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:422475	1	0	0	1	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:177929	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:2559583	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:5654699	0	0	0	0	1	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:2428924	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:167044	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:5654700	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:187687	0	0	0	0	1	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:180336	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:4420097	1	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:112399	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:5654712	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:180292	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:2262752	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:198203	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:194138	1	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:1257604	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:212436	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:74752	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:186797	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:112412	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:3214842	0	0	0	0	1	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:1236394	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:449147	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:1433557	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:5654695	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:5654736	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:2172127	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:5655253	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:5673000	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:448424	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE
+REAC:190236	0	0	1	0	0	piechart: attributelist="X3UTR,X5UTR,CDS,promCore,combined" colorlist="#FF0000,#CCFF00,#00FF66,#0066FF,#FFFFF0" showlabels=FALSE

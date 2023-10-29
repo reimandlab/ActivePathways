@@ -337,7 +337,7 @@ directional_merged_pvals["PIK3R4"]
 #0.8122527
 
 ```
-To assess the impact of the directional penalty on gene merged P-value signals we create a plot showing directional results on the y axis and non-directional results on the x. Green dots are prioritised hits, red dots are penalised.
+To assess the impact of the directional penalty on gene merged P-value signals we create a plot showing directional results on the y axis and non-directional results on the x. Blue dots are prioritised hits, red dots are penalised.
 
 ```R
 lineplot_df <- data.frame(original = -log10(merged_pvals),

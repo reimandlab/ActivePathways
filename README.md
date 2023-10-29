@@ -610,6 +610,9 @@ To change the color of the *combined* contribution, a color must be provided to 
 
 * See the vignette for more details: `browseVignettes(package='ActivePathways')`.
 
+* Mykhaylo Slobodyanyuk^, Alexander T. Bahcheli^, Zoe P. Klein, Masroor Bayati, Lisa J. Strug, Jüri Reimand. Directional integration and pathway enrichment analysis for multi-omics data. bioRxiv (2023-09-24) (^ - co-first authors)
+<https://www.biorxiv.org/content/10.1101/2023.09.23.559116v1>.
+
 * Integrative Pathway Enrichment Analysis of Multivariate Omics Data. Paczkowska M, Barenboim J, Sintupisut N, Fox NS, Zhu H, Abd-Rabbo D, Mee MW, Boutros PC, PCAWG Drivers and Functional Interpretation Working Group; Reimand J, PCAWG Consortium. Nature Communications (2020) <https://pubmed.ncbi.nlm.nih.gov/32024846/> <https://doi.org/10.1038/s41467-019-13983-9>.
 
 * Pathway Enrichment Analysis and Visualization of Omics Data Using g:Profiler, GSEA, Cytoscape and EnrichmentMap. Reimand J, Isserlin R, Voisin V, Kucera M, Tannus-Lopes C, Rostamianfar A, Wadi L, Meyer M, Wong J, Xu C, Merico D, Bader GD. Nature Protocols (2019) <https://pubmed.ncbi.nlm.nih.gov/30664679/> <https://doi.org/10.1038/s41596-018-0103-9>.

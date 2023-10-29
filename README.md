@@ -346,7 +346,8 @@ lineplot_df <- data.frame(original = -log10(merged_pvals),
 ggplot(lineplot_df) +
 	geom_point(size = 2.4, shape = 19,
 		aes(original, modified,
-		    color = ifelse(modified <= -log10(0.05), "#de2d26", "#2ca25f"))) +
+		    color = ifelse(original <= -log10(0.05),"gray",
+                                    ifelse(modified > -log10(0.05),"#1F449C","#F05039")))) +
 	labs(title = "",
 		 x ="Merged -log10(P)",
 		 y = "Directional Merged -log10(P)") + 
@@ -356,9 +357,10 @@ ggplot(lineplot_df) +
 		       col = "black", size = 0.5) + 
             geom_abline(size = 0.5, slope = 1,intercept = 0) +
 	    scale_color_identity()
+	    
 ```
 
-<img src="https://github.com/reimandlab/ActivePathways/blob/ActivePathways_2.0.2/vignettes/lineplot_tutorial.png" width="300" /> 
+![](https://github.com/reimandlab/ActivePathways/blob/master/vignettes/lineplot_tutorial.png)
 
 #### Pathway-level insight
 To explore how changes on the individual gene level impact biological pathways, we can compare results before and after incorporating a directional penalty.

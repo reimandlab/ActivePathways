@@ -26,6 +26,11 @@ library("data.table")
 
 ActivePathways is a tool for multivariate pathway enrichment analysis that identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list or matrix of genes. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance and direction of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. We can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone.
 
+The new version of ActivePathways is described in our recent preprint.
+
+Mykhaylo Slobodyanyuk^, Alexander T. Bahcheli^, Zoe P. Klein, Masroor Bayati, Lisa J. Strug, Jüri Reimand. Directional integration and pathway enrichment analysis for multi-omics data. bioRxiv (2023-09-24) (^ - co-first authors)
+https://www.biorxiv.org/content/10.1101/2023.09.23.559116v1
+
 The first version of ActivePathways was published in Nature Communications with the PCAWG Pan-Cancer project.
 
 Marta Paczkowska\^, Jonathan Barenboim\^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, Juri Reimand. Integrative pathway enrichment analysis of multivariate omics data. Nature Communications 11 735 (2020) (\^ - co-first authors) <https://www.nature.com/articles/s41467-019-13983-9> <https://www.ncbi.nlm.nih.gov/pubmed/32024846>
@@ -161,7 +166,7 @@ merged_pvals["PIK3R4"]
 directional_merged_pvals["PIK3R4"]
 ```
 
-To assess the impact of the directional penalty on gene merged P-value signals we create a plot showing directional results on the y axis and non-directional results on the x. Green dots are prioritised hits, red dots are penalised.
+To assess the impact of the directional penalty on gene merged P-value signals we create a plot showing directional results on the y axis and non-directional results on the x. Blue dots are prioritised hits, red dots are penalised.
 
 ```{r}
 lineplot_df <- data.frame(original = -log10(merged_pvals),
@@ -170,15 +175,16 @@ lineplot_df <- data.frame(original = -log10(merged_pvals),
 ggplot(lineplot_df) +
 	geom_point(size = 2.4, shape = 19,
 		aes(original, modified,
-		    color = ifelse(modified <= -log10(0.05), "#de2d26", "#2ca25f"))) +
+		    color = ifelse(original <= -log10(0.05),"gray",
+                                    ifelse(modified > -log10(0.05),"#1F449C","#F05039")))) +
 	labs(title = "",
 		 x ="Merged -log10(P)",
 		 y = "Directional Merged -log10(P)") + 
             geom_hline(yintercept = 1.301, linetype = "dashed",
-		       col = 'black', linewidth = 0.5) +
+		       col = 'black', size = 0.5) +
             geom_vline(xintercept = 1.301, linetype = "dashed",
-		       col = "black", linewidth = 0.5) + 
-            geom_abline(linewidth = 0.5, slope = 1,intercept = 0) +
+		       col = "black", size = 0.5) + 
+            geom_abline(size = 0.5, slope = 1,intercept = 0) +
 	    scale_color_identity()
 ```
 
@@ -472,7 +478,7 @@ The following sections will discuss how to create a pathway enrichment map using
 
 1.  Cytoscape, see <https://cytoscape.org/download.html>
 2.  EnrichmentMap app of Cytoscape, see menu Apps\>App manager or <https://apps.cytoscape.org/apps/enrichmentmap>
-3.  EhancedGraphics app of Cytoscape, see menu Apps\>App manager or <https://apps.cytoscape.org/apps/enhancedGraphics>
+3.  EnhancedGraphics app of Cytoscape, see menu Apps\>App manager or <https://apps.cytoscape.org/apps/enhancedGraphics>
 
 ## Required files
 
@@ -594,6 +600,9 @@ To change the color of the *combined* contribution, a color must be provided to 
 Tip: if the coloring of nodes did not work in Cytoscape after setting the options in the Style panel, check that the EnhancedGraphics Cytoscape app is installed.
 
 # References
+
+-   Mykhaylo Slobodyanyuk^, Alexander T. Bahcheli^, Zoe P. Klein, Masroor Bayati, Lisa J. Strug, Jüri Reimand. Directional integration and pathway enrichment analysis for multi-omics data. bioRxiv (2023-09-24) (^ - co-first authors)
+<https://www.biorxiv.org/content/10.1101/2023.09.23.559116v1>.
 
 -   Integrative Pathway Enrichment Analysis of Multivariate Omics Data. Paczkowska M, Barenboim J, Sintupisut N, Fox NS, Zhu H, Abd-Rabbo D, Mee MW, Boutros PC, PCAWG Drivers and Functional Interpretation Working Group; Reimand J, PCAWG Consortium. Nature Communications (2020) <https://pubmed.ncbi.nlm.nih.gov/32024846/> <https://doi.org/10.1038/s41467-019-13983-9>.
 

@@ -1,6 +1,5 @@
-# ActivePathways 2.0.2
-
-## Major Changes
+### ActivePathways 2.0.3
+* Minor updates in documentation and code examples. 
 
 ### ActivePathways 2.0.2
 * Separated the directional P-value merging methods into separate functions. 'Fisher_directional', 'DPM', 'Stouffer_directional', and 'Strube_directional' methods perform directional integration. The 'scores_direction' and 'constraints_vector' parameters must be provided.

@@ -1,7 +1,7 @@
 # ActivePathways - integrative pathway analysis of multi-omics data
 
 
-**October 30th 2023: ActivePathways version 2.0.2 is now available on CRAN and in this GitHub. This update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
+**October 30th 2023: ActivePathways version 2.0.3 is now available on CRAN and in this GitHub. The 2.0.3 version involves minor updates in documentation and code examples. The 2.0.2 update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
 
 ActivePathways is a tool for multivariate pathway enrichment analysis that identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list or matrix of genes. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritises genes based on the significance and direction of signals from the omics datasets, and performs pathway enrichment analysis of these prioritised genes. We can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
 

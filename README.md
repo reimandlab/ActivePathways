@@ -18,7 +18,7 @@ https://www.ncbi.nlm.nih.gov/pubmed/32024846
 
 ## Installation
 
-#### From CRAN: ActivePathways 2.0.2 is currently the most recent version
+#### From CRAN: ActivePathways 2.0.3 is currently the most recent version
 Open R and run `install.packages('ActivePathways')`
 
 #### Using devtools on our GitHub repository

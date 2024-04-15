@@ -18,6 +18,10 @@ https://pubmed.ncbi.nlm.nih.gov/32024846/
 
 ## Installation
 
+Package tested with: MacOS 14, Windows 11, Ubuntu 20.04
+Software dependencies: data.table, ggplot2, testthat, knitr, rmarkdown, RColorBrewer
+Installation time: less than 2 minutes
+
 #### From CRAN: ActivePathways 2.0.3 is currently the most recent version
 Open R and run `install.packages('ActivePathways')`
 

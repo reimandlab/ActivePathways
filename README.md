@@ -16,6 +16,10 @@ Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Hel
 https://www.nature.com/articles/s41467-019-13983-9
 https://pubmed.ncbi.nlm.nih.gov/32024846/ 
 
+To cite ActivePathways version 2.0.3, use:
+Reimand, J., & Slobodyanyuk, M. (2024). DPM: Directional integration and pathway enrichment analysis for multi-omics data. Zenodo. https://doi.org/10.5281/zenodo.12118089
+
+
 ## Installation
 
 Package tested with: MacOS 14, Windows 11, Ubuntu 20.04.

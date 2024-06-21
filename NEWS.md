@@ -1,3 +1,6 @@
+### ActivePathways 2.0.4
+* Minor update to ensure the 'scores' and 'scores_direction' matrices have the same number of rows, and that the gene row names in 'scores' are in the same order as 'scores_direction'.
+
 ### ActivePathways 2.0.3
 * Minor updates in documentation and code examples. 
 

@@ -73,7 +73,9 @@ merge_p_values <- function(scores, method = "Fisher", scores_direction = NULL,
     if (method %in% c("Fisher","Brown","Stouffer","Strube")) stop("Only DPM, Fisher_directional, Stouffer_directional, and Strube_directional methods support directional integration")
     
     if (is.matrix(scores_direction)){
+      if (nrow(scores) != nrow(scores_direction)) stop("scores and scores_direction must have the same number of rows")
       if (any(!rownames(scores_direction) %in% rownames(scores))) stop ("scores_direction gene names must match scores genes")
+      if (any(rownames(scores) != rownames(scores_direction))) stop("scores genes should be in the same order as scores_direction genes")
       if (is.null(colnames(scores)) || is.null(colnames(scores_direction))) stop("column names must be provided to scores and scores_direction")
       if (any(!colnames(scores_direction) %in% colnames(scores))) stop("scores_direction column names must match scores column names")
       if (length(constraints_vector) != length(colnames(scores_direction))) stop("constraints_vector should have the same number of entries as columns in scores_direction")

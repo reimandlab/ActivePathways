@@ -16,9 +16,7 @@ Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Hel
 https://www.nature.com/articles/s41467-019-13983-9
 https://pubmed.ncbi.nlm.nih.gov/32024846/ 
 
-To cite ActivePathways version 2.0+ and the DPM algorithm, please see our bioRxiv preprint. A peer-reviewed publication on the updated algorithm is currently in revision.
-
-Mykhaylo Slobodyanyuk, Alexander T. Bahcheli, Zoe P. Klein, Masroor Bayati, Lisa J. Strug, Jüri Reimand (2024). Directional integration and pathway enrichment analysis for multi-omics data. BioRxiv (2023) doi: https://doi.org/10.1101/2023.09.23.559116 
+The package version 2.0.3 used in the DPM preprint and manuscript is archived on Zenodo: https://zenodo.org/records/12118089.
 
 ## Installation
 

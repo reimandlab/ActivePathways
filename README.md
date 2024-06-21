@@ -1,7 +1,7 @@
 # ActivePathways - integrative pathway analysis of multi-omics data
 
 
-**October 30th 2023: ActivePathways version 2.0.3 is now available on CRAN and in this GitHub. The 2.0.3 version involves minor updates in documentation and code examples. The 2.0.2 update provides additional functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
+**June 21st 2024: ActivePathways version 2.0.4 is now available on CRAN and in this GitHub. The 2.0.4 version includes a bugfix that enforces a matching ordering of genes in the pvalue and direction matrices provided as input. The major update 2.0 provides a functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
 
 ActivePathways is a tool for multivariate pathway enrichment analysis that identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list or matrix of genes. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritises genes based on the significance and direction of signals from the omics datasets, and performs pathway enrichment analysis of these prioritised genes. We can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
 
@@ -16,9 +16,9 @@ Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Hel
 https://www.nature.com/articles/s41467-019-13983-9
 https://pubmed.ncbi.nlm.nih.gov/32024846/ 
 
-To cite ActivePathways version 2.0.3, use:
-Reimand, J., & Slobodyanyuk, M. (2024). DPM: Directional integration and pathway enrichment analysis for multi-omics data. Zenodo. https://doi.org/10.5281/zenodo.12118089
+To cite ActivePathways version 2.0+ and the DPM algorithm, please see our bioRxiv preprint. A peer-reviewed publication on the updated algorithm is currently in revision.
 
+Mykhaylo Slobodyanyuk, Alexander T. Bahcheli, Zoe P. Klein, Masroor Bayati, Lisa J. Strug, Jüri Reimand (2024). Directional integration and pathway enrichment analysis for multi-omics data. BioRxiv (2023) doi: https://doi.org/10.1101/2023.09.23.559116 
 
 ## Installation
 
@@ -28,7 +28,7 @@ Software dependencies: data.table, ggplot2, testthat, knitr, rmarkdown, RColorBr
 
 Installation time: less than 2 minutes.
 
-#### From CRAN: ActivePathways 2.0.3 is currently the most recent version
+#### From CRAN: ActivePathways 2.0.4 is currently the most recent version
 Open R and run `install.packages('ActivePathways')`
 
 #### Using devtools on our GitHub repository

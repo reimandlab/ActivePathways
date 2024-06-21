@@ -40,9 +40,16 @@ test_that("scores_direction and constraints_vector have valid input",{
   dir_test[1,1] <- 'a'
   expect_error(run_ap(scores_test,dir_test,constraints_vector_test), 'scores_direction must be a numeric matrix')
   
+  dir_test <- direction_test[1:3,]
+  expect_error(run_ap(scores_test,dir_test,constraints_vector_test), 'scores and scores_direction must have the same number of rows')
+  
   dir_test <- direction_test
   rownames(dir_test) <- 1:length(direction_test[,1])
   expect_error(run_ap(scores_test,dir_test,constraints_vector_test), 'scores_direction gene names must match scores genes')
+  
+  dir_test <- direction_test
+  rownames(dir_test) <- rev(rownames(direction_test))
+  expect_error(run_ap(scores_test,dir_test,constraints_vector_test), 'scores genes should be in the same order as scores_direction genes')
   
   dir_test <- direction_test
   colnames(dir_test) <- NULL

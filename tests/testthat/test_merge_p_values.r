@@ -113,9 +113,16 @@ test_that("scores_direction and constraints_vector are valid", {
    colnames(test_dir) <- NULL
    expect_error(merge_p_values(test_matrix, "Fisher_directional", test_dir, c(1,1)), 'column names must be provided to scores and scores_direction')
    
+   test_m <- test_matrix[1:2,]
+   expect_error(merge_p_values(test_m, "Fisher_directional", test_direction_matrix, c(1,1)), 'scores and scores_direction must have the same number of rows')
+   
    test_m <- test_matrix
    rownames(test_m) <- c("TP53", "GENE2", "GENE3")
    expect_error(merge_p_values(test_m, "Fisher_directional", test_direction_matrix, c(1,1)), 'scores_direction gene names must match scores genes')
+   
+   test_m <- test_matrix
+   rownames(test_m) <- c("CHRNA1","TP53","PTEN")
+   expect_error(merge_p_values(test_m, "Fisher_directional", test_direction_matrix, c(1,1)), 'scores genes should be in the same order as scores_direction genes')
    
    test_m <- test_matrix
    colnames(test_m) <- c("RNA","Mutation")

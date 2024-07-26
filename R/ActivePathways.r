@@ -413,6 +413,10 @@ columnSignificance <- function(scores, gmt, background, cutoff, significant, cor
 #'     export_as_CSV(res, "results_ActivePathways.csv")
 #'}
 export_as_CSV = function (res, file_name) {
+   overlap_index <- which(grepl("overlap", colnames(res), fixed=TRUE))
+   dataset_indices <- which(grepl("Genes_", colnames(res), fixed=TRUE))
+   for (i in c(overlap_index, dataset_indices)){
+      res[[i]] <- sapply(res[[i]], function(x) paste(x, collapse = "|"))
+   }
    data.table::fwrite(res, file_name)	
 } 
-

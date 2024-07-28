@@ -26,10 +26,9 @@ library("data.table")
 
 ActivePathways is a tool for multivariate pathway enrichment analysis that identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list or matrix of genes. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritizes genes based on the significance and direction of signals from the omics datasets, and performs pathway enrichment analysis of these prioritized genes. We can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone.
 
-The new version of ActivePathways is described in our recent preprint.
+The new version of ActivePathways is described in our recent publication in Nature Communications (2024). 
 
-Mykhaylo Slobodyanyuk^, Alexander T. Bahcheli^, Zoe P. Klein, Masroor Bayati, Lisa J. Strug, Jüri Reimand. Directional integration and pathway enrichment analysis for multi-omics data. bioRxiv (2023-09-24) (^ - co-first authors)
-https://www.biorxiv.org/content/10.1101/2023.09.23.559116v1
+Mykhaylo Slobodyanyuk^, Alexander T. Bahcheli^, Zoe P. Klein, Masroor Bayati, Lisa J. Strug, Jüri Reimand. Directional integration and pathway enrichment analysis for multi-omics data. Nature Communications (2024) (^ - co-first authors) <https://www.nature.com/articles/s41467-024-49986-4> <https://pubmed.ncbi.nlm.nih.gov/38971800/> 
 
 The first version of ActivePathways was published in Nature Communications with the PCAWG Pan-Cancer project.
 
@@ -601,8 +600,7 @@ Tip: if the coloring of nodes did not work in Cytoscape after setting the option
 
 # References
 
--   Mykhaylo Slobodyanyuk^, Alexander T. Bahcheli^, Zoe P. Klein, Masroor Bayati, Lisa J. Strug, Jüri Reimand. Directional integration and pathway enrichment analysis for multi-omics data. bioRxiv (2023-09-24) (^ - co-first authors)
-<https://www.biorxiv.org/content/10.1101/2023.09.23.559116v1>.
+-   Mykhaylo Slobodyanyuk^, Alexander T. Bahcheli^, Zoe P. Klein, Masroor Bayati, Lisa J. Strug, Jüri Reimand. Directional integration and pathway enrichment analysis for multi-omics data. Nature Communications (2024) (^ - co-first authors) <https://www.nature.com/articles/s41467-024-49986-4> <https://pubmed.ncbi.nlm.nih.gov/38971800/>.
 
 -   Integrative Pathway Enrichment Analysis of Multivariate Omics Data. Paczkowska M, Barenboim J, Sintupisut N, Fox NS, Zhu H, Abd-Rabbo D, Mee MW, Boutros PC, PCAWG Drivers and Functional Interpretation Working Group; Reimand J, PCAWG Consortium. Nature Communications (2020) <https://pubmed.ncbi.nlm.nih.gov/32024846/> <https://doi.org/10.1038/s41467-019-13983-9>.
 

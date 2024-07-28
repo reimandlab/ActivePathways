@@ -1,22 +1,23 @@
 # ActivePathways - integrative pathway analysis of multi-omics data
 
 
-**June 21st 2024: ActivePathways version 2.0.4 is now available on CRAN and in this GitHub. The 2.0.4 version includes a bugfix that enforces a matching ordering of genes in the pvalue and direction matrices provided as input. The major update 2.0 provides a functionality to p-value merging, allowing for directional information between datasets to be incorporated.**
+**July 28th 2024: ActivePathways version 2.0.5 is now available on CRAN and GitHub that fixes a minor bug on exporing unfiltered results as CSV files. The major update 2.0 provides the directional p-value merging (DPM) method described in our recent publication.**
 
 ActivePathways is a tool for multivariate pathway enrichment analysis that identifies gene sets, such as pathways or Gene Ontology terms, that are over-represented in a list or matrix of genes. ActivePathways uses a data fusion method to combine multiple omics datasets, prioritises genes based on the significance and direction of signals from the omics datasets, and performs pathway enrichment analysis of these prioritised genes. We can find pathways and genes supported by single or multiple omics datasets, as well as additional genes and pathways that are only apparent through data integration and remain undetected in any single dataset alone. 
 
-The new version of ActivePathways is described in our recent preprint.
+The new version of ActivePathways is described in our recent publication.
 
-Mykhaylo Slobodyanyuk^, Alexander T. Bahcheli^, Zoe P. Klein, Masroor Bayati, Lisa J. Strug, Jüri Reimand. Directional integration and pathway enrichment analysis for multi-omics data. bioRxiv (2023-09-24) (^ - co-first authors)
-https://www.biorxiv.org/content/10.1101/2023.09.23.559116v1
+Mykhaylo Slobodyanyuk^, Alexander T. Bahcheli^, Zoe P. Klein, Masroor Bayati, Lisa J. Strug, Jüri Reimand. Directional integration and pathway enrichment analysis for multi-omics data. *Nature Communications* 15, 5690 (2024). (^ - co-first authors)
+<https://www.nature.com/articles/s41467-024-49986-4>
+<https://pubmed.ncbi.nlm.nih.gov/38971800/>
 
 The first version of ActivePathways was published in Nature Communications with the PCAWG Pan-Cancer project. 
 
-Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, Juri Reimand. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11 735 (2020) (^ - co-first authors)
-https://www.nature.com/articles/s41467-019-13983-9
-https://pubmed.ncbi.nlm.nih.gov/32024846/ 
+Marta Paczkowska^, Jonathan Barenboim^, Nardnisa Sintupisut, Natalie S. Fox, Helen Zhu, Diala Abd-Rabbo, Miles W. Mee, Paul C. Boutros, PCAWG Drivers and Functional Interpretation Working Group, PCAWG Consortium, Juri Reimand. Integrative pathway enrichment analysis of multivariate omics data. *Nature Communications* 11, 735 (2020) (^ - co-first authors)
+<https://www.nature.com/articles/s41467-019-13983-9> 
+<https://pubmed.ncbi.nlm.nih.gov/32024846/>
 
-The package version 2.0.3 used in the DPM preprint and manuscript is archived on Zenodo: https://zenodo.org/records/12118089.
+The package version 2.0.3 used in the DPM preprint and manuscript is archived on Zenodo: <https://zenodo.org/records/12118089>.
 
 ## Installation
 
@@ -26,7 +27,7 @@ Software dependencies: data.table, ggplot2, testthat, knitr, rmarkdown, RColorBr
 
 Installation time: less than 2 minutes.
 
-#### From CRAN: ActivePathways 2.0.4 is currently the most recent version
+#### From CRAN: ActivePathways 2.0.5 is currently the most recent version
 Open R and run `install.packages('ActivePathways')`
 
 #### Using devtools on our GitHub repository
@@ -618,9 +619,8 @@ To change the color of the *combined* contribution, a color must be provided to 
 
 * See the vignette for more details: `browseVignettes(package='ActivePathways')`.
 
-* Mykhaylo Slobodyanyuk^, Alexander T. Bahcheli^, Zoe P. Klein, Masroor Bayati, Lisa J. Strug, Jüri Reimand. Directional integration and pathway enrichment analysis for multi-omics data. bioRxiv (2023-09-24) (^ - co-first authors)
-<https://www.biorxiv.org/content/10.1101/2023.09.23.559116v1>.
+* Mykhaylo Slobodyanyuk^, Alexander T. Bahcheli^, Zoe P. Klein, Masroor Bayati, Lisa J. Strug, Jüri Reimand. Directional integration and pathway enrichment analysis for multi-omics data. Nature Communications (2024) (^ - co-first authors) <https://www.nature.com/articles/s41467-024-49986-4> <https://pubmed.ncbi.nlm.nih.gov/38971800/>.
 
-* Integrative Pathway Enrichment Analysis of Multivariate Omics Data. Paczkowska M, Barenboim J, Sintupisut N, Fox NS, Zhu H, Abd-Rabbo D, Mee MW, Boutros PC, PCAWG Drivers and Functional Interpretation Working Group; Reimand J, PCAWG Consortium. Nature Communications (2020) <https://pubmed.ncbi.nlm.nih.gov/32024846/> <https://doi.org/10.1038/s41467-019-13983-9>.
+* Integrative Pathway Enrichment Analysis of Multivariate Omics Data. Paczkowska M^, Barenboim J^, Sintupisut N, Fox NS, Zhu H, Abd-Rabbo D, Mee MW, Boutros PC, PCAWG Drivers and Functional Interpretation Working Group; Reimand J, PCAWG Consortium. Nature Communications (2020) (^ - co-first authors) <https://pubmed.ncbi.nlm.nih.gov/32024846/> <https://doi.org/10.1038/s41467-019-13983-9>.
 
-* Pathway Enrichment Analysis and Visualization of Omics Data Using g:Profiler, GSEA, Cytoscape and EnrichmentMap. Reimand J, Isserlin R, Voisin V, Kucera M, Tannus-Lopes C, Rostamianfar A, Wadi L, Meyer M, Wong J, Xu C, Merico D, Bader GD. Nature Protocols (2019) <https://pubmed.ncbi.nlm.nih.gov/30664679/> <https://doi.org/10.1038/s41596-018-0103-9>.
+* Pathway Enrichment Analysis and Visualization of Omics Data Using g:Profiler, GSEA, Cytoscape and EnrichmentMap. Reimand J^, Isserlin R^, Voisin V, Kucera M, Tannus-Lopes C, Rostamianfar A, Wadi L, Meyer M, Wong J, Xu C, Merico D, Bader GD. Nature Protocols (2019) (^ - co-first authors)<https://pubmed.ncbi.nlm.nih.gov/30664679/> <https://doi.org/10.1038/s41596-018-0103-9>.

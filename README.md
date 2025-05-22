@@ -507,6 +507,77 @@ length(directional_conflict_genes)
 ```
 To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualising-directional-impact-with-node-borders).
 
+```R 
+## 
+# 1) Write the aggregated pathways txt file 
+##
+df_txtpathways <- data.frame(term_id = c(enriched_pathways$term_id,enriched_pathways_directional$term_id),
+                             term_name = c(enriched_pathways$term_name,enriched_pathways_directional$term_name),
+                             adjusted_p_val = c(enriched_pathways$adjusted_p_val,enriched_pathways_directional$adjusted_p_val))
+pathways_txt = aggregate(x = adjusted_p_val ~ term_id + term_name, 
+          data = df_txtpathways, 
+          FUN = function(x){
+            c(min = min(x))
+          })
+pathways_txt <- as.data.table(pathways_txt)
+utils::write.table(pathways_txt, 
+                   file="Aggregated_pathways.txt", 
+                   row.names=FALSE, 
+                   sep="\t", 
+                   quote=FALSE)
+
+##
+# 2) Write the aggregated gmt file
+##
+gmt_main <- read.GMT(fname_GMT2)
+gmt_main <- gmt_main[pathways_txt$term_id]
+write.GMT(gmt_main,"Aggregated_pathways.gmt")
+
+## 
+# 3) Write the aggregated subgroups txt file 
+##
+col_colors <- c("#FF0000","#00FF00","#FFFFF0")
+tests <- c('rna','protein','combined')
+
+# aggregate the pathways and dataset contributions across both methods
+all_pathways <- data.frame(term_id = c(enriched_pathways$term_id, enriched_pathways_directional$term_id))
+evidence <- append(enriched_pathways$evidence, enriched_pathways_directional$evidence)
+all_pathways$evidence <- evidence
+term_ids <- unique(all_pathways$term_id)
+evidence_grouped <- lapply(term_ids, function(id) {all_pathways$evidence[all_pathways$term_id == id]})
+col_significance <- data.frame(term_id = term_ids, stringsAsFactors = FALSE)
+col_significance$evidence <- lapply(evidence_grouped, '[[', 1)
+evidence_columns = do.call(rbind, lapply(col_significance$evidence,
+                                         function(x) 0+(tests %in% x)))
+col_significance = cbind(col_significance[,"term_id"], evidence_columns)
+col_significance <- as.data.frame(col_significance)
+colnames(col_significance) = c("term_id",tests)
+
+# check for lost, gained, and shared pathways between methods
+lostp <- enriched_pathways$term_id[!enriched_pathways$term_id %in% enriched_pathways_directional$term_id]
+gainedp <- enriched_pathways_directional$term_id[!enriched_pathways_directional$term_id %in% enriched_pathways$term_id]
+sharedp <- enriched_pathways$term_id[enriched_pathways$term_id %in% enriched_pathways_directional$term_id]
+col_significance$directional_impact <- 0
+col_significance[col_significance$term_id %in% lostp,]$directional_impact <- 1
+col_significance[col_significance$term_id %in% gainedp,]$directional_impact <- 2
+col_significance <- as.data.table(col_significance)
+
+# add the instruct string for cytoscape
+instruct.str <- paste('piechart:',
+                      ' attributelist="', 
+                      paste(tests, collapse=','),
+                      '" colorlist="', 
+                      paste(col_colors, collapse=','), 
+                      '" showlabels=FALSE', sep='')
+col_significance[, "instruct" := instruct.str]
+utils::write.table(col_significance, 
+                   file="Aggregated_subgroups.txt", 
+                   row.names=FALSE, 
+                   sep="\t", 
+                   quote=FALSE)
+
+```
+
 More thorough documentation of the ActivePathways function can be found in R with `?ActivePathways`, and complete tutorials can be found with `browseVignettes(package='ActivePathways')`.
 
 
@@ -623,4 +694,5 @@ To change the color of the *combined* contribution, a color must be provided to 
 
 * Integrative Pathway Enrichment Analysis of Multivariate Omics Data. Paczkowska M^, Barenboim J^, Sintupisut N, Fox NS, Zhu H, Abd-Rabbo D, Mee MW, Boutros PC, PCAWG Drivers and Functional Interpretation Working Group; Reimand J, PCAWG Consortium. Nature Communications (2020) (^ - co-first authors) <https://pubmed.ncbi.nlm.nih.gov/32024846/> <https://doi.org/10.1038/s41467-019-13983-9>.
 
-* Pathway Enrichment Analysis and Visualization of Omics Data Using g:Profiler, GSEA, Cytoscape and EnrichmentMap. Reimand J^, Isserlin R^, Voisin V, Kucera M, Tannus-Lopes C, Rostamianfar A, Wadi L, Meyer M, Wong J, Xu C, Merico D, Bader GD. Nature Protocols (2019) (^ - co-first authors)<https://pubmed.ncbi.nlm.nih.gov/30664679/> <https://doi.org/10.1038/s41596-018-0103-9>.
+* Pathway Enrichment Analysis and Visualization of Omics Data Using g:Profiler, GSEA, Cytoscape and EnrichmentMap. Reimand J^, Isserlin R^, Voisin V, Kucera M, Tannus-Lopes C, Rostamianfar A, Wadi L, Meyer M, Wong J, Xu C, Merico D, Bader GD. Nature Protocols (2019) (^ - co-first authors)
+<https://pubmed.ncbi.nlm.nih.gov/30664679/> <https://doi.org/10.1038/s41596-018-0103-9>.

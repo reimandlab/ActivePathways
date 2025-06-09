@@ -505,78 +505,54 @@ length(directional_conflict_genes)
 
 
 ```
-To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualising-directional-impact-with-node-borders).
+
+ActivePathways 2.0 allows you to incorporate directional information in your pathway analysis. You can compare results with and without directional penalties to gain deeper insights into your data.
 
 ```R 
-## 
-# 1) Write the aggregated pathways txt file 
-##
-df_txtpathways <- data.frame(term_id = c(enriched_pathways$term_id,enriched_pathways_directional$term_id),
-                             term_name = c(enriched_pathways$term_name,enriched_pathways_directional$term_name),
-                             adjusted_p_val = c(enriched_pathways$adjusted_p_val,enriched_pathways_directional$adjusted_p_val))
-pathways_txt = aggregate(x = adjusted_p_val ~ term_id + term_name, 
-          data = df_txtpathways, 
-          FUN = function(x){
-            c(min = min(x))
-          })
-pathways_txt <- as.data.table(pathways_txt)
-utils::write.table(pathways_txt, 
-                   file="Aggregated_pathways.txt", 
-                   row.names=FALSE, 
-                   sep="\t", 
-                   quote=FALSE)
+# Run standard pathway analysis
+enriched_pathways <- ActivePathways(
+  pval_matrix, gmt = fname_GMT2)
 
-##
-# 2) Write the aggregated gmt file
-##
-gmt_main <- read.GMT(fname_GMT2)
-gmt_main <- gmt_main[pathways_txt$term_id]
-write.GMT(gmt_main,"Aggregated_pathways.gmt")
+# Run directional pathway analysis
+enriched_pathways_directional <- ActivePathways(
+  pval_matrix, gmt = fname_GMT2,
+  merge_method = "DPM", 
+  scores_direction = dir_matrix, 
+  constraints_vector = constraints_vector)
 
-## 
-# 3) Write the aggregated subgroups txt file 
-##
-col_colors <- c("#FF0000","#00FF00","#FFFFF0")
-tests <- c('rna','protein','combined')
-
-# aggregate the pathways and dataset contributions across both methods
-all_pathways <- data.frame(term_id = c(enriched_pathways$term_id, enriched_pathways_directional$term_id))
-evidence <- append(enriched_pathways$evidence, enriched_pathways_directional$evidence)
-all_pathways$evidence <- evidence
-term_ids <- unique(all_pathways$term_id)
-evidence_grouped <- lapply(term_ids, function(id) {all_pathways$evidence[all_pathways$term_id == id]})
-col_significance <- data.frame(term_id = term_ids, stringsAsFactors = FALSE)
-col_significance$evidence <- lapply(evidence_grouped, '[[', 1)
-evidence_columns = do.call(rbind, lapply(col_significance$evidence,
-                                         function(x) 0+(tests %in% x)))
-col_significance = cbind(col_significance[,"term_id"], evidence_columns)
-col_significance <- as.data.frame(col_significance)
-colnames(col_significance) = c("term_id",tests)
-
-# check for lost, gained, and shared pathways between methods
-lostp <- enriched_pathways$term_id[!enriched_pathways$term_id %in% enriched_pathways_directional$term_id]
-gainedp <- enriched_pathways_directional$term_id[!enriched_pathways_directional$term_id %in% enriched_pathways$term_id]
-sharedp <- enriched_pathways$term_id[enriched_pathways$term_id %in% enriched_pathways_directional$term_id]
-col_significance$directional_impact <- 0
-col_significance[col_significance$term_id %in% lostp,]$directional_impact <- 1
-col_significance[col_significance$term_id %in% gainedp,]$directional_impact <- 2
-col_significance <- as.data.table(col_significance)
-
-# add the instruct string for cytoscape
-instruct.str <- paste('piechart:',
-                      ' attributelist="', 
-                      paste(tests, collapse=','),
-                      '" colorlist="', 
-                      paste(col_colors, collapse=','), 
-                      '" showlabels=FALSE', sep='')
-col_significance[, "instruct" := instruct.str]
-utils::write.table(col_significance, 
-                   file="Aggregated_subgroups.txt", 
-                   row.names=FALSE, 
-                   sep="\t", 
-                   quote=FALSE)
-
+# Examine pathways lost due to directional conflicts
+pathways_lost <- setdiff(enriched_pathways$term_id, enriched_pathways_directional$term_id)
+enriched_pathways[enriched_pathways$term_id %in% pathways_lost,]
 ```
+
+## Merging results for visualization in Cytoscape
+
+ActivePathways provides functions to merge results from multiple analyses for visualization in Cytoscape:
+
+```R
+# Merge results from standard and directional analyses
+merged_results <- merge_results(
+  enriched_pathways, enriched_pathways_directional,
+  output_prefix = "Aggregated_",
+  col_colors = c("#FF0000", "#00FF00", "#FFFFF0")
+)
+
+# Create a filtered GMT file with only significant pathways
+merged_gmt <- merge_gmt(
+  gmt_file = fname_GMT2,
+  term_ids = merged_results$term_ids,
+  output_file = "Aggregated_pathways.gmt"
+)
+```
+
+This creates files for Cytoscape visualization that show both analyses in a single enrichment map, with node borders indicating which pathways were:
+- Shared between both analyses
+- Lost when using directional analysis
+- Gained when using directional analysis
+
+Follow the same steps for creating an enrichment map in Cytoscape, but use the "combined_" files instead.
+
+To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualising-directional-impact-with-node-borders).
 
 More thorough documentation of the ActivePathways function can be found in R with `?ActivePathways`, and complete tutorials can be found with `browseVignettes(package='ActivePathways')`.
 

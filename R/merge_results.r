@@ -7,8 +7,8 @@
 #' @param enriched_pathways A data.table returned by ActivePathways
 #' @param enriched_pathways_directional A data.table returned by ActivePathways
 #' @param output_prefix A string prefix for output files
-#' @param tests A character vector of names for the data sources (e.g., c('rna', 'protein', 'combined'))
 #' @param col_colors A character vector of colors for each test (must match length of tests)
+#' @param tests A character vector of names for the data sources (e.g., c('rna', 'protein', 'combined'))
 #' @param impact_labels A character vector of labels for directional impact categories
 #'
 #' @return A list containing the merged results
@@ -30,15 +30,22 @@
 #' merge_results(
 #'   enriched_pathways, enriched_pathways_directional,
 #'   output_prefix = "merged_",
-#'   tests = c('rna', 'protein', 'combined'),
-#'   col_colors = c("#FF0000", "#00FF00", "#FFFFF0")
+#'   col_colors = c("#FF0000", "#00FF00", "#FFFFF0"),
+#'   tests = c('rna', 'protein', 'combined')
 #' )
 #' }
 merge_results <- function(enriched_pathways, enriched_pathways_directional, output_prefix = "",
-                          tests = NULL, col_colors = NULL,
+                          col_colors = NULL,
+                          tests = gsub("^Genes_", "", grep("^Genes_", colnames(enriched_pathways), value = TRUE)), 
                           impact_labels = c("shared", "lost", "gained")) {
   if (is.null(tests)) {
     stop("Tests parameter must be provided (e.g., c('rna', 'protein', 'combined'))")
+  }
+  
+  # Check if all tests exist in both dataframes with "Genes_" prefix
+  if (!all(sapply(tests, function(test) paste0("Genes_", test) %in% colnames(enriched_pathways))) ||
+      !all(sapply(tests, function(test) paste0("Genes_", test) %in% colnames(enriched_pathways_directional)))) {
+    stop("All tests must exist as columns with 'Genes_' prefix in both enriched_pathways and enriched_pathways_directional")
   }
   
   if (is.null(col_colors)) {
@@ -65,7 +72,7 @@ pathways_txt <- stats::aggregate(x = adjusted_p_val ~ term_id + term_name,
 # Convert to data.frame since write.table works natively with data.frames
 pathways_txt <- as.data.frame(pathways_txt)
 utils::write.table(pathways_txt, 
-                   file = paste0(output_prefix, "combined_pathways.txt"), 
+                   file = paste0(output_prefix, "_pathways.txt"), 
                    row.names = FALSE, 
                    sep = "\t", 
                    quote = FALSE)
@@ -114,35 +121,11 @@ instruct_str <- paste('piechart:',
 col_significance[, "instruct" := instruct_str]
   
 utils::write.table(col_significance, 
-                   file = paste0(output_prefix, "combined_subgroups.txt"), 
+                   file = paste0(output_prefix, "_subgroups.txt"), 
                    row.names = FALSE, 
                    sep = "\t", 
                    quote = FALSE)
   
-  # # Create a legend and plot for directional impact
-  # impact_counts <- c(
-  #   length(sharedp),
-  #   length(lostp),
-  #   length(gainedp)
-  # )
-  
-  # impact_df <- data.frame(
-  #   impact = factor(impact_labels, levels = impact_labels),
-  #   count = impact_counts
-  # )
-  
-  # # plot the number of pathways in each category
-  # legend_plot <- ggplot2::ggplot(impact_df, ggplot2::aes(x = impact, y = count, fill = impact)) +
-  #     ggplot2::geom_bar(stat = "identity") +
-  #     ggplot2::scale_fill_manual(name = "Directional Impact", 
-  #                               values = c("grey", "red", "blue")) +
-  #     ggplot2::theme_minimal() +
-  #     ggplot2::labs(title = "Pathway Changes with Directional Analysis",
-  #                  x = "Impact Category", y = "Number of Pathways")
-    
-  #   ggplot2::ggsave(paste0(output_prefix, "directional_legend.pdf"), 
-  #                  legend_plot, width = 7, height = 5)
-
   return(pathways_txt)
 }
 

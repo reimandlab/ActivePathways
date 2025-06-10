@@ -6,6 +6,7 @@
 #'
 #' @param enriched_pathways A data.table returned by ActivePathways
 #' @param enriched_pathways_directional A data.table returned by ActivePathways
+#' @param gmt_file Path to GMT file
 #' @param output_prefix A string prefix for output files
 #' @param col_colors A character vector of colors for each test (must match length of tests)
 #' @param tests A character vector of names for the data sources (e.g., c('rna', 'protein', 'combined')) or NULL
@@ -29,23 +30,31 @@
 #' # Merge the results
 #' merge_results(
 #'   enriched_pathways, enriched_pathways_directional,
+#'   gmt_file = fname_GMT2,
 #'   output_prefix = "merged_",
 #'   col_colors = c("#FF0000", "#00FF00", "#FFFFF0"),
 #'   tests = c('rna', 'protein', 'combined')
 #' )
 #' }
-merge_results <- function(enriched_pathways, enriched_pathways_directional, output_prefix = "",
+merge_results <- function(enriched_pathways, enriched_pathways_directional, gmt_file, output_prefix = "",
                           col_colors = NULL,
                           tests = c(gsub("^Genes_", "", grep("^Genes_", colnames(enriched_pathways), value = TRUE)), 'combined'), 
                           impact_labels = c("shared", "lost", "gained")) {
+  # read the gmt file
+  gmt <- read.GMT(gmt_file)
+
   if (is.null(tests) || length(tests) == 0) {
     stop("Tests parameter must be provided (e.g., c('rna', 'protein', 'combined')) or NULL")
   }
   
-  # Check if all tests exist in both dataframes with "Genes_" prefix
-  if (!all(sapply(tests, function(test) paste0("Genes_", test) %in% colnames(enriched_pathways))) ||
-      !all(sapply(tests, function(test) paste0("Genes_", test) %in% colnames(enriched_pathways_directional)))) {
-    stop("All tests must exist as columns with 'Genes_' prefix in both enriched_pathways and enriched_pathways_directional")
+  # check if gmt is a valid GMT object
+  if (!is.GMT(gmt)) stop('gmt is not a valid GMT object')
+
+  # Check if all tests (except 'combined') exist in both dataframes with "Genes_" prefix
+  tests_to_check <- tests[tests != "combined"]
+  if (!all(sapply(tests_to_check, function(test) paste0("Genes_", test) %in% colnames(enriched_pathways))) ||
+      !all(sapply(tests_to_check, function(test) paste0("Genes_", test) %in% colnames(enriched_pathways_directional)))) {
+    stop("All tests (except 'combined') must exist as columns with 'Genes_' prefix in both enriched_pathways and enriched_pathways_directional")
   }
   
   if (is.null(col_colors)) {
@@ -72,7 +81,7 @@ pathways_txt <- stats::aggregate(x = adjusted_p_val ~ term_id + term_name,
 # Convert to data.frame since write.table works natively with data.frames
 pathways_txt <- as.data.frame(pathways_txt)
 utils::write.table(pathways_txt, 
-                   file = paste0(output_prefix, "_pathways.txt"), 
+                   file = paste0(output_prefix, "merged_pathways.txt"), 
                    row.names = FALSE, 
                    sep = "\t", 
                    quote = FALSE)
@@ -121,11 +130,16 @@ instruct_str <- paste('piechart:',
 col_significance[, "instruct" := instruct_str]
   
 utils::write.table(col_significance, 
-                   file = paste0(output_prefix, "_subgroups.txt"), 
+                   file = paste0(output_prefix, "merged_subgroups.txt"), 
                    row.names = FALSE, 
                    sep = "\t", 
                    quote = FALSE)
-  
+
+# Filter to include only the specified term IDs
+filtered_gmt <- gmt[term_ids]
+
+write.GMT(filtered_gmt, paste0(output_prefix, "merged_pathways.gmt"))
+
   return(pathways_txt)
 }
 
@@ -136,7 +150,6 @@ utils::write.table(col_significance,
 #'
 #' @param gmt_file Path to the GMT file
 #' @param term_ids Character vector of term IDs to include
-#' @param output_file Path to write the filtered GMT file
 #'
 #' @return A GMT object containing only the specified terms
 #' @export
@@ -146,6 +159,7 @@ utils::write.table(col_significance,
 #' # Get term IDs from merged results
 #' merged_results <- merge_results(
 #'   enriched_pathways, enriched_pathways_directional,
+#'   gmt_file = fname_GMT2,
 #'   output_prefix = "merged_",
 #'   tests = c('rna', 'protein', 'combined'),
 #'   col_colors = c("#FF0000", "#00FF00", "#FFFFF0")
@@ -154,19 +168,15 @@ utils::write.table(col_significance,
 #' # Merge and filter GMT file
 #' merge_gmt(
 #'   gmt_file = fname_GMT2,
-#'   term_ids = merged_results$term_ids,
-#'   output_file = "merged_pathways.gmt"
+#'   term_ids = merged_results$term_ids
 #' )
 #' }
-merge_gmt <- function(gmt_file, term_ids, output_file = "merged_pathways.gmt") {
+merge_gmt <- function(gmt_file, term_ids) {
   # Read the GMT file
   gmt_main <- read.GMT(gmt_file)
   
   # Filter to include only the specified term IDs
   gmt_filtered <- gmt_main[term_ids]
-  
-  # Write the filtered GMT file
-  write.GMT(gmt_filtered, output_file)
   
   return(gmt_filtered)
 }

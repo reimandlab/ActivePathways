@@ -315,22 +315,16 @@ To visualize differences in biological pathways between ActivePathways analyses 
 # Merge the results from both analyses
 merged_results <- merge_results(
   enriched_pathways, enriched_pathways_directional,
+  gmt_file = fname_GMT2,
   output_prefix = "Aggregated_",
   col_colors = c("#FF0000", "#00FF00", "#FFFFF0")
-)
-
-# Create a filtered GMT file containing only the significant pathways
-merged_gmt <- merge_gmt(
-  gmt_file = fname_GMT2,
-  term_ids = merged_results$term_ids,
-  output_file = "Aggregated_pathways.gmt"
 )
 ```
 
 This creates three files needed for Cytoscape visualization:
-1. `Aggregated_pathways.txt` - Combined significant pathways with p-values
-2. `Aggregated_subgroups.txt` - Information about which datasets support each pathway and directional impact
-3. `Aggregated_pathways.gmt` - A filtered GMT file containing only the significant pathways
+1. `Aggregated_merged_pathways.txt` - Combined significant pathways with p-values
+2. `Aggregated_merged_subgroups.txt` - Information about which datasets support each pathway and directional impact
+3. `Aggregated_merged_pathways.gmt` - A filtered GMT file containing only the significant pathways
 
 ### Examining pathways affected by directional analysis
 

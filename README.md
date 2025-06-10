@@ -533,15 +533,9 @@ ActivePathways provides functions to merge results from multiple analyses for vi
 # Merge results from standard and directional analyses
 merged_results <- merge_results(
   enriched_pathways, enriched_pathways_directional,
+  gmt_file = fname_GMT2,
   output_prefix = "Aggregated_",
   col_colors = c("#FF0000", "#00FF00", "#FFFFF0")
-)
-
-# Create a filtered GMT file with only significant pathways
-merged_gmt <- merge_gmt(
-  gmt_file = fname_GMT2,
-  term_ids = merged_results$term_ids,
-  output_file = "Aggregated_pathways.gmt"
 )
 ```
 

@@ -8,7 +8,7 @@
 #' @param enriched_pathways_directional A data.table returned by ActivePathways
 #' @param output_prefix A string prefix for output files
 #' @param col_colors A character vector of colors for each test (must match length of tests)
-#' @param tests A character vector of names for the data sources (e.g., c('rna', 'protein', 'combined'))
+#' @param tests A character vector of names for the data sources (e.g., c('rna', 'protein', 'combined')) or NULL
 #' @param impact_labels A character vector of labels for directional impact categories
 #'
 #' @return A list containing the merged results
@@ -36,10 +36,10 @@
 #' }
 merge_results <- function(enriched_pathways, enriched_pathways_directional, output_prefix = "",
                           col_colors = NULL,
-                          tests = gsub("^Genes_", "", grep("^Genes_", colnames(enriched_pathways), value = TRUE)), 
+                          tests = c(gsub("^Genes_", "", grep("^Genes_", colnames(enriched_pathways), value = TRUE)), 'combined'), 
                           impact_labels = c("shared", "lost", "gained")) {
-  if (is.null(tests)) {
-    stop("Tests parameter must be provided (e.g., c('rna', 'protein', 'combined'))")
+  if (is.null(tests) || length(tests) == 0) {
+    stop("Tests parameter must be provided (e.g., c('rna', 'protein', 'combined')) or NULL")
   }
   
   # Check if all tests exist in both dataframes with "Genes_" prefix

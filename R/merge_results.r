@@ -10,7 +10,6 @@
 #' @param output_prefix A string prefix for output files
 #' @param col_colors A character vector of colors for each test (must match length of tests)
 #' @param tests A character vector of names for the data sources (e.g., c('rna', 'protein', 'combined')) or NULL
-#' @param impact_labels A character vector of labels for directional impact categories
 #'
 #' @return A list containing the merged results
 #' @import data.table
@@ -31,15 +30,15 @@
 #' merge_results(
 #'   enriched_pathways, enriched_pathways_directional,
 #'   gmt_file = fname_GMT2,
-#'   output_prefix = "merged_",
+#'   output_prefix = "Aggregated",
 #'   col_colors = c("#FF0000", "#00FF00", "#FFFFF0"),
 #'   tests = c('rna', 'protein', 'combined')
 #' )
 #' }
-merge_results <- function(enriched_pathways, enriched_pathways_directional, gmt_file, output_prefix = "",
+merge_results <- function(enriched_pathways, enriched_pathways_directional, gmt_file, output_prefix = "Aggregated",
                           col_colors = NULL,
-                          tests = c(gsub("^Genes_", "", grep("^Genes_", colnames(enriched_pathways), value = TRUE)), 'combined'), 
-                          impact_labels = c("shared", "lost", "gained")) {
+                          tests = c(gsub("^Genes_", "", grep("^Genes_", colnames(enriched_pathways), value = TRUE)), 'combined') 
+                         ) {
   # read the gmt file
   gmt <- read.GMT(gmt_file)
 
@@ -81,7 +80,7 @@ pathways_txt <- stats::aggregate(x = adjusted_p_val ~ term_id + term_name,
 # Convert to data.frame since write.table works natively with data.frames
 pathways_txt <- as.data.frame(pathways_txt)
 utils::write.table(pathways_txt, 
-                   file = paste0(output_prefix, "merged_pathways.txt"), 
+                   file = paste0(output_prefix, "_pathways.txt"), 
                    row.names = FALSE, 
                    sep = "\t", 
                    quote = FALSE)
@@ -130,7 +129,7 @@ instruct_str <- paste('piechart:',
 col_significance[, "instruct" := instruct_str]
   
 utils::write.table(col_significance, 
-                   file = paste0(output_prefix, "merged_subgroups.txt"), 
+                   file = paste0(output_prefix, "_subgroups.txt"), 
                    row.names = FALSE, 
                    sep = "\t", 
                    quote = FALSE)
@@ -138,7 +137,7 @@ utils::write.table(col_significance,
 # Filter to include only the specified term IDs
 filtered_gmt <- gmt[term_ids]
 
-write.GMT(filtered_gmt, paste0(output_prefix, "merged_pathways.gmt"))
+write.GMT(filtered_gmt, paste0(output_prefix, "_pathways.gmt"))
 
   return(pathways_txt)
 }
@@ -160,7 +159,7 @@ write.GMT(filtered_gmt, paste0(output_prefix, "merged_pathways.gmt"))
 #' merged_results <- merge_results(
 #'   enriched_pathways, enriched_pathways_directional,
 #'   gmt_file = fname_GMT2,
-#'   output_prefix = "merged_",
+#'   output_prefix = "Aggregated",
 #'   tests = c('rna', 'protein', 'combined'),
 #'   col_colors = c("#FF0000", "#00FF00", "#FFFFF0")
 #' )

@@ -534,7 +534,7 @@ ActivePathways provides functions to merge results from multiple analyses for vi
 merged_results <- merge_results(
   enriched_pathways, enriched_pathways_directional,
   gmt_file = fname_GMT2,
-  output_prefix = "Aggregated_",
+  output_prefix = "Aggregated",
   col_colors = c("#FF0000", "#00FF00", "#FFFFF0")
 )
 ```
@@ -544,7 +544,7 @@ This creates files for Cytoscape visualization that show both analyses in a sing
 - Lost when using directional analysis
 - Gained when using directional analysis
 
-Follow the same steps for creating an enrichment map in Cytoscape, but use the "combined_" files instead.
+Follow the same steps for creating an enrichment map in Cytoscape, but use the "Aggregated_" files instead.
 
 To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualising-directional-impact-with-node-borders).
 

@@ -299,8 +299,6 @@ enriched_pathways <- ActivePathways(
 
 # Perform directional integration and pathway enrichment analysis
 constraints_vector <- c(1,1)
-constraints_vector
-dir_matrix[example_genes,]
 
 enriched_pathways_directional <- ActivePathways(
         pval_matrix, gmt = fname_GMT2, cytoscape_file_tag = "Directional_", merge_method = "DPM",
@@ -316,15 +314,15 @@ To visualize differences in biological pathways between ActivePathways analyses 
 merged_results <- merge_results(
   enriched_pathways, enriched_pathways_directional,
   gmt_file = fname_GMT2,
-  output_prefix = "Aggregated_",
+  output_prefix = "Aggregated",
   col_colors = c("#FF0000", "#00FF00", "#FFFFF0")
 )
 ```
 
 This creates three files needed for Cytoscape visualization:
-1. `Aggregated_merged_pathways.txt` - Combined significant pathways with p-values
-2. `Aggregated_merged_subgroups.txt` - Information about which datasets support each pathway and directional impact
-3. `Aggregated_merged_pathways.gmt` - A filtered GMT file containing only the significant pathways
+1. `Aggregated_pathways.txt` - Combined significant pathways with p-values
+2. `Aggregated_subgroups.txt` - Information about which datasets support each pathway and directional impact
+3. `Aggregated_pathways.gmt` - A filtered GMT file containing only the significant pathways
 
 ### Examining pathways affected by directional analysis
 

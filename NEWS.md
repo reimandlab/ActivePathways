@@ -1,5 +1,8 @@
+### ActivePathways 2.0.6
+* Added a merge_results() and merge_gmt() function to aggregate results between ActivePathways analyses with and without a directional penalty for visualization in Cytoscape.
+
 ### ActivePathways 2.0.5
-* Fixed a minor bug when exporting results from the ActivePathways() output as a data.table into a csv file. Thre bug occurred when all results unfiltered by statistical significance values were exported, resulting in NULL values in gene overlap columns of resulting tables. These NULL entries are now first converted to an empty string inside the export_as_CSV() function.
+* Fixed a minor bug when exporting results from the ActivePathways() output as a data.table into a csv file. The bug occurred when all results unfiltered by statistical significance values were exported, resulting in NULL values in gene overlap columns of resulting tables. These NULL entries are now first converted to an empty string inside the export_as_CSV() function.
 
 ### ActivePathways 2.0.4
 * Minor update to ensure the 'scores' and 'scores_direction' matrices have the same number of rows, and that the gene row names in 'scores' are in the same order as 'scores_direction'. The method now reports an error and terminates if two matrices are misaligned.

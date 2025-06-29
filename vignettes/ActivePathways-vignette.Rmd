@@ -283,7 +283,58 @@ pathway_gene_directions[directional_conflict_genes,]
 length(directional_conflict_genes)
 ```
 
+## Comparing standard and directional pathway analysis
+
 To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualizing-directional-impact-with-node-borders).
+
+To explore how changes on the individual gene level impact biological pathways, we can compare results before and after incorporating a directional penalty.
+
+```{r}
+fname_GMT2 <- system.file("extdata", "hsapiens_REAC_subset2.gmt", 
+        package = "ActivePathways")
+
+# Perform integrative pathway enrichment analysis with no directionality
+enriched_pathways <- ActivePathways(
+        pval_matrix, gmt = fname_GMT2, cytoscape_file_tag = "Original_")
+
+# Perform directional integration and pathway enrichment analysis
+constraints_vector <- c(1,1)
+
+enriched_pathways_directional <- ActivePathways(
+        pval_matrix, gmt = fname_GMT2, cytoscape_file_tag = "Directional_", merge_method = "DPM",
+        scores_direction = dir_matrix, constraints_vector = constraints_vector)
+```
+
+### Merging results for visualization in Cytoscape
+
+To visualize differences in biological pathways between ActivePathways analyses with or without a directional penalty, we can combine both outputs into a single enrichment map. The `merge_results` and `merge_gmt` functions make this process straightforward:
+
+```{r}
+# Merge the results from both analyses
+merged_results <- merge_results(
+  enriched_pathways, enriched_pathways_directional,
+  gmt_file = fname_GMT2,
+  output_prefix = "Aggregated",
+  col_colors = c("#FF0000", "#00FF00", "#FFFFF0")
+)
+```
+
+This creates three files needed for Cytoscape visualization:
+1. `Aggregated_pathways.txt` - Combined significant pathways with p-values
+2. `Aggregated_subgroups.txt` - Information about which datasets support each pathway and directional impact
+3. `Aggregated_pathways.gmt` - A filtered GMT file containing only the significant pathways
+
+### Examining pathways affected by directional analysis
+
+Let's examine the pathways that are lost when directional information is incorporated in the data integration:
+
+```{r}
+pathways_lost_in_directional_integration = 
+        setdiff(enriched_pathways$term_id, enriched_pathways_directional$term_id)
+pathways_lost_in_directional_integration
+
+enriched_pathways[enriched_pathways$term_id %in% pathways_lost_in_directional_integration,]
+```
 
 ## Significance threshold and returning all results
 

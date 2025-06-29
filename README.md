@@ -505,6 +505,47 @@ length(directional_conflict_genes)
 
 
 ```
+
+ActivePathways 2.0 allows you to incorporate directional information in your pathway analysis. You can compare results with and without directional penalties to gain deeper insights into your data.
+
+```R 
+# Run standard pathway analysis
+enriched_pathways <- ActivePathways(
+  pval_matrix, gmt = fname_GMT2)
+
+# Run directional pathway analysis
+enriched_pathways_directional <- ActivePathways(
+  pval_matrix, gmt = fname_GMT2,
+  merge_method = "DPM", 
+  scores_direction = dir_matrix, 
+  constraints_vector = constraints_vector)
+
+# Examine pathways lost due to directional conflicts
+pathways_lost <- setdiff(enriched_pathways$term_id, enriched_pathways_directional$term_id)
+enriched_pathways[enriched_pathways$term_id %in% pathways_lost,]
+```
+
+## Merging results for visualization in Cytoscape
+
+ActivePathways provides functions to merge results from multiple analyses for visualization in Cytoscape:
+
+```R
+# Merge results from standard and directional analyses
+merged_results <- merge_results(
+  enriched_pathways, enriched_pathways_directional,
+  gmt_file = fname_GMT2,
+  output_prefix = "Aggregated",
+  col_colors = c("#FF0000", "#00FF00", "#FFFFF0")
+)
+```
+
+This creates files for Cytoscape visualization that show both analyses in a single enrichment map, with node borders indicating which pathways were:
+- Shared between both analyses
+- Lost when using directional analysis
+- Gained when using directional analysis
+
+Follow the same steps for creating an enrichment map in Cytoscape, but use the "Aggregated_" files instead.
+
 To visualise differences in biological pathways between ActivePathways analyses with or without a directional penalty, we combine both outputs into a single enrichment map for [plotting](#visualising-directional-impact-with-node-borders).
 
 More thorough documentation of the ActivePathways function can be found in R with `?ActivePathways`, and complete tutorials can be found with `browseVignettes(package='ActivePathways')`.
@@ -623,4 +664,5 @@ To change the color of the *combined* contribution, a color must be provided to 
 
 * Integrative Pathway Enrichment Analysis of Multivariate Omics Data. Paczkowska M^, Barenboim J^, Sintupisut N, Fox NS, Zhu H, Abd-Rabbo D, Mee MW, Boutros PC, PCAWG Drivers and Functional Interpretation Working Group; Reimand J, PCAWG Consortium. Nature Communications (2020) (^ - co-first authors) <https://pubmed.ncbi.nlm.nih.gov/32024846/> <https://doi.org/10.1038/s41467-019-13983-9>.
 
-* Pathway Enrichment Analysis and Visualization of Omics Data Using g:Profiler, GSEA, Cytoscape and EnrichmentMap. Reimand J^, Isserlin R^, Voisin V, Kucera M, Tannus-Lopes C, Rostamianfar A, Wadi L, Meyer M, Wong J, Xu C, Merico D, Bader GD. Nature Protocols (2019) (^ - co-first authors)<https://pubmed.ncbi.nlm.nih.gov/30664679/> <https://doi.org/10.1038/s41596-018-0103-9>.
+* Pathway Enrichment Analysis and Visualization of Omics Data Using g:Profiler, GSEA, Cytoscape and EnrichmentMap. Reimand J^, Isserlin R^, Voisin V, Kucera M, Tannus-Lopes C, Rostamianfar A, Wadi L, Meyer M, Wong J, Xu C, Merico D, Bader GD. Nature Protocols (2019) (^ - co-first authors)
+<https://pubmed.ncbi.nlm.nih.gov/30664679/> <https://doi.org/10.1038/s41596-018-0103-9>.

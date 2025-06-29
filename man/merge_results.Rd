@@ -8,11 +8,10 @@ merge_results(
   enriched_pathways,
   enriched_pathways_directional,
   gmt_file,
-  output_prefix = "",
+  output_prefix = "Aggregated",
   col_colors = NULL,
   tests = c(gsub("^Genes_", "", grep("^Genes_", colnames(enriched_pathways), value =
-    TRUE)), "combined"),
-  impact_labels = c("shared", "lost", "gained")
+    TRUE)), "combined")
 )
 }
 \arguments{
@@ -27,8 +26,6 @@ merge_results(
 \item{col_colors}{A character vector of colors for each test (must match length of tests)}
 
 \item{tests}{A character vector of names for the data sources (e.g., c('rna', 'protein', 'combined')) or NULL}
-
-\item{impact_labels}{A character vector of labels for directional impact categories}
 }
 \value{
 A list containing the merged results
@@ -53,7 +50,7 @@ enriched_pathways_directional <- ActivePathways(
 merge_results(
   enriched_pathways, enriched_pathways_directional,
   gmt_file = fname_GMT2,
-  output_prefix = "merged_",
+  output_prefix = "Aggregated",
   col_colors = c("#FF0000", "#00FF00", "#FFFFF0"),
   tests = c('rna', 'protein', 'combined')
 )

@@ -24,7 +24,7 @@ It's useful for creating a filtered GMT file for visualization in Cytoscape.
 merged_results <- merge_results(
   enriched_pathways, enriched_pathways_directional,
   gmt_file = fname_GMT2,
-  output_prefix = "merged_",
+  output_prefix = "Aggregated",
   tests = c('rna', 'protein', 'combined'),
   col_colors = c("#FF0000", "#00FF00", "#FFFFF0")
 )

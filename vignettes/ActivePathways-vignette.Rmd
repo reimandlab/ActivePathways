@@ -44,7 +44,7 @@ A basic example of using ActivePathways is shown below.
 
 We will analyse cancer driver gene predictions for a collection of cancer genomes. Each dataset (i.e., column in the matrix) contains a statistical significance score (P-value) where genes with small P-values are considered stronger candidates of cancer drivers based on the distribution of mutations in the genes. For each gene (i.e., row in the matrix), we have several predictions representing genomic elements of the gene, such as coding sequences (CDS), untranslated regions (UTR), and core promoters (promCore).
 
-To analyse these driver genes using existing knowledge of gene function, we will use gene sets corresponding to known molecular pathways from the Reactome database. These gene sets are commonly distributed in text files in the GMT format [(Gene Matrix Transposed)](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29) file.
+To analyse these driver genes using existing knowledge of gene function, we will use gene sets corresponding to known molecular pathways from the Reactome database. These gene sets are commonly distributed in text files in the GMT format (Gene Matrix Transposed) file.
 
 Let's start by reading the data from the files embedded in the R package. For the p-value matrix, `ActivePathways` expects an object of the matrix class so the table has to be cast to the correct class after reading the file.
 
@@ -66,7 +66,7 @@ scores[is.na(scores)] <- 1
 
 The basic use of `ActivePathways` requires only two input parameters, the matrix of P-values with genes in rows and datasets in columns, as prepared above, and the path to the GMT file in the file system. Importantly, the gene IDs (symbols, accession numbers, etc) in the P-value matrix need to match those in the GMT file.
 
-Here we use a GMT file provided with the package. This GMT file is heavily filtered and outdated; thus users must provide their own GMT file when using the package. These GMT files can be acquired from multiple [sources](https://baderlab.org/GeneSets) such as Gene Ontology, Reactome and others. For better accuracy and statistical power these pathway databases should be combined. Acquiring an [up-to-date GMT file](http://download.baderlab.org/EM_Genesets/current_release/) is essential to avoid using unreliable outdated annotations [(see this paper)](https://www.nature.com/articles/nmeth.3963).
+Here we use a GMT file provided with the package. This GMT file is heavily filtered and outdated; thus users must provide their own GMT file when using the package. These GMT files can be acquired from multiple [sources](https://baderlab.org/GeneSets) such as Gene Ontology, Reactome and others. For better accuracy and statistical power these pathway databases should be combined. Acquiring an [up-to-date GMT file](https://download.baderlab.org/EM_Genesets/current_release/) is essential to avoid using unreliable outdated annotations [(see this paper)](https://www.nature.com/articles/nmeth.3963).
 
 ```{r}
 library(ActivePathways)
